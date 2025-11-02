@@ -59,8 +59,14 @@ const advancedSteps = [
 
 export const BulkOperationsWizard: React.FC<BulkOperationsWizardProps> = ({
   tenantId,
-  onClose
+  onClose,
+  onExecute,
+  onRollback,
+  showAdvancedFeatures = false
 }) => {
+  const maxStep = showAdvancedFeatures ? 6 : 5
+  const steps = showAdvancedFeatures ? advancedSteps : basicSteps
+
   const [state, setState] = useState<WizardState>({
     step: 1,
     selectedUserIds: [],
@@ -72,20 +78,22 @@ export const BulkOperationsWizard: React.FC<BulkOperationsWizardProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const goToStep = useCallback((step: 1 | 2 | 3 | 4 | 5) => {
-    setState(prev => ({ ...prev, step }))
-    setError(null)
-  }, [])
+  const goToStep = useCallback((step: number) => {
+    if (step >= 1 && step <= maxStep) {
+      setState(prev => ({ ...prev, step: step as any }))
+      setError(null)
+    }
+  }, [maxStep])
 
   const nextStep = useCallback(() => {
-    if (state.step < 5) {
-      goToStep((state.step + 1) as any)
+    if (state.step < maxStep) {
+      goToStep(state.step + 1)
     }
-  }, [state.step, goToStep])
+  }, [state.step, goToStep, maxStep])
 
   const prevStep = useCallback(() => {
     if (state.step > 1) {
-      goToStep((state.step - 1) as any)
+      goToStep(state.step - 1)
     }
   }, [state.step, goToStep])
 
