@@ -14,20 +14,7 @@ import type { Column } from '@/types/dashboard'
 import { useListState } from '@/hooks/admin/useListState'
 import { useListFilters } from '@/hooks/admin/useListFilters'
 import { useFilterUsers } from '../../hooks/useFilterUsers'
-
-interface ClientItem {
-  id: string
-  name: string
-  email: string
-  phone?: string
-  company?: string
-  tier?: 'INDIVIDUAL' | 'SMB' | 'ENTERPRISE'
-  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED'
-  totalBookings?: number
-  totalRevenue?: number
-  lastBooking?: string
-  createdAt: string
-}
+import type { ClientItem } from '../../types/entities'
 
 type EntitiesSubTab = 'clients' | 'team'
 
