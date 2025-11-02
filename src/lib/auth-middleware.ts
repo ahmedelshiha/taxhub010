@@ -119,7 +119,7 @@ export function withPermissionAuth(
       // Get session
       const session = await getServerSession(authOptions)
 
-      if (!session?.user?.email) {
+      if (!session?.user?.id) {
         return NextResponse.json(
           { error: 'Unauthorized: No session found' },
           { status: 401 }
@@ -128,7 +128,7 @@ export function withPermissionAuth(
 
       // Get user from database with permissions
       const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
+        where: { id: session.user.id },
         select: {
           id: true,
           tenantId: true,
