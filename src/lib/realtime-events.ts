@@ -96,6 +96,10 @@ export type AdminRealtimeEventMessage =
   | { type: 'booking-updated' | 'booking-created' | 'booking-deleted'; data: BookingEventPayload; timestamp: string; userId?: string }
   | { type: 'system_alert'; data: SystemAlertPayload; timestamp: string; userId?: string }
   | { type: 'heartbeat' | 'ready'; data: HeartbeatPayload | Record<string, never>; timestamp: string; userId?: string }
+  | { type: 'user-created' | 'user-updated' | 'user-deleted'; data: UserEventPayload; timestamp: string; userId?: string }
+  | { type: 'role-updated'; data: RoleEventPayload; timestamp: string; userId?: string }
+  | { type: 'permission-changed'; data: PermissionEventPayload; timestamp: string; userId?: string }
+  | { type: 'user-management-settings-updated'; data: UserManagementSettingsPayload; timestamp: string; userId?: string }
 
 // Type guard helper
 export function isAdminRealtimeEventMessage(input: any): input is AdminRealtimeEventMessage {
