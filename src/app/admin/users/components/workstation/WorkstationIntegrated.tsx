@@ -169,24 +169,16 @@ export function WorkstationIntegrated({
     await workstationContext.refreshQuickStats()
   }, [onRefresh, workstationContext])
 
-  // Memoized sidebar content
-  const sidebarContent = (
-    <div className="workstation-sidebar-content">
-      <Suspense fallback={<div className="p-4">Loading filters...</div>}>
-        <AdvancedUserFilters
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-          onApplySavedView={handleApplySavedView}
-          savedViews={[
-            { name: 'All Users', role: undefined },
-            { name: 'Clients', role: 'CLIENT' },
-            { name: 'Team', role: 'TEAM_MEMBER' },
-            { name: 'Admins', role: 'ADMIN' },
-          ]}
-        />
-      </Suspense>
-    </div>
-  )
+  // Sidebar props for WorkstationSidebar
+  const sidebarProps = {
+    isOpen: workstationContext.sidebarOpen,
+    onClose: () => workstationContext.setSidebarOpen(false),
+    filters,
+    onFiltersChange: handleFiltersChange,
+    stats,
+    onAddUser,
+    onReset: () => handleFiltersChange({}),
+  }
 
   // Memoized main content
   const mainContent = (
