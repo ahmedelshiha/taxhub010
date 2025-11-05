@@ -167,7 +167,7 @@ export function WorkstationIntegrated({
     onFiltersChange: handleFiltersChange,
     stats,
     onAddUser,
-    onReset: () => handleFiltersChange({}),
+    onReset: () => handleFiltersChange({} as any),
   }
 
   // Memoized main content
@@ -203,11 +203,10 @@ export function WorkstationIntegrated({
             <UsersTable
               users={users}
               isLoading={isLoading}
+              onViewProfile={(u) => handleSelectUser(u)}
               selectedUserIds={workstationContext.selectedUserIds}
               onSelectUser={handleSelectUser}
-              onToggleUserSelection={handleToggleUserSelection}
-              onSelectAllUsers={handleSelectAllUsers}
-              onClearSelection={handleClearSelection}
+              onSelectAll={handleSelectAll}
             />
           )}
         </div>
