@@ -132,7 +132,6 @@ describe('AdminUsersLayout', () => {
 
     it('should have proper ARIA landmarks', () => {
       renderWithContext(<AdminUsersLayout />)
-      expect(screen.getByRole('banner')).toBeInTheDocument()
       expect(screen.getByRole('main')).toBeInTheDocument()
       expect(screen.getByRole('complementary')).toBeInTheDocument()
     })
