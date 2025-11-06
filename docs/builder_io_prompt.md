@@ -115,6 +115,8 @@ The following documentation has been created to finalize the project. You MUST r
 
 | Phase | Document | Summary |
 | :--- | :--- | :--- |
+| **Master Index** | `docs/DOCUMENTATION_INDEX.md` | **Central navigation hub** for ALL project documentation. Links to all phase docs, contact matrix, deployment checklist, and quick-start guides. Start here for easy navigation. |
+| **Project Status** | `docs/ADMIN_WORKBENCH_PROJECT_STATUS.md` | **Complete project status report** with verification results, file inventory (27+ files verified), pre-deployment checklist, and 5-week rollout timeline. Production-ready summary. |
 | **Phase 6: Builder.io Integration** | `docs/BUILDER_IO_INTEGRATION_GUIDE.md` | Complete setup, architecture, and workflow guide for the Builder.io CMS integration, including API configuration and fallback logic. |
 | | `docs/BUILDER_IO_SETUP_MODELS.md` | Step-by-step instructions for creating the required Builder.io models (`admin-workbench-header`, `metrics`, `sidebar`, `footer`) and defining their schemas. |
 | | `docs/BUILDER_IO_TESTING_PLAN.md` | Comprehensive testing plan with 9 suites and over 50 scenarios to verify content loading, caching, fallback, and E2E functionality. |
