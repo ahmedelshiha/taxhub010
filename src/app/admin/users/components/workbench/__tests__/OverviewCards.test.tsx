@@ -4,11 +4,18 @@ import { vi, describe, it, beforeEach, expect } from 'vitest'
 import OverviewCards from '../OverviewCards'
 
 // Mock the useUsersContext hook
-const mockUseUsersContext = vi.fn()
+let mockUseUsersContext: ReturnType<typeof vi.fn>
 
-vi.mock('../../../contexts/UsersContextProvider', () => ({
-  useUsersContext: mockUseUsersContext
-}))
+vi.mock('../../../contexts/UsersContextProvider', () => {
+  mockUseUsersContext = vi.fn(() => ({
+    users: [],
+    isLoading: false,
+    error: null
+  }))
+  return {
+    useUsersContext: mockUseUsersContext
+  }
+})
 
 // Mock the OperationsOverviewCards component
 vi.mock('../OperationsOverviewCards', () => ({
