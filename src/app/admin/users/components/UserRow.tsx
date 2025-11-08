@@ -17,6 +17,9 @@ interface UserRowProps {
   onSelect?: (userId: string, selected: boolean) => void
   onViewProfile?: (user: UserItem) => void
   onEditInline?: (userId: string, field: string, value: any) => void
+  onDeleteUser?: (userId: string) => Promise<void>
+  onResetPassword?: (email: string) => Promise<void>
+  onRoleChange?: (userId: string, role: UserItem['role']) => Promise<void>
 }
 
 /**
