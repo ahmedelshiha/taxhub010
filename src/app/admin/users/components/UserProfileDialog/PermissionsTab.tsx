@@ -159,113 +159,203 @@ export const PermissionsTab = memo(function PermissionsTab({ user }: Permissions
   }, [user, selectedRole, selectedPermissions, setSelectedUser])
 
   return (
-    <div className="max-w-2xl space-y-8">
-      {/* Role Section */}
-      <section>
-        <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-200">
-          <Shield className="w-5 h-5 text-blue-600" />
-          <h3 className="text-base font-semibold text-slate-900">Role Assignment</h3>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
-          <div>
-            <label htmlFor="role-select" className="text-sm font-semibold text-slate-900 block mb-3">
-              Select Role
-            </label>
-            <Select value={selectedRole} onValueChange={handleRoleChange}>
-              <SelectTrigger id="role-select" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {availableRoles.map(role => (
-                  <SelectItem key={role} value={role}>
-                    {role}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-slate-600 mt-2">
-              Select a role to automatically assign standard permissions for that role
-            </p>
+    <div className="w-full space-y-4">
+      {/* Header with change indicator */}
+      {hasChanges && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-blue-600" />
+            <span className="text-sm font-medium text-blue-900">
+              {changeCount} permission{changeCount === 1 ? '' : 's'} will be changed
+            </span>
           </div>
-
-          <div>
-            <p className="text-sm font-semibold text-slate-900 mb-3">Current Role</p>
-            <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
-              {selectedRole}
-            </Badge>
-          </div>
+          <Button
+            onClick={handleReset}
+            disabled={isSaving}
+            variant="ghost"
+            size="sm"
+            className="text-blue-600 hover:text-blue-700"
+          >
+            Reset
+          </Button>
         </div>
-      </section>
+      )}
 
-      {/* Permissions Section */}
-      <section>
-        <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-200">
-          <Shield className="w-5 h-5 text-purple-600" />
-          <h3 className="text-base font-semibold text-slate-900">Manage Permissions</h3>
-        </div>
+      {/* Professional Tabs */}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 h-auto bg-slate-100">
+          <TabsTrigger value="role" className="relative">
+            Role Assignment
+            {selectedRole !== user.role && (
+              <Badge className="ml-2 h-5 rounded px-1 text-xs bg-orange-100 text-orange-800">
+                Changed
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="custom" className="relative">
+            Permissions
+            {changeCount > 0 && (
+              <Badge className="ml-2 h-5 rounded px-1 text-xs bg-blue-100 text-blue-800">
+                {changeCount}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="history" className="relative">
+            History
+            {changeHistory.length > 0 && (
+              <Badge className="ml-2 h-5 rounded px-1 text-xs bg-gray-100 text-gray-800">
+                {changeHistory.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
 
-        <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
-          {selectedPermissions.length > 0 && (
+        {/* Role Selection Tab */}
+        <TabsContent value="role" className="space-y-4 mt-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
             <div>
-              <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
-                Current Permissions ({selectedPermissions.length})
+              <label htmlFor="role-select" className="text-sm font-semibold text-slate-900 block mb-3">
+                Select Role <span className="text-red-600">*</span>
+              </label>
+              <Select value={selectedRole} onValueChange={handleRoleChange}>
+                <SelectTrigger id="role-select" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableRoles.map(role => (
+                    <SelectItem key={role} value={role}>
+                      {role}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-slate-600 mt-2">
+                Select a role to automatically assign standard permissions for that role
               </p>
-              <div className="flex flex-wrap gap-2 mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                {selectedPermissions.map(perm => (
-                  <Badge
-                    key={perm}
-                    className="bg-green-100 text-green-800 border border-green-200 font-normal cursor-pointer hover:bg-green-200"
-                    onClick={() => handlePermissionToggle(perm)}
-                    title={`Click to remove ${perm}`}
-                  >
-                    ✓ {perm}
+            </div>
+
+            <div className="pt-4 border-t border-slate-200">
+              <p className="text-sm font-semibold text-slate-900 mb-3">Current Role</p>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-blue-100 text-blue-800 border border-blue-200 text-base py-2">
+                  {selectedRole}
+                </Badge>
+                {selectedRole !== user.role && (
+                  <Badge variant="outline" className="text-amber-700 border-amber-200">
+                    Updated from {user.role}
                   </Badge>
-                ))}
+                )}
               </div>
             </div>
-          )}
+          </div>
+        </TabsContent>
 
-          <div>
-            <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
-              Available Permissions
-            </p>
-            <div className="space-y-2">
-              {availablePermissions.map(perm => {
-                const isSelected = selectedPermissions.includes(perm)
-                const metadata = PERMISSION_METADATA?.[perm]
-                
-                return (
-                  <label
-                    key={perm}
-                    className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                      isSelected
-                        ? 'bg-blue-50 border-blue-200'
-                        : 'bg-white border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handlePermissionToggle(perm)}
-                      className="mt-1 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900">{perm}</p>
-                      {metadata?.description && (
-                        <p className="text-xs text-slate-600 mt-1">{metadata.description}</p>
-                      )}
-                    </div>
-                  </label>
-                )
-              })}
+        {/* Permissions Tab */}
+        <TabsContent value="custom" className="space-y-4 mt-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Search permissions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            {availablePermissions.length === 0 && (
-              <p className="text-sm text-slate-600">No additional permissions available</p>
+
+            {/* Current Permissions */}
+            {selectedPermissions.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
+                  Assigned ({selectedPermissions.length})
+                </p>
+                <div className="flex flex-wrap gap-2 p-4 bg-green-50 rounded-lg border border-green-200">
+                  {selectedPermissions.map(perm => (
+                    <Badge
+                      key={perm}
+                      className="bg-green-100 text-green-800 border border-green-200 font-normal cursor-pointer hover:bg-green-200"
+                      onClick={() => handlePermissionToggle(perm)}
+                      title={`Click to remove ${perm}`}
+                    >
+                      ✓ {perm}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Available Permissions */}
+            <div>
+              <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
+                Available Permissions ({availablePermissions.length})
+              </p>
+              <div className="max-h-96 overflow-y-auto space-y-2">
+                {availablePermissions.map(perm => {
+                  const isSelected = selectedPermissions.includes(perm)
+                  const metadata = PERMISSION_METADATA?.[perm]
+
+                  return (
+                    <label
+                      key={perm}
+                      className={cn(
+                        'flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors',
+                        isSelected
+                          ? 'bg-blue-50 border-blue-200'
+                          : 'bg-white border-slate-200 hover:bg-slate-50'
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handlePermissionToggle(perm)}
+                        className="mt-1 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900">{perm}</p>
+                        {metadata?.description && (
+                          <p className="text-xs text-slate-600 mt-1">{metadata.description}</p>
+                        )}
+                      </div>
+                    </label>
+                  )
+                })}
+              </div>
+              {availablePermissions.length === 0 && (
+                <p className="text-sm text-slate-600 text-center py-4">No permissions match your search</p>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* History Tab */}
+        <TabsContent value="history" className="space-y-4 mt-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6">
+            {changeHistory.length > 0 ? (
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-4">
+                  Change History ({changeHistory.length})
+                </p>
+                {changeHistory.map((change, idx) => (
+                  <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="text-xs text-slate-600 mb-2">Change #{changeHistory.length - idx}</div>
+                    <div className="text-sm">
+                      <p className="font-medium text-slate-900">Role: <Badge className="ml-2">{change.role}</Badge></p>
+                      <p className="text-xs text-slate-600 mt-1">
+                        Permissions: {change.permissions.length} assigned
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-sm text-slate-600">No changes made yet</p>
+              </div>
             )}
           </div>
-        </div>
-      </section>
+        </TabsContent>
+      </Tabs>
 
       {/* Error State */}
       {error && (
@@ -279,38 +369,50 @@ export const PermissionsTab = memo(function PermissionsTab({ user }: Permissions
       )}
 
       {/* Action Buttons */}
-      {hasChanges && (
-        <section className="border-t border-slate-200 pt-6 flex items-center gap-3">
+      <div className="flex items-center gap-2 pt-4 border-t border-slate-200">
+        <Button
+          onClick={handleSave}
+          disabled={isSaving || !hasChanges}
+          className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4" />
+              Save Changes
+            </>
+          )}
+        </Button>
+
+        {changeHistory.length > 0 && (
           <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-          >
-            {isSaving ? (
-              <>
-                <span className="animate-spin">⏳</span>
-                Saving...
-              </>
-            ) : (
-              <>
-                <CheckCircle2 className="w-4 h-4" />
-                Save Changes
-              </>
-            )}
-          </Button>
-          <Button
-            onClick={handleReset}
+            onClick={handleUndo}
             disabled={isSaving}
             variant="outline"
             className="border-slate-300 text-slate-700 hover:bg-slate-50"
           >
-            Cancel
+            <RotateCcw className="w-4 h-4 mr-2 transform scale-x-[-1]" />
+            Undo
           </Button>
-        </section>
-      )}
+        )}
+
+        <Button
+          onClick={handleReset}
+          disabled={isSaving || !hasChanges}
+          variant="outline"
+          className="border-slate-300 text-slate-700 hover:bg-slate-50 ml-auto"
+        >
+          <RotateCcw className="w-4 h-4 mr-2" />
+          Reset
+        </Button>
+      </div>
 
       {!hasChanges && selectedPermissions.length > 0 && (
-        <section className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-green-900">No changes</p>
@@ -318,7 +420,7 @@ export const PermissionsTab = memo(function PermissionsTab({ user }: Permissions
               Current permissions are up to date
             </p>
           </div>
-        </section>
+        </div>
       )}
     </div>
   )
