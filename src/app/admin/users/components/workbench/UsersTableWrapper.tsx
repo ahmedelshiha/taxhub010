@@ -6,6 +6,9 @@ import { UsersTable } from '../UsersTable'
 import { UserItem } from '../../contexts/UsersContextProvider'
 import { UserProfileDialog } from '../UserProfileDialog'
 import DirectoryHeader from './DirectoryHeader'
+import { UserDirectoryFilterBar } from '../UserDirectoryFilterBar'
+import { UserDirectoryFilterBarEnhanced } from '../UserDirectoryFilterBarEnhanced'
+import { useFilterState } from '../../hooks/useFilterState'
 import { useUserActions } from '../../hooks/useUserActions'
 import { deleteUser as deleteUserApi } from './api/users'
 import { toast } from 'sonner'
@@ -31,37 +34,19 @@ export default function UsersTableWrapper({
 }: UsersTableWrapperProps) {
   const context = useUsersContext()
 
-  // Filter users based on provided filters
-  const filteredUsers = useMemo(() => {
-    let result = Array.isArray(context.users) ? [...context.users] : []
-
-    // Apply search filter
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase()
-      result = result.filter(
-        (u) =>
-          u.name?.toLowerCase().includes(searchLower) ||
-          u.email?.toLowerCase().includes(searchLower)
-      )
-    }
-
-    // Apply role filter
-    if (filters.role) {
-      result = result.filter((u) => u.role === filters.role)
-    }
-
-    // Apply status filter
-    if (filters.status) {
-      result = result.filter((u) => u.status === filters.status)
-    }
-
-    // Apply department filter if available
-    if (filters.department && 'department' in result[0]) {
-      result = result.filter((u) => (u as any).department === filters.department)
-    }
-
-    return result
-  }, [context.users, filters])
+  // Use filter state hook for centralized filter management
+  const {
+    filters: filterState,
+    updateFilter,
+    filteredUsers,
+    hasActiveFilters,
+    clearFilters,
+    stats,
+    toggleRole,
+    toggleStatus,
+    clearRoles,
+    clearStatuses
+  } = useFilterState(context.users)
 
   const handleSelectUser = useCallback(
     (userId: string, selected: boolean) => {
@@ -151,6 +136,42 @@ export default function UsersTableWrapper({
           onClearSelection={() => onSelectionChange?.(new Set())}
           onColumnSettings={() => console.log('Open column settings')}
           onSidebarToggle={() => console.log('Toggle sidebar')}
+        />
+
+        <UserDirectoryFilterBarEnhanced
+          filters={filterState}
+          onFiltersChange={(newFilters) => {
+            updateFilter('search', newFilters.search)
+            updateFilter('roles', newFilters.roles || [])
+            updateFilter('statuses', newFilters.statuses || [])
+          }}
+          onToggleRole={toggleRole}
+          onToggleStatus={toggleStatus}
+          onClearRoles={clearRoles}
+          onClearStatuses={clearStatuses}
+          selectedCount={selectedUserIds.size}
+          totalCount={stats.totalCount}
+          filteredCount={stats.filteredCount}
+          filteredUsers={filteredUsers}
+          allUsers={context.users}
+          selectedUserIds={selectedUserIds}
+          onSelectAll={handleSelectAll}
+          onClearFilters={clearFilters}
+          roleOptions={[
+            { value: 'ADMIN', label: 'Admin' },
+            { value: 'TEAM_LEAD', label: 'Team Lead' },
+            { value: 'TEAM_MEMBER', label: 'Team Member' },
+            { value: 'STAFF', label: 'Staff' },
+            { value: 'CLIENT', label: 'Client' },
+            { value: 'VIEWER', label: 'Viewer' }
+          ]}
+          statusOptions={[
+            { value: 'ACTIVE', label: 'Active' },
+            { value: 'INACTIVE', label: 'Inactive' },
+            { value: 'SUSPENDED', label: 'Suspended' }
+          ]}
+          multiSelect={true}
+          showExport={true}
         />
 
         <div className="flex-1 overflow-hidden min-h-0 w-full">
