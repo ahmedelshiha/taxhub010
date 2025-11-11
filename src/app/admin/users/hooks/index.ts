@@ -8,6 +8,7 @@ export { usePerformanceMonitoring, useRenderCount, useDebouncedEffect, useCompon
 export { useAuditLogs } from './useAuditLogs'
 export { useDashboardMetrics, useDashboardRecommendations, useDashboardAnalytics } from './useDashboardMetrics'
 export { useFilterUsers, type FilterOptions, type FilterConfig } from './useFilterUsers'
+export { useFilterState, type UseFilterStateConfig, type UseFilterStateReturn } from './useFilterState'
 export { useUnifiedUserService } from './useUnifiedUserService'
 export { useEntityForm, type FormMode, type ValidationRule, type FieldValidation, type EntityFormConfig } from './useEntityForm'
 export { useServerSideFiltering, type ServerFilterOptions, type ServerFilterResponse, type UseServerSideFilteringState } from './useServerSideFiltering'
