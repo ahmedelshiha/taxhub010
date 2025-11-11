@@ -130,7 +130,7 @@ export function useFilteredUsers(
       })
       throw error
     }
-  }, [enabled, useCache, filters, cacheTtl])
+  }, [useCache, filters, cacheTtl])
 
   // Use SWR for data fetching
   const { data, error, isLoading, mutate } = useSWR<FilteredUsersResponse>(
