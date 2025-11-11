@@ -100,6 +100,47 @@ Each phase includes objectives, key tasks, acceptance criteria, and dependencies
 - Acceptance
   - Create/edit/archive entities; invite users; permission matrix enforced.
 
+### Phase 1.1 — Business Account Setup Wizard (Modal)
+- Purpose
+  - Allow clients to create a business account from a focused modal, matching the reference UI: two tabs (Existing Entity Setup, New Entity Setup), country flag indicator, license-number driven verification, consent checkbox, prominent primary CTA, support partner label, and chat link.
+- UX Requirements
+  - Modal overlay with focus trap, ESC to close, and ARIA roles (dialog, aria-labelledby/aria-describedby). Keyboard-only and screen-reader friendly. Persist dark theme.
+  - Tabs: "Existing Entity Setup" (search/verify existing registrations and auto-link) and "New Entity Setup" (create new entity with license details).
+  - Fields (UAE default): License Number, Business Name, Economic Department/Free Zone (select), TRN (optional at creation), Legal Form (LLC, Sole Establishment, etc.), Incorporation Date, Attachments (trade license PDF/JPG, certificate). Terms consent checkbox with link to agreement. CTA text: "Set up Business".
+  - Helpers: country switcher (UAE/KSA/EGY), inline validation messages, empty-state copy on mismatch, support partner label, live chat link.
+- Regional Variants
+  - UAE: Validate DED/Free-zone license, TRN format (15 digits), ESR applicability flag, Corporate Tax applicability.
+  - KSA: CR Number, VAT Registration Number, optional Zakat flag; no e-invoice device at setup; city/region selector.
+  - Egypt: Tax ID (TIN), ETA profile number, activity code (GPC/industry), e-Invoicing obligation flag.
+- Validation & Integrations
+  - Real-time license lookup adapters (pluggable): UAE (DED + major free zones), KSA (MC / CR), Egypt (GAFI/ETA where permitted). Fallback to manual verification workflow.
+  - TRN/VAT/TIN checksum validation, name similarity (Levenshtein) with license record; duplicate-entity prevention and merge suggestion.
+  - File uploads scanned for malware; OCR to prefill Business Name and number.
+- Data Model Additions
+  - entity_licenses(id, entity_id, country, authority, license_number, legal_form, issued_at, expires_at, economic_zone_id, status, metadata).
+  - entity_registrations(id, entity_id, type[TRN/ZATCA/ETA/WHT/ZAKAT], value, verified_at, source, status).
+  - economic_zones(id, country, name, authority_code, city, metadata).
+  - consents(id, subject_type, subject_id, type[terms|privacy|service], version, accepted_by, accepted_at, ip, user_agent).
+  - verification_attempts(id, type[license|tax_id], value, country, status, result, attempted_by, attempted_at, correlation_id).
+- API Design
+  - POST /api/entities/setup (idempotent with Idempotency-Key header). Payload: country, tab, license_number, business_name, economic_zone_id, legal_form, registrations[], attachments[], consent_version.
+  - GET /api/registries/:country/license/:number → normalized license record; cache with TTL and ETag; rate limiting.
+  - POST /api/consents → record explicit consent with IP/UA; linked to entity/user.
+  - Emits audit events: entity.setup.requested, entity.setup.verified, entity.setup.completed, entity.setup.failed.
+- Security & Privacy
+  - RLS on all tables by tenant/entity; encrypted columns for IDs/certificates; redact PII in logs.
+  - Virus scan on uploads; content-type verification; size limits; signed URLs; temporary storage before verification.
+- Error States
+  - License not found, registry unavailable, duplicate entity, invalid consent; present fallback: “Continue with manual review” opening a case in Messaging.
+  - Show support partner block and Chat CTA on repeat failures.
+- Acceptance Criteria
+  - End-to-end setup succeeds for happy-path in UAE/KSA/EGY; duplicate protection; consent captured with timestamp/IP/UA; audit events present.
+  - Accessibility verified (tab order, labels, contrast); localized AR/EN content; RTL layout correct.
+- Telemetry
+  - Funnel metrics: view → submit → verified → completed; reason codes for drop-offs; time-to-completion; registry latency.
+- Testing
+  - Unit tests for validators; contract tests for adapters; E2E flows: existing vs new entity, duplicate, offline registry, manual review route.
+
 ### Phase 2 — Dashboard & Actionables (right panel)
 - Tasks
   - Action center with upcoming/overdue filings, renewals, and required evidence.
@@ -269,7 +310,7 @@ Each phase includes objectives, key tasks, acceptance criteria, and dependencies
 Use the platform’s MCP connectors to accelerate setup. You can connect integrations from the MCP popover.
 
 - Supabase — authentication and database primitives; real-time subscriptions.
-- Neon — serverless Postgres for data storage.
+- Neon �� serverless Postgres for data storage.
 - Netlify — hosting/CDN for static assets or marketing site.
 - Zapier — automate reminders, move docs across apps.
 - Figma — design-to-code; accelerate RTL/Arabic UI work.
