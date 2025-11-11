@@ -19,8 +19,13 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const whereClause: any = {}
+    if (context.tenantId) {
+      whereClause.tenantId = context.tenantId
+    }
+
     const schedules = await prisma.exportSchedule.findMany({
-      where: { tenantId: context.tenantId },
+      where: whereClause,
       include: { _count: { select: { executions: true } } },
       orderBy: { createdAt: 'desc' }
     })
