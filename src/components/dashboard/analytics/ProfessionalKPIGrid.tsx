@@ -188,7 +188,7 @@ export default function ProfessionalKPIGrid({ stats }: KPIStatsProps) {
                     </div>
                   )}
 
-                  <p className="text-sm text-gray-600">{kpi.subtitle}</p>
+                  <p className="text-xs text-gray-600">{kpi.subtitle}</p>
 
                   {hasAlerts && (
                     <div className="space-y-1">
