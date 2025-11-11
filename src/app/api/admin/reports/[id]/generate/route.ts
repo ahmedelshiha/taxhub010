@@ -5,6 +5,7 @@ import { tenantContext } from '@/lib/tenant-context'
 import { hasPermission } from '@/lib/permissions'
 import { rateLimitAsync } from '@/lib/rate-limit'
 import { generateReportHTML, applyFilters, calculateSummaryStats } from '@/app/admin/users/utils/report-builder'
+import { Report, ReportSection } from '@/app/admin/users/types/report-builder'
 
 export const POST = withTenantContext(async (request: NextRequest, { params }: { params: { id: string } }) => {
   try {
@@ -33,9 +34,9 @@ export const POST = withTenantContext(async (request: NextRequest, { params }: {
     }
 
     // Cast report to ensure sections are properly typed
-    const typedReport = {
+    const typedReport: Report = {
       ...report,
-      sections: Array.isArray(report.sections) ? report.sections : []
+      sections: (Array.isArray(report.sections) ? report.sections : []) as ReportSection[]
     }
 
     const execution = await prisma.reportExecution.create({
@@ -68,7 +69,7 @@ export const POST = withTenantContext(async (request: NextRequest, { params }: {
       }
 
       // Cast sections as array to avoid JsonValue type issues
-      const sections = Array.isArray(typedReport.sections) ? (typedReport.sections as any[]) : []
+      const sections = Array.isArray(typedReport.sections) ? (typedReport.sections as ReportSection[]) : []
       const reportData = {
         columns: sections[0]?.columns || [],
         rows: data,
