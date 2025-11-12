@@ -15,8 +15,10 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SwipeToConfirm } from "@/components/ui/SwipeToConfirm";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface ExistingBusinessTabProps {
   onError: (message: string) => void;
