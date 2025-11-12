@@ -369,7 +369,7 @@ export async function getJobStatus(entityId: string): Promise<{
 
     // Get TTL from Redis
     const key = `${JOB_STATE_PREFIX}${entityId}`;
-    const ttl = await redis.ttl(key);
+    const ttl = await (redis as any).ttl(key);
 
     return {
       state,
