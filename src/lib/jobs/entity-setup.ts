@@ -2,6 +2,7 @@ import { Redis } from "@upstash/redis";
 import prisma from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { countryRegistry } from "@/lib/registries/countries";
+import { Redis } from '@upstash/redis';
 
 export type VerificationJobStatus = 
   | "PENDING_VERIFICATION"
@@ -75,7 +76,7 @@ export async function initializeVerificationJob(
 
   try {
     const key = `${JOB_STATE_PREFIX}${entityId}`;
-    await redis.setex(key, VERIFICATION_TIMEOUT / 1000, JSON.stringify(state));
+    await redis.set(key, JSON.stringify(state), { ex: VERIFICATION_TIMEOUT / 1000 });
     
     // Publish event
     await publishEvent("job.initialized", state);
@@ -110,7 +111,7 @@ export async function updateVerificationState(
     };
 
     const key = `${JOB_STATE_PREFIX}${entityId}`;
-    await redis.setex(key, VERIFICATION_TIMEOUT / 1000, JSON.stringify(updated));
+    await redis.set(key, JSON.stringify(updated), { ex: VERIFICATION_TIMEOUT / 1000 });
     
     // Publish update event
     await publishEvent("job.updated", updated);
@@ -314,7 +315,7 @@ export async function publishEvent(
       ...payload,
     });
     
-    await redis.publish(JOB_CHANNEL, event);
+    await (redis as any).publish(JOB_CHANNEL, event);
   } catch (error) {
     logger.error("Failed to publish verification event", { eventType, error });
   }
@@ -325,7 +326,7 @@ export async function publishEvent(
  */
 export async function enqueueVerificationJob(entityId: string): Promise<void> {
   try {
-    await redis.rpush(JOB_QUEUE, JSON.stringify({ entityId }));
+    await (redis as any).rpush(JOB_QUEUE, JSON.stringify({ entityId }));
     logger.info("Verification job enqueued", { entityId });
   } catch (error) {
     logger.error("Failed to enqueue verification job", { entityId, error });
@@ -338,7 +339,7 @@ export async function enqueueVerificationJob(entityId: string): Promise<void> {
  */
 export async function processNextVerificationJob(): Promise<VerificationJobState | null> {
   try {
-    const job = await redis.lpop(JOB_QUEUE);
+    const job = await (redis as any).lpop(JOB_QUEUE);
     if (!job) return null;
 
     const { entityId } = JSON.parse(job as string);
@@ -368,7 +369,7 @@ export async function getJobStatus(entityId: string): Promise<{
 
     // Get TTL from Redis
     const key = `${JOB_STATE_PREFIX}${entityId}`;
-    const ttl = await redis.ttl(key);
+    const ttl = await (redis as any).ttl(key);
 
     return {
       state,

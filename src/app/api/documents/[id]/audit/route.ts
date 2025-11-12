@@ -93,7 +93,7 @@ export const GET = withTenantContext(
         return NextResponse.json(
           {
             error: 'Invalid query parameters',
-            details: error.errors,
+            details: error.issues,
           },
           { status: 400 }
         )

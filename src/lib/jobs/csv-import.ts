@@ -1,14 +1,9 @@
 import prisma from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { countryRegistry } from "@/lib/registries/countries";
+import { logAuditSafe } from "@/lib/observability-helpers";
+import prisma from '@/lib/prisma'
 
-// Upstash Redis mock for build - will use REST API at runtime
-const redis = {
-  get: async (key: string) => null,
-  set: async (key: string, value: any, options?: any) => 'OK',
-  del: async (key: string) => 1,
-  expire: async (key: string, seconds: number) => 1,
-};
 import type { EntityRow } from "@/lib/csv/entity-importer";
 
 export type CsvImportJobStatus = 
@@ -104,10 +99,10 @@ export async function initializeImportJob(
 
   try {
     const key = `${JOB_STATE_PREFIX}${jobId}`;
-    await redis.setex(key, IMPORT_TIMEOUT / 1000, JSON.stringify(state));
+    await redis.set(key, JSON.stringify(state), { ex: IMPORT_TIMEOUT / 1000 });
     
     // Enqueue job for processing
-    await redis.lpush(JOB_QUEUE, JSON.stringify({
+    await (redis as any).lpush(JOB_QUEUE, JSON.stringify({
       jobId,
       tenantId,
       userId,
@@ -115,7 +110,7 @@ export async function initializeImportJob(
     }));
 
     // Publish event
-    await redis.publish(JOB_CHANNEL, JSON.stringify({
+    await (redis as any).publish(JOB_CHANNEL, JSON.stringify({
       type: "job.initialized",
       jobId,
       status: "PENDING",
@@ -142,10 +137,10 @@ async function updateImportJobState(
 
     const updated = { ...state, ...updates };
     const key = `${JOB_STATE_PREFIX}${jobId}`;
-    await redis.setex(key, IMPORT_TIMEOUT / 1000, JSON.stringify(updated));
+    await redis.set(key, JSON.stringify(updated), { ex: IMPORT_TIMEOUT / 1000 });
 
     // Publish update event
-    await redis.publish(JOB_CHANNEL, JSON.stringify({
+    await (redis as any).publish(JOB_CHANNEL, JSON.stringify({
       type: "job.updated",
       jobId,
       status: updated.status,
@@ -307,17 +302,17 @@ export async function processNextImportJob(): Promise<boolean> {
     });
 
     // Log import completion
-    await logger.audit({
+    await logAuditSafe({
       action: "entities.csv_import_completed",
-      actorId: job.userId,
-      targetId: job.tenantId,
       details: {
+        actorId: job.userId,
+        targetId: job.tenantId,
         jobId: job.jobId,
         totalRows: job.data.length,
         successCount,
         failureCount: errors.length,
       },
-    });
+    }).catch(() => {});
 
     logger.info("CSV import job completed", {
       jobId: job.jobId,

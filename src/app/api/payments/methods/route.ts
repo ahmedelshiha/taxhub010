@@ -181,7 +181,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       return NextResponse.json(
         {
           error: 'Invalid request body',
-          details: error.errors,
+          details: error.issues,
         },
         { status: 400 }
       )

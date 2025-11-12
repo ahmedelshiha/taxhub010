@@ -111,8 +111,8 @@ export const GET = withTenantContext(async (
 
     const formatted = transactions.map((txn) => ({
       ...txn,
-      amount: parseFloat(txn.amount),
-      balance: txn.balance ? parseFloat(txn.balance) : null,
+      amount: Number(txn.amount),
+      balance: txn.balance ? Number(txn.balance) : null,
     }))
 
     await logAuditSafe({
@@ -147,7 +147,7 @@ export const GET = withTenantContext(async (
       return NextResponse.json(
         {
           error: 'Invalid query parameters',
-          details: error.errors,
+          details: error.issues,
         },
         { status: 400 }
       )

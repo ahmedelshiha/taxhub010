@@ -133,7 +133,7 @@ export const GET = withTenantContext(
         return NextResponse.json(
           {
             error: 'Invalid query parameters',
-            details: error.errors,
+            details: error.issues,
           },
           { status: 400 }
         )
@@ -222,7 +222,7 @@ export const POST = withTenantContext(
         return NextResponse.json(
           {
             error: 'Invalid request body',
-            details: error.errors,
+            details: error.issues,
           },
           { status: 400 }
         )

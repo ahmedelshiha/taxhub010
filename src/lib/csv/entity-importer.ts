@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { parse } from 'csv-parse/sync';
 
 const entityRowSchema = z.object({
   country: z.enum(['AE', 'SA', 'EG']).describe('Country code (AE, SA, EG)'),
@@ -55,7 +57,7 @@ export async function validateCsvData(csvContent: string): Promise<ImportResult>
       } catch (error) {
         result.errorCount++;
         if (error instanceof z.ZodError) {
-          const messages = error.errors
+          const messages = error.issues
             .map((err) => `${err.path.join('.')}: ${err.message}`)
             .join('; ');
           result.errors.push({

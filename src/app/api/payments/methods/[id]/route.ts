@@ -54,7 +54,7 @@ export const PATCH = withTenantContext(
       return NextResponse.json(updated, { status: 200 })
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return NextResponse.json({ error: 'Invalid request body', details: error.errors }, { status: 400 })
+        return NextResponse.json({ error: 'Invalid request body', details: error.issues }, { status: 400 })
       }
       console.error('Payment method update API error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

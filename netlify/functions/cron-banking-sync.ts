@@ -1,7 +1,7 @@
 import { Handler, HandlerEvent } from '@netlify/functions'
 import prisma from '@/lib/prisma'
 import { logger } from '@/lib/logger'
-import { BankingProviderFactory } from '@/lib/banking/adapters'
+import { createBankingProvider } from '@/lib/banking/adapters'
 
 interface SyncStats {
   connectionsProcessed: number
@@ -93,8 +93,7 @@ const handler: Handler = async (event: HandlerEvent) => {
       const connectionStartTime = Date.now()
 
       try {
-        const factory = new BankingProviderFactory()
-        const provider = factory.getProvider(connection.provider)
+        const provider = createBankingProvider(connection.provider)
 
         // Fetch transactions
         const endDate = new Date()
@@ -204,7 +203,7 @@ const handler: Handler = async (event: HandlerEvent) => {
 
     stats.totalDuration = Date.now() - startTime
 
-    logger.info('Banking sync cron completed', stats)
+    logger.info('Banking sync cron completed', { stats })
 
     return {
       statusCode: 200,

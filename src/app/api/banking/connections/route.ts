@@ -108,7 +108,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       return NextResponse.json(
         {
           error: 'Invalid query parameters',
-          details: error.errors,
+          details: error.issues,
         },
         { status: 400 }
       )
@@ -136,8 +136,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     const validated = CreateConnectionSchema.parse(body)
 
     // Get provider and test connection
-    const factory = new BankingProviderFactory()
-    const provider = factory.getProvider(validated.provider)
+    const provider = createBankingProvider(validated.provider)
 
     let sessionToken: string | null = null
     try {
@@ -199,7 +198,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       return NextResponse.json(
         {
           error: 'Invalid request body',
-          details: error.errors,
+          details: error.issues,
         },
         { status: 400 }
       )
