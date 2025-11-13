@@ -166,8 +166,8 @@ export const UserForm = React.forwardRef<HTMLFormElement, UserFormProps>(
                   type="email"
                   placeholder="john.doe@example.com"
                   disabled={isSubmitting || isLoading}
-                  {...register('email' as const)}
-                  aria-invalid={!!((errors as any).email)}
+                  {...register('email' as Path<UserCreate | UserEdit>)}
+                  aria-invalid={!!(errors as any).email}
                   className="h-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 {(errors as any).email && (errors as any).email.message && (
