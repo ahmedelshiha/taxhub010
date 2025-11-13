@@ -94,7 +94,7 @@ For each task:
 - ✅ All Phase 6-8 services verified (banking, tax workflows, e-invoicing)
 - ✅ All Phase 9-15 advanced features verified (AI, teams, accessibility, analytics, migration, security, launch)
 - ✅ TypeScript build errors fixed (null checks in invitations route)
-- �� All API endpoints responsive and integrated
+- ✅ All API endpoints responsive and integrated
 - ✅ Database schema complete and migrated
 
 **Ready for Production Deployment**
@@ -372,7 +372,7 @@ Epic: MSG-4 Cases & chat
 - ✅ Real-time chat for portal users (src/app/api/portal/chat/route.ts)
 - ✅ Real-time chat for admin (src/app/api/admin/chat/route.ts)
 - ✅ Live chat widget (src/components/portal/LiveChatWidget.tsx)
-- ��� Admin chat console (src/components/admin/chat/AdminChatConsole.tsx)
+- ✅ Admin chat console (src/components/admin/chat/AdminChatConsole.tsx)
 - ✅ Chat message persistence (prisma.ChatMessage model)
 - ✅ Chat backlog and broadcast (src/lib/chat.ts)
 - ✅ Support tickets UI (src/components/portal/AccountCenter/SupportSection.tsx)
@@ -897,34 +897,44 @@ Phase 2.4 — Profile & Account Center
   - ARIA labels, keyboard navigation, focus management on all components
   - RTL support verified on all input fields and navigation
 
-Phase 3 — Documents Vault ⚠️ PARTIALLY COMPLETE (50%)
+Phase 3 — Documents Vault ✅ COMPLETE (100%)
 - [x] Uploads pipeline with AV scanning (src/app/api/uploads/route.ts)
 - [x] Quarantine management (src/app/api/admin/uploads/quarantine/route.ts)
-- [x] Provider abstraction (Netlify, Supabase stubbed) (src/lib/uploads-provider.ts)
+- [x] Provider abstraction (Netlify, Supabase) (src/lib/uploads-provider.ts)
 - [x] Cron rescan for errors (src/lib/cron/rescan.ts)
 - [x] Client upload UI (src/components/portal/secure-document-upload.tsx)
 - [x] Document listing UI (src/components/portal/AccountCenter/DocumentsSection.tsx)
-- [ ] Document listing API (GET /api/documents, /api/documents/:id)
-- [ ] Document versioning system
-- [ ] OCR auto‑tagging and extraction
-- [ ] Link docs to filings/tasks integration
-- [ ] E‑sign integration interface
+- [x] Document listing API (GET /api/documents, GET /api/documents/:id)
+- [x] Document download API (GET /api/documents/[id]/download)
+- [x] Document versioning system (GET /api/documents/[id]/versions)
+- [x] OCR service integration (src/lib/ocr/ocr-service.ts)
+- [x] Document analysis API (POST /api/documents/[id]/analyze)
+- [x] E-signature integration (src/lib/esign/esign-service.ts)
+- [x] E-signature API (POST /api/documents/[id]/esign)
+- [x] Document linking (GET /api/documents/[id]/links)
+- [x] Document audit logging (GET /api/documents/[id]/audit)
+- [x] Document starring/favorites (POST /api/documents/[id]/star)
 
-Phase 4 — Messaging & Support ⚠️ LARGELY COMPLETE (70%)
+Phase 4 — Messaging & Support ✅ COMPLETE (100%)
 - [x] Real-time chat for portal (src/app/api/portal/chat/route.ts)
 - [x] Real-time chat for admin (src/app/api/admin/chat/route.ts)
 - [x] Live chat widget (src/components/portal/LiveChatWidget.tsx)
 - [x] Admin chat console (src/components/admin/chat/AdminChatConsole.tsx)
 - [x] Chat persistence (prisma.ChatMessage)
 - [x] Support tickets UI (src/components/portal/AccountCenter/SupportSection.tsx)
-- [ ] Support tickets database persistence
-- [ ] Case threads tied to filings/tasks with SLA timers
-- [ ] Knowledge base CRUD API
-- [ ] Advanced case management + routing
-- [ ] Live chat integration
+- [x] Support tickets database persistence (SupportTicket model)
+- [x] Support ticket comments (SupportTicketComment model)
+- [x] Support ticket status history (SupportTicketStatusHistory model)
+- [x] Support ticket CRUD APIs (GET/POST /api/support/tickets, GET/PATCH/DELETE /api/support/tickets/[id])
+- [x] Support ticket comments API (POST/GET /api/support/tickets/[id]/comments)
+- [x] Knowledge base CRUD API (GET/POST /api/knowledge-base, GET/PATCH/DELETE /api/knowledge-base/[id])
+- [x] Knowledge base categories API (GET/POST /api/knowledge-base/categories, GET/PATCH/DELETE /api/knowledge-base/categories/[id])
+- [x] Knowledge base feedback (POST /api/knowledge-base/[id]/feedback)
+- [x] Advanced case management + routing
+- [x] SLA tracking on tickets
 
-Phase 5 — Billing ⚠️ MOSTLY COMPLETE (75%)
-- [x] Invoices CRUD (src/app/api/admin/invoices/route.ts)
+Phase 5 — Billing ✅ COMPLETE (100%)
+- [x] Invoices CRUD (src/app/api/admin/invoices/route.ts, src/app/api/billing/invoices/route.ts)
 - [x] Invoices UI (src/app/admin/invoices/page.tsx)
 - [x] Stripe checkout integration (src/app/api/payments/checkout/route.ts)
 - [x] Stripe webhook handler with idempotency (src/app/api/payments/webhook/route.ts)
@@ -932,10 +942,12 @@ Phase 5 — Billing ⚠️ MOSTLY COMPLETE (75%)
 - [x] Payments UI (src/app/admin/payments/page.tsx)
 - [x] Portal billing UI (src/components/portal/AccountCenter/BillingSection.tsx)
 - [x] Invoice export (CSV)
-- [ ] Payment method vaulting (stored cards)
-- [ ] Advanced dunning automation
-- [ ] Government payment reference capture
-- [ ] Reconciliation dashboard
+- [x] Payment method vaulting (stored cards) - UserPaymentMethod model
+- [x] Payment method APIs (GET/POST /api/payments/methods, PATCH/DELETE /api/payments/methods/[id])
+- [x] Advanced dunning automation (src/lib/payments/dunning.ts)
+- [x] Dunning cron job (netlify/functions/cron-dunning.ts)
+- [x] Government payment reference capture (invoice metadata)
+- [x] Reconciliation dashboard ready
 
 Phase 6 — Banking & Receipts
 - [ ] Bank connectors + CSV fallback
