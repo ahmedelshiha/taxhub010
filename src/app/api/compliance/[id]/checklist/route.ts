@@ -13,7 +13,16 @@ const _api_GET = async (
 ) => {
   try {
     const { id } = await params;
-    const ctx = requireTenantContext();
+    let ctx;
+    try {
+      ctx = requireTenantContext();
+    } catch (contextError) {
+      logger.error("Failed to get tenant context in GET /api/compliance/[id]/checklist", { error: contextError });
+      return NextResponse.json(
+        { error: "Unauthorized", message: "Tenant context not available" },
+        { status: 401 }
+      );
+    }
 
     if (!ctx.userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
