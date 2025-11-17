@@ -395,13 +395,23 @@ export async function getJobStatus(entityId: string): Promise<{
     if (!state) return null;
 
     // Get TTL from Redis
-    const key = `${JOB_STATE_PREFIX}${entityId}`;
-    const ttl = await (redis as any).ttl(key);
+    try {
+      const redis = getRedisClient();
+      const key = `${JOB_STATE_PREFIX}${entityId}`;
+      const ttl = await (redis as any).ttl(key);
 
-    return {
-      state,
-      expiresIn: Math.max(0, ttl || 0),
-    };
+      return {
+        state,
+        expiresIn: Math.max(0, ttl || 0),
+      };
+    } catch (error) {
+      // If Redis fails, return default TTL
+      logger.warn("Failed to get TTL from Redis", { entityId, error });
+      return {
+        state,
+        expiresIn: Math.max(0, Math.ceil((VERIFICATION_TIMEOUT - (Date.now() - state.startedAt.getTime())) / 1000)),
+      };
+    }
   } catch (error) {
     logger.error("Error getting job status", { entityId, error });
     return null;
