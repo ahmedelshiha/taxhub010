@@ -68,7 +68,7 @@ echo "✅ Linter check complete"
 
 # Step 5: Build the application
 echo "🔨 Step 5: Building application..."
-SENTRY_CLI_ENABLED=false pnpm build
+SENTRY_CLI_SKIP=true SENTRY_CLI_ENABLED=false pnpm build
 if [ $? -ne 0 ]; then
   echo "❌ Build failed"
   exit 1
