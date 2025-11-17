@@ -280,16 +280,27 @@ export class ZATCAAdapter implements EInvoicingProvider {
 
   /**
    * Validate signature
+   *
+   * PRODUCTION NOTE: This is a mock implementation. For production:
+   * - Implement proper signature verification against ZATCA certificates
+   * - Validate cryptographic signatures using public key infrastructure
+   * - Ensure compliance with Saudi Arabia e-invoicing standards
    */
   async validateSignature(invoice: ZATCAInvoice): Promise<boolean> {
     try {
       if (!invoice.signature) {
+        logger.warn('ZATCA signature validation: Missing signature', {
+          invoiceNumber: invoice.invoiceNumber,
+        })
         return false
       }
 
-      // TODO: In production, verify signature against certificate
-      logger.debug('ZATCA signature validated', {
+      // Mock validation - checks if signature exists
+      // In production, implement proper certificate-based verification
+      logger.debug('ZATCA signature validation: Using mock implementation', {
         invoiceNumber: invoice.invoiceNumber,
+        hasSignature: !!invoice.signature,
+        environment: process.env.NODE_ENV,
       })
 
       return true
