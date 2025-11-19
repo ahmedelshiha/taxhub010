@@ -94,7 +94,7 @@ export default function DocumentCard({
 
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (onDownload && !loading && document.status !== 'QUARANTINED') {
+    if (onDownload && !loading && document.status !== 'INFECTED' && document.status !== 'ERROR') {
       onDownload(document.id)
     }
   }
