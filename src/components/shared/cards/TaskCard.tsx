@@ -59,7 +59,7 @@ export default function TaskCard({
   className = '',
 }: TaskCardProps) {
   const { has } = usePermissions()
-  const canEditTask = has(PERMISSIONS.TASKS_EDIT)
+  const canEditTask = has(PERMISSIONS.TASKS_UPDATE)
   const canDeleteTask = has(PERMISSIONS.TASKS_DELETE)
   const canUpdateOwnTask = has(PERMISSIONS.TASKS_UPDATE_OWN)
 
