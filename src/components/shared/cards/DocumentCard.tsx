@@ -175,10 +175,10 @@ export default function DocumentCard({
           <div className="flex items-center gap-2">
             <Badge className={statusColors[document.status] || 'bg-gray-100 text-gray-800'}>
               {document.status === 'SCANNING' && <span className="mr-1">Scanning...</span>}
-              {document.status === 'SAFE' && (
+              {document.status === 'CLEAN' && (
                 <CheckCircle2 className="h-3 w-3 mr-1" />
               )}
-              {document.status === 'QUARANTINED' && (
+              {(document.status === 'INFECTED' || document.status === 'ERROR') && (
                 <AlertCircle className="h-3 w-3 mr-1" />
               )}
               {document.status}
