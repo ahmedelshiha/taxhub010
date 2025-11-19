@@ -73,6 +73,7 @@ export default function InvoiceCard({
     VIEWED: 'bg-purple-100 text-purple-800',
     PARTIALLY_PAID: 'bg-yellow-100 text-yellow-800',
     PAID: 'bg-green-100 text-green-800',
+    REFUNDED: 'bg-teal-100 text-teal-800',
     OVERDUE: 'bg-red-100 text-red-800',
     CANCELLED: 'bg-gray-100 text-gray-800',
   }
