@@ -201,17 +201,55 @@ export async function fetchStatsServerSide(tenantId: string): Promise<UserStats>
  * Fetch detailed activity/logs for a specific user
  * Can be called as needed for user profiles
  */
-export async function fetchUserActivityServerSide(userId: string) {
+export async function fetchUserActivityServerSide(userId: string, tenantId: string, limit: number = 50) {
   try {
-    const ctx = tenantContext.getContextOrNull()
-    if (!ctx || !ctx.userId) {
-      // No tenant context available — return empty activity
+    if (!userId || !tenantId) {
+      console.error('fetchUserActivityServerSide: userId and tenantId are required')
       return []
     }
 
-    // TODO: Implement activity log fetching based on your database schema
-    // For now, return empty array
-    return []
+    // Fetch audit logs related to this user
+    const activityLogs = await prisma.auditLog.findMany({
+      where: {
+        tenantId,
+        OR: [
+          { userId }, // User performed the action
+          { metadata: { path: ['targetUserId'], equals: userId } } // Action was performed on this user
+        ]
+      },
+      select: {
+        id: true,
+        action: true,
+        resource: true,
+        metadata: true,
+        createdAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit
+    })
+
+    // Format for frontend consumption
+    return activityLogs.map((log) => ({
+      id: log.id,
+      action: log.action,
+      resource: log.resource || '',
+      timestamp: log.createdAt instanceof Date ? log.createdAt.toISOString() : String(log.createdAt),
+      actor: log.user ? {
+        id: log.user.id,
+        name: log.user.name || 'Unknown',
+        email: log.user.email,
+        avatar: log.user.image
+      } : null,
+      details: log.metadata || {}
+    }))
   } catch (error) {
     console.error('Failed to fetch user activity:', error)
     return []
