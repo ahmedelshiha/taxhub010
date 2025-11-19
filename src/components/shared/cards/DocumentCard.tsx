@@ -11,11 +11,9 @@ import {
   Download,
   Trash2,
   FileText,
-  Lock,
   CheckCircle2,
   AlertCircle,
   Star,
-  MoreVertical,
 } from 'lucide-react'
 import { ComponentVariant, CardComponentProps } from '../types'
 import { formatDate, formatFileSize, formatRelativeTime } from '@/lib/shared/formatters'
