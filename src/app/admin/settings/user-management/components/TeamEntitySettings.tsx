@@ -201,7 +201,7 @@ export function TeamEntitySettings({ isLoading = false, isSaving = false, onUpda
               </Button>
             </div>
             <div className="space-y-3">
-              {skills.map((s: any, i: number) => (
+              {skills.map((s: { key?: string; name?: string; weight?: number }, i: number) => (
                 <div key={i} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end bg-gray-50 border border-gray-200 rounded-lg p-3">
                   <TextField
                     label="Key"
@@ -239,7 +239,7 @@ export function TeamEntitySettings({ isLoading = false, isSaving = false, onUpda
                     variant="ghost"
                     className="text-red-600 hover:bg-red-50"
                     onClick={() => {
-                      const next = skills.filter((_: any, idx: number) => idx !== i)
+                      const next = skills.filter((_: { key?: string; name?: string; weight?: number }, idx: number) => idx !== i)
                       onChange('skills', 'skills', next)
                     }}
                   >
