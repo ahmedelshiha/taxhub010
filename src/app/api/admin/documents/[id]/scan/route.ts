@@ -63,8 +63,7 @@ export const POST = withAdminAuth(async (request, context) => {
         action: 'admin:documents_scan',
         userId,
         resource: 'Document',
-        resourceId: document.id,
-        details: {
+        metadata: {
           documentName: document.name,
           previousStatus: document.avStatus,
           force,
