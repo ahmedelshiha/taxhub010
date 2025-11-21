@@ -120,7 +120,6 @@ export const GET = withTenantAuth(async (request, context) => {
         action: 'documents:view',
         userId,
         resource: 'Document',
-        resourceId: document.id,
       },
     }).catch(() => {})
 
@@ -198,8 +197,7 @@ export const PUT = withTenantAuth(async (request, context) => {
         action: 'documents:update',
         userId,
         resource: 'Document',
-        resourceId: document.id,
-        details: updateData,
+        metadata: updateData,
       },
     }).catch(() => {})
 
@@ -260,8 +258,7 @@ export const DELETE = withTenantAuth(async (request, context) => {
         action: 'documents:delete',
         userId,
         resource: 'Document',
-        resourceId: document.id,
-        details: {
+        metadata: {
           documentName: document.name,
           documentSize: document.size,
         },
@@ -290,7 +287,7 @@ export const DELETE = withTenantAuth(async (request, context) => {
           metadata: {
             ...document.metadata,
             deletedAt: new Date().toISOString(),
-            deletedBy: user.id,
+            deletedBy: userId,
           },
         },
       })
