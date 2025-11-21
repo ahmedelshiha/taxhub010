@@ -418,8 +418,9 @@ export default function LocalizationContent() {
       await loadLanguages()
       toast.success('Language added successfully')
     } catch (e: unknown) {
-      setError(e?.message || 'Failed to create language')
-      toast.error(e?.message || 'Failed to create language')
+      const error = e instanceof Error ? e.message : String(e)
+      setError(error || 'Failed to create language')
+      toast.error(error || 'Failed to create language')
     } finally {
       setSaving(false)
     }
