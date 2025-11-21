@@ -97,7 +97,7 @@ export default function AdminIntegrationsPage() {
                         {health.externalApis.map((api: { name: string; status?: string }, idx: number) => (
                           <div key={idx} className="flex items-center justify-between">
                             <div className="text-sm text-gray-700">{api.name}</div>
-                            <StatusBadge status={api.status || 'degraded'} />
+                            <StatusBadge status={mapHealthStatus(api.status)} />
                           </div>
                         ))}
                       </div>
