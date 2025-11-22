@@ -54,7 +54,7 @@ export const DYNAMIC_COMPONENTS = {
   // Shared heavy components
   DataTable: () =>
     import('@/components/shared/tables/SharedDataTable').then(
-      (mod) => mod.SharedDataTable
+      (mod) => ({ default: mod.default })
     ),
   AdvancedSearch: () =>
     import('@/components/shared/inputs/AdvancedSearch').then(
