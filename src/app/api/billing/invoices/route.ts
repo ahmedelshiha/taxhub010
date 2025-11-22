@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withTenantContext } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
+import type { TenantContext } from '@/lib/tenant-context'
 import prisma from '@/lib/prisma'
 import { logger } from '@/lib/logger'
 import { z } from 'zod'
@@ -12,8 +13,10 @@ const createInvoiceSchema = z.object({
 })
 
 export const GET = withTenantContext(async (request: NextRequest) => {
+  let ctx: TenantContext | undefined;
+
   try {
-    const ctx = requireTenantContext()
+    ctx = requireTenantContext()
 
     if (!ctx.userId || !ctx.tenantId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -53,17 +56,36 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       invoices: formattedInvoices,
     })
   } catch (error) {
-    logger.error('Error fetching invoices', { error })
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    logger.error('Error fetching invoices', {
+      error: errorMsg,
+      userId: ctx?.userId,
+      tenantId: ctx?.tenantId,
+    });
+
+    console.error('[INVOICES_API_ERROR] GET failed:', {
+      message: errorMsg,
+      stack: errorStack,
+    });
+
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        message: errorMsg,
+        ...(process.env.NODE_ENV === 'development' && { details: errorStack }),
+      },
       { status: 500 }
     )
   }
 })
 
 export const POST = withTenantContext(async (request: NextRequest) => {
+  let ctx: TenantContext | undefined;
+
   try {
-    const ctx = requireTenantContext()
+    ctx = requireTenantContext()
 
     if (!ctx.userId || !ctx.tenantId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -102,9 +124,26 @@ export const POST = withTenantContext(async (request: NextRequest) => {
         { status: 400 }
       )
     }
-    logger.error('Error creating invoice', { error })
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    logger.error('Error creating invoice', {
+      error: errorMsg,
+      userId: ctx?.userId,
+      tenantId: ctx?.tenantId,
+    });
+
+    console.error('[INVOICES_API_ERROR] POST failed:', {
+      message: errorMsg,
+      stack: errorStack,
+    });
+
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        message: errorMsg,
+        ...(process.env.NODE_ENV === 'development' && { details: errorStack }),
+      },
       { status: 500 }
     )
   }

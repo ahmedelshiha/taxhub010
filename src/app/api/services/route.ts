@@ -1,314 +1,195 @@
-import { NextResponse, type NextRequest } from 'next/server';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
-import { withTenantContext } from '@/lib/api-wrapper';
-import { requireTenantContext } from '@/lib/tenant-utils';
-import { createChatMessage, broadcastChatMessage } from '@/lib/chat';
+import { NextRequest, NextResponse } from 'next/server'
+import { ServicesService } from '@/services/services.service'
+import { PERMISSIONS, hasPermission } from '@/lib/permissions'
+import { ServiceFiltersSchema, ServiceSchema } from '@/schemas/services'
+import { withTenantContext } from '@/lib/api-wrapper'
+import { requireTenantContext } from '@/lib/tenant-utils'
+import { applyRateLimit, getClientIp } from '@/lib/rate-limit'
+import { logAudit } from '@/lib/audit'
+import { withCache } from '@/lib/api-cache'
+import { respond } from '@/lib/api-response'
+import { logger } from '@/lib/logger'
 
-const serviceSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  category: z.string(),
-  countryScope: z.array(z.enum(['AE', 'SA', 'EG'])),
-  pricing: z.object({
-    amount: z.number(),
-    currency: z.string(),
-    unit: z.string(), // 'per_entity', 'per_year', 'fixed', etc.
-  }),
-  prerequisites: z.array(z.string()).optional(),
-  featureFlag: z.string().optional(),
-  sla: z.object({
-    turnaroundTime: z.string(),
-    responseTime: z.string(),
-  }).optional(),
-  icon: z.string().optional(),
-});
+const svc = new ServicesService()
 
-type Service = z.infer<typeof serviceSchema>;
+/**
+ * Filter service fields based on user role
+ * Admin sees all fields, Portal users see limited fields
+ */
+function filterServiceFields(service: any, userRole: string) {
+  if (userRole === 'ADMIN' || userRole === 'TEAM_LEAD' || userRole === 'TEAM_MEMBER') {
+    return service
+  }
 
-// Mock services data (in production, this would come from database)
-const SERVICES: Service[] = [
-  {
-    id: 'vat-return-ae',
-    name: 'UAE VAT Return Filing',
-    description: 'Monthly or quarterly VAT return preparation and filing with the UAE FTA',
-    category: 'VAT Filing',
-    countryScope: ['AE'],
-    pricing: {
-      amount: 500,
-      currency: 'AED',
-      unit: 'per_return',
-    },
-    prerequisites: ['TRN Verification', 'VAT Registration'],
-    sla: {
-      turnaroundTime: '5 business days',
-      responseTime: '24 hours',
-    },
-    icon: '📋',
-  },
-  {
-    id: 'corporate-tax-ae',
-    name: 'UAE Corporate Tax Return',
-    description: 'Annual corporate income tax return for eligible entities in UAE',
-    category: 'Corporate Tax',
-    countryScope: ['AE'],
-    pricing: {
-      amount: 2500,
-      currency: 'AED',
-      unit: 'per_year',
-    },
-    prerequisites: ['Entity Setup', 'Financial Records'],
-    sla: {
-      turnaroundTime: '10 business days',
-      responseTime: '24 hours',
-    },
-    icon: '🏢',
-  },
-  {
-    id: 'zatca-vat-sa',
-    name: 'ZATCA VAT Filing (KSA)',
-    description: 'Monthly VAT return filing with ZATCA including e-invoice compliance',
-    category: 'VAT Filing',
-    countryScope: ['SA'],
-    pricing: {
-      amount: 800,
-      currency: 'SAR',
-      unit: 'per_return',
-    },
-    prerequisites: ['VAT Registration', 'E-Invoice Setup'],
-    sla: {
-      turnaroundTime: '3 business days',
-      responseTime: '12 hours',
-    },
-    icon: '📑',
-  },
-  {
-    id: 'zakat-return-sa',
-    name: 'Zakat Return Filing',
-    description: 'Annual zakat computation and filing for Saudi entities',
-    category: 'Zakat',
-    countryScope: ['SA'],
-    pricing: {
-      amount: 1500,
-      currency: 'SAR',
-      unit: 'per_year',
-    },
-    prerequisites: ['Entity Setup', 'Financial Statements'],
-    sla: {
-      turnaroundTime: '7 business days',
-      responseTime: '24 hours',
-    },
-    icon: '🕌',
-  },
-  {
-    id: 'esr-annual-ae',
-    name: 'UAE ESR Annual Report',
-    description: 'Economic Substance Report submission for UAE entities with significant economic activity',
-    category: 'Compliance',
-    countryScope: ['AE'],
-    pricing: {
-      amount: 3000,
-      currency: 'AED',
-      unit: 'per_year',
-    },
-    prerequisites: ['Entity Setup', 'Business Plan', 'Financial Records'],
-    sla: {
-      turnaroundTime: '14 business days',
-      responseTime: '24 hours',
-    },
-    icon: '📊',
-  },
-  {
-    id: 'eta-filing-eg',
-    name: 'ETA VAT Return (Egypt)',
-    description: 'Egyptian Tax Authority VAT return filing and e-Invoice compliance',
-    category: 'VAT Filing',
-    countryScope: ['EG'],
-    pricing: {
-      amount: 600,
-      currency: 'EGP',
-      unit: 'per_return',
-    },
-    prerequisites: ['Tax ID', 'E-Invoice Profile'],
-    sla: {
-      turnaroundTime: '4 business days',
-      responseTime: '24 hours',
-    },
-    icon: '🗂️',
-  },
-  {
-    id: 'bookkeeping',
-    name: 'Full Bookkeeping Service',
-    description: 'End-to-end bookkeeping including invoice entry, reconciliation, and reporting',
-    category: 'Bookkeeping',
-    countryScope: ['AE', 'SA', 'EG'],
-    pricing: {
-      amount: 2000,
-      currency: 'AED',
-      unit: 'per_month',
-    },
-    prerequisites: ['Business Setup', 'Bank Access'],
-    sla: {
-      turnaroundTime: 'Monthly',
-      responseTime: '48 hours',
-    },
-    icon: '📚',
-  },
-  {
-    id: 'audit',
-    name: 'Independent Audit',
-    description: 'Annual audit of financial statements in accordance with ISA standards',
-    category: 'Audit',
-    countryScope: ['AE', 'SA', 'EG'],
-    pricing: {
-      amount: 5000,
-      currency: 'AED',
-      unit: 'per_year',
-    },
-    prerequisites: ['Financial Statements', 'Annual Records'],
-    sla: {
-      turnaroundTime: '20 business days',
-      responseTime: '24 hours',
-    },
-    icon: '✓',
-  },
-];
+  // Portal user - exclude admin-only fields
+  const { 
+    basePrice,
+    advanceBookingDays,
+    minAdvanceHours,
+    maxDailyBookings,
+    bufferTime,
+    businessHours,
+    blackoutDates,
+    costPerUnit,
+    profitMargin,
+    internalNotes,
+    ...portalFields 
+  } = service
 
+  return portalFields
+}
+
+/**
+ * Create cached handler for services list
+ */
+const getCachedServices = withCache<any>(
+  {
+    key: 'services-list',
+    ttl: 300,
+    staleWhileRevalidate: 600,
+    tenantAware: true,
+  },
+  async (request: NextRequest): Promise<any> => {
+    const ctx = requireTenantContext()
+    const sp = new URL(request.url).searchParams
+    const filters = ServiceFiltersSchema.parse({
+      search: sp.get('search') || undefined,
+      category: sp.get('category') || 'all',
+      featured: (sp.get('featured') as any) || 'all',
+      status: (sp.get('status') as any) || 'all',
+      limit: sp.get('limit') ? Number(sp.get('limit')) : 20,
+      offset: sp.get('offset') ? Number(sp.get('offset')) : 0,
+      sortBy: (sp.get('sortBy') as any) || 'updatedAt',
+      sortOrder: (sp.get('sortOrder') as any) || 'desc',
+    })
+
+    const tenantId = ctx.tenantId
+    const userRole = ctx.role
+
+    // For portal users, only show active services
+    if (userRole !== 'ADMIN' && userRole !== 'TEAM_LEAD' && userRole !== 'TEAM_MEMBER') {
+      filters.status = 'active'
+    }
+
+    const result = await svc.getServicesList(tenantId, filters as any)
+
+    // Filter fields based on role
+    if (Array.isArray(result?.data)) {
+      result.data = result.data.map((s: any) => filterServiceFields(s, userRole))
+    }
+
+    return result
+  }
+)
+
+/**
+ * GET /api/services
+ * List services with optional filters
+ * - Portal users: see only active services, limited fields
+ * - Admin users: see all services, all fields
+ * - Unauthenticated: see public active services
+ */
 export const GET = withTenantContext(
-  async (request: NextRequest) => {
+  async (request: NextRequest, { params }: any) => {
     try {
-      // userId is optional for public service browsing
-      let context;
+      // Rate limiting
+      const ip = getClientIp(request as any)
+      const rl = await applyRateLimit(`services-list:${ip}`, 100, 60_000)
+      if (rl && !rl.allowed) {
+        await logAudit({
+          action: 'security.ratelimit.block',
+          metadata: { ip, key: `services-list:${ip}`, route: new URL(request.url).pathname },
+        }).catch(() => {}) // Don't fail if audit logging fails
+        return respond.tooMany('Rate limit exceeded')
+      }
+
+      let ctx: any = null
       try {
-        context = requireTenantContext();
+        ctx = requireTenantContext()
       } catch {
-        // Service catalog can be viewed without tenant context
-        context = { tenantId: null, userId: null };
+        // Service catalog can be viewed without authentication
+        ctx = { tenantId: null, userId: null, role: 'PUBLIC' }
       }
 
-      // Get query parameters
-      const search = request.nextUrl.searchParams.get('search');
-      const country = request.nextUrl.searchParams.get('country') as Service['countryScope'][number] | null;
-      const category = request.nextUrl.searchParams.get('category');
-
-      // Filter services
-      let filtered = SERVICES;
-
-      if (search) {
-        const searchLower = search.toLowerCase();
-        filtered = filtered.filter(
-          (s) =>
-            s.name.toLowerCase().includes(searchLower) ||
-            s.description.toLowerCase().includes(searchLower)
-        );
+      // Check permission for admin operations
+      if (ctx.role === 'ADMIN' || ctx.role === 'TEAM_LEAD' || ctx.role === 'TEAM_MEMBER') {
+        if (!hasPermission(ctx.role, PERMISSIONS.SERVICES_VIEW)) {
+          return respond.forbidden('You do not have permission to view services')
+        }
       }
 
-      if (country) {
-        filtered = filtered.filter((s) => s.countryScope.includes(country));
+      // Get cached services
+      const result = await getCachedServices(request)
+
+      if (!result || !result?.services) {
+        return respond.ok(
+          { services: [], total: 0, page: 0, limit: 20, totalPages: 0 }
+        )
       }
 
-      if (category) {
-        filtered = filtered.filter((s) => s.category === category);
-      }
-
-      // Get unique categories
-      const categories = Array.from(new Set(SERVICES.map((s) => s.category)));
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          services: filtered,
-          categories,
-          total: filtered.length,
-        },
-      });
+      return respond.ok(result)
     } catch (error) {
-      logger.error('Failed to fetch services', { error });
-      return NextResponse.json(
-        { error: 'Failed to fetch services' },
-        { status: 500 }
-      );
+      logger.error('Failed to fetch services', { error })
+      if (error instanceof Error && error.message.includes('Zod')) {
+        return respond.badRequest('Invalid query parameters')
+      }
+      return respond.serverError('Failed to fetch services')
     }
   },
   { requireAuth: false }
-);
+)
 
+/**
+ * POST /api/services
+ * Create a new service (Admin only)
+ */
 export const POST = withTenantContext(
-  async (request: NextRequest) => {
+  async (request: NextRequest, { params }: any) => {
     try {
-      const ctx = requireTenantContext();
-      const { userId, tenantId, userName, userEmail } = ctx;
+      const ctx = requireTenantContext()
 
-      const data = await request.json();
-      const { serviceId } = data;
-
-      if (!serviceId) {
-        return NextResponse.json(
-          { error: 'Service ID is required' },
-          { status: 400 }
-        );
+      // Check admin permission
+      if (!hasPermission(ctx.role, PERMISSIONS.SERVICES_CREATE)) {
+        return respond.forbidden('You do not have permission to create services')
       }
 
-      const service = SERVICES.find((s) => s.id === serviceId);
-      if (!service) {
-        return NextResponse.json(
-          { error: 'Service not found' },
-          { status: 404 }
-        );
+      // Rate limiting for creation
+      const rl = await applyRateLimit(`services-create:${ctx.userId}`, 10, 3600_000)
+      if (rl && !rl.allowed) {
+        return respond.tooMany('Too many service creation attempts')
       }
 
-      // Create a unique request ID
-      const requestId = `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-      const roomId = `service-request-${requestId}`;
+      const body = await request.json()
 
-      // Log audit event
-      await logger.audit({
-        action: 'service.request_created',
-        actorId: userId!,
-        targetId: serviceId,
-        details: { requestId, serviceName: service.name, roomId },
-      });
+      // Validate request
+      const validatedData = ServiceSchema.parse(body)
 
-      // Create initial messaging case linked to service request
-      try {
-        const initialMessage = createChatMessage({
-          text: `Service Request: ${service.name}\n\nClient has requested the following service:\n\n**Service:** ${service.name}\n**Category:** ${service.category}\n**Description:** ${service.description}\n\nPlease provide more details and pricing information.`,
-          userId: userId || 'system',
-          userName: userName || userEmail || 'Client',
-          role: 'client',
-          tenantId,
-          room: roomId,
-        });
+      // Create service
+      const service = await svc.createService(ctx.tenantId, validatedData as any)
 
-        await broadcastChatMessage(initialMessage);
-      } catch (messagingError) {
-        logger.warn('Failed to create messaging case for service request', {
-          error: messagingError,
-          requestId,
-          serviceId,
-        });
-        // Don't fail the entire operation if messaging fails
-      }
+      // Log audit
+      await logAudit({
+        action: 'service.created',
+        actorId: ctx.userId,
+        targetId: service.id,
+        details: { name: service.name, slug: service.slug },
+      })
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          requestId,
-          serviceId,
-          serviceName: service.name,
-          status: 'pending',
-          roomId,
-          createdAt: new Date(),
-        },
-      });
+      return respond.created(service)
     } catch (error) {
-      logger.error('Failed to create service request', { error });
-      return NextResponse.json(
-        { error: 'Failed to create service request' },
-        { status: 500 }
-      );
+      logger.error('Failed to create service', { error })
+
+      if (error instanceof Error) {
+        if (error.message.includes('Zod') || error.message.includes('validation')) {
+          return respond.badRequest('Invalid service data')
+        }
+        if (error.message.includes('already exists') || error.message.includes('unique')) {
+          return respond.badRequest('Service with this slug already exists')
+        }
+      }
+
+      return respond.serverError('Failed to create service')
     }
   },
   { requireAuth: true }
-);
+)

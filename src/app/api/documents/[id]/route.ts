@@ -1,299 +1,308 @@
-import { NextRequest, NextResponse } from 'next/server'
+'use server'
+
+import { NextRequest } from 'next/server'
 import { withTenantContext } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
+import { respond } from '@/lib/api-response'
 import prisma from '@/lib/prisma'
-import { logAuditSafe } from '@/lib/observability-helpers'
 import { z } from 'zod'
-import { deleteFile } from '@/lib/upload-provider'
 
-const DocumentUpdateSchema = z.object({
-  name: z.string().min(1).optional(),
-  category: z.string().optional(),
-  isStarred: z.boolean().optional(),
-})
-
-async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+/**
+ * GET /api/documents/[id]
+ * Get document details
+ */
+export const GET = withTenantContext(async (request: NextRequest, { params }: any) => {
   try {
-    const { userId, tenantId } = requireTenantContext()
+    const ctx = requireTenantContext()
+    const { tenantId, userId, role } = ctx
+    const userRole = role
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant context required' }, { status: 400 })
-    }
-
-    const { id } = params
-    const action = request.nextUrl.searchParams.get('action')
-
-    // Fetch document with tenant isolation
     const document = await prisma.attachment.findFirst({
-      where: { id, tenantId },
+      where: {
+        id: params.id,
+        tenantId,
+      },
       include: {
         uploader: {
-          select: { id: true, email: true, name: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
         },
-        tenant: {
-          select: { id: true, name: true },
+        versions: {
+          orderBy: { versionNumber: 'desc' },
+          include: {
+            uploader: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        links: {
+          select: {
+            id: true,
+            linkedToType: true,
+            linkedToId: true,
+            linkedAt: true,
+            linkedBy: true,
+          },
+        },
+        auditLogs: {
+          select: {
+            id: true,
+            action: true,
+            details: true,
+            performedBy: true,
+            performedAt: true,
+          },
+          orderBy: { performedAt: 'desc' },
+          take: 10,
         },
       },
     })
 
     if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+      return respond.notFound('Document not found')
     }
 
-    // Handle download action
-    if (action === 'download') {
-      // Log download access
-      await logAuditSafe({
-        action: 'documents:download',
-        details: {
-          documentId: document.id,
+    // Authorization check - portal users can only see their own documents
+    if (userRole !== 'ADMIN' && document.uploaderId !== userId) {
+      return respond.forbidden('You do not have access to this document')
+    }
+
+    // Format response based on role
+    const baseData = {
+      id: document.id,
+      name: document.name,
+      size: document.size,
+      contentType: document.contentType,
+      url: document.url,
+      uploadedAt: document.uploadedAt,
+      uploadedBy: document.uploader,
+      status: document.avStatus,
+      isStarred: document.isStarred,
+      isQuarantined: document.avStatus === 'infected',
+      versions: document.versions.map((v) => ({
+        id: v.id,
+        number: v.versionNumber,
+        uploadedAt: v.uploadedAt,
+        uploadedBy: v.uploader,
+        changeDescription: v.changeDescription,
+      })),
+      links: document.links,
+      recentAuditLogs: document.auditLogs,
+    }
+
+    // Admin gets additional details
+    if (userRole === 'ADMIN') {
+      return respond.ok({
+        data: {
+          ...baseData,
+          key: document.key,
+          provider: document.provider,
+          metadata: document.metadata,
+          avDetails: document.avDetails,
+          avThreatName: document.avThreatName,
+          avScanTime: document.avScanTime,
+          avScanAt: document.avScanAt,
+        },
+      })
+    }
+
+    // Log access
+    await prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'documents:view',
+        userId,
+        resource: 'Document',
+      },
+    }).catch(() => { })
+
+    return respond.ok({ data: baseData })
+  } catch (error) {
+    console.error('Get document error:', error)
+    return respond.serverError()
+  }
+})
+
+/**
+ * PUT /api/documents/[id]
+ * Update document metadata
+ */
+export const PUT = withTenantContext(async (request: NextRequest, { params }: any) => {
+  try {
+    const ctx = requireTenantContext()
+    const { tenantId, userId, role } = ctx
+    const userRole = role
+
+    const document = await prisma.attachment.findFirst({
+      where: {
+        id: params.id,
+        tenantId,
+      },
+    })
+
+    if (!document) {
+      return respond.notFound('Document not found')
+    }
+
+    // Authorization - only uploader or admin can update
+    if (userRole !== 'ADMIN' && document.uploaderId !== userId) {
+      return respond.forbidden('You do not have permission to update this document')
+    }
+
+    const body = await request.json()
+    const UpdateSchema = z.object({
+      name: z.string().optional(),
+      isStarred: z.boolean().optional(),
+      metadata: z.record(z.any()).optional(),
+    })
+
+    const updateData = UpdateSchema.parse(body)
+
+    // Merge metadata
+    const currentMetadata = typeof document.metadata === 'object' && document.metadata !== null
+      ? document.metadata as Record<string, any>
+      : {}
+    const newMetadata = updateData.metadata
+      ? { ...currentMetadata, ...updateData.metadata }
+      : document.metadata
+
+    const updated = await prisma.attachment.update({
+      where: { id: params.id },
+      data: {
+        ...(updateData.name && { name: updateData.name }),
+        ...(updateData.isStarred !== undefined && { isStarred: updateData.isStarred }),
+        ...(newMetadata && { metadata: newMetadata }),
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    })
+
+    // Log audit
+    await prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'documents:update',
+        userId,
+        resource: 'Document',
+        metadata: updateData,
+      },
+    }).catch(() => { })
+
+    return respond.ok({
+      data: {
+        id: updated.id,
+        name: updated.name,
+        size: updated.size,
+        contentType: updated.contentType,
+        url: updated.url,
+        uploadedAt: updated.uploadedAt,
+        uploadedBy: updated.uploader,
+        status: updated.avStatus,
+        isStarred: updated.isStarred,
+      },
+    })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return respond.badRequest('Invalid update data', error.errors)
+    }
+    console.error('Update document error:', error)
+    return respond.serverError()
+  }
+})
+
+/**
+ * DELETE /api/documents/[id]
+ * Delete document (soft delete for portal, hard delete for admin)
+ */
+export const DELETE = withTenantContext(async (request: NextRequest, { params }: any) => {
+  try {
+    const ctx = requireTenantContext()
+    const { tenantId, userId, role } = ctx
+    const userRole = role
+
+    const document = await prisma.attachment.findFirst({
+      where: {
+        id: params.id,
+        tenantId,
+      },
+    })
+
+    if (!document) {
+      return respond.notFound('Document not found')
+    }
+
+    // Authorization
+    if (userRole !== 'ADMIN' && document.uploaderId !== userId) {
+      return respond.forbidden('You do not have permission to delete this document')
+    }
+
+    // Log deletion
+    await prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'documents:delete',
+        userId,
+        resource: 'Document',
+        metadata: {
           documentName: document.name,
           documentSize: document.size,
         },
-      }).catch(() => {})
-
-      // If we have a URL (stored on provider), redirect to it
-      if (document.url) {
-        // For external URLs, add expiration parameters if using signed URLs
-        return NextResponse.redirect(document.url, { status: 303 })
-      }
-
-      // Fallback: return error if no URL available
-      return NextResponse.json(
-        { error: 'Document content not available' },
-        { status: 404 }
-      )
-    }
-
-    // Default: return document metadata
-    const metadata = {
-      id: document.id,
-      name: document.name || 'Unknown',
-      size: document.size || 0,
-      contentType: document.contentType || 'application/octet-stream',
-      key: document.key,
-      url: document.url,
-      uploadedAt: document.uploadedAt.toISOString(),
-      uploadedBy: document.uploader
-        ? {
-            id: document.uploader.id,
-            email: document.uploader.email,
-            name: document.uploader.name,
-          }
-        : null,
-      category: extractCategory(document.key || ''),
-      avStatus: document.avStatus,
-      avThreatName: document.avThreatName,
-      avScanAt: document.avScanAt?.toISOString() || null,
-      avScanTime: document.avScanTime,
-      isQuarantined: document.avStatus === 'infected',
-      provider: document.provider,
-      tenant: {
-        id: document.tenant.id,
-        name: document.tenant.name,
       },
-      // Version history (placeholder for future implementation)
-      versions: [
-        {
-          version: 1,
-          uploadedAt: document.uploadedAt.toISOString(),
-          uploadedBy: document.uploader?.name || 'System',
-          size: document.size,
+    }).catch(() => { })
+
+    // Admin: hard delete, Portal user: soft delete (archive)
+    if (userRole === 'ADMIN') {
+      // Hard delete - cascade handles versions, links, audit logs
+      await prisma.attachment.delete({
+        where: { id: params.id },
+      })
+
+      return respond.ok({
+        data: {
+          id: params.id,
+          deleted: true,
+          message: 'Document permanently deleted',
         },
-      ],
-    }
+      })
+    } else {
+      // Soft delete - mark as deleted in metadata
+      const currentMetadata = typeof document.metadata === 'object' && document.metadata !== null
+        ? document.metadata as Record<string, any>
+        : {}
+      await prisma.attachment.update({
+        where: { id: params.id },
+        data: {
+          metadata: {
+            ...currentMetadata,
+            deletedAt: new Date().toISOString(),
+            deletedBy: userId,
+          },
+        },
+      })
 
-    return NextResponse.json(metadata, { status: 200 })
+      return respond.ok({
+        data: {
+          id: params.id,
+          archived: true,
+          message: 'Document archived (can be restored)',
+        },
+      })
+    }
   } catch (error) {
-    console.error('Document detail API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('Delete document error:', error)
+    return respond.serverError()
   }
-}
-
-async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const { userId, tenantId } = requireTenantContext()
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant context required' }, { status: 400 })
-    }
-
-    const { id } = params
-    const body = await request.json()
-    const validation = DocumentUpdateSchema.safeParse(body)
-
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request body', details: validation.error.issues },
-        { status: 400 }
-      )
-    }
-
-    const { name, category, isStarred } = validation.data
-
-    const document = await prisma.attachment.findFirst({
-      where: { id, tenantId },
-    })
-
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
-
-    const updateData: {
-      name?: string
-      isStarred?: boolean
-      key?: string
-    } = {}
-    if (name) updateData.name = name
-    if (isStarred !== undefined) updateData.isStarred = isStarred
-    if (category) {
-      const oldKey = document.key || ''
-      const keyParts = oldKey.split('/')
-      keyParts[1] = category
-        .replace(/\s+/g, '-')
-        .toLowerCase()
-      updateData.key = keyParts.join('/')
-    }
-
-    const latestVersion = await prisma.documentVersion.findFirst({
-      where: { attachmentId: document.id },
-      orderBy: { versionNumber: 'desc' },
-    })
-
-    await prisma.documentVersion.create({
-      data: {
-        attachmentId: document.id,
-        versionNumber: (latestVersion?.versionNumber || 0) + 1,
-        name: document.name,
-        size: document.size,
-        contentType: document.contentType,
-        key: document.key,
-        url: document.url,
-        uploaderId: userId,
-        changeDescription: 'Document metadata updated',
-        tenantId: tenantId,
-      },
-    })
-
-    const updatedDocument = await prisma.attachment.update({
-      where: { id },
-      data: updateData,
-    })
-
-    await logAuditSafe({
-      action: 'documents:update',
-      details: {
-        documentId: updatedDocument.id,
-        updatedFields: Object.keys(updateData),
-      },
-    })
-
-    return NextResponse.json({ success: true, document: updatedDocument })
-  } catch (error: any) {
-    if (error.code === 'P2025') {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
-    console.error('Document update API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
-
-async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const { userId, tenantId } = requireTenantContext()
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant context required' }, { status: 400 })
-    }
-
-    const { id } = params
-
-    // Verify document exists and belongs to tenant
-    const document = await prisma.attachment.findFirst({
-      where: { id, tenantId },
-    })
-
-    if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
-
-    // Delete file from storage provider
-    if (document.key) {
-      await deleteFile(document.key)
-    }
-
-    // Delete document from database
-    await prisma.attachment.delete({
-      where: { id },
-    })
-
-    // Log deletion
-    await logAuditSafe({
-      action: 'documents:delete',
-      details: {
-        documentId: document.id,
-        documentName: document.name,
-        documentSize: document.size,
-        deletedBy: userId,
-      },
-    }).catch(() => {})
-
-    return NextResponse.json(
-      { success: true, message: 'Document deleted' },
-      { status: 200 }
-    )
-  } catch (error) {
-    console.error('Document delete API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
-}
-
-const getHandler = withTenantContext(GET, { requireAuth: true })
-const patchHandler = withTenantContext(PATCH, { requireAuth: true })
-const deleteHandler = withTenantContext(DELETE, { requireAuth: true })
-
-export { getHandler as GET, patchHandler as PATCH, deleteHandler as DELETE }
-
-/**
- * Extract category from storage key path
- */
-function extractCategory(key: string): string {
-  const parts = key.split('/')
-  if (parts.length < 2) return 'Other'
-
-  const categoryPart = parts[1]
-  return categoryPart
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
+})

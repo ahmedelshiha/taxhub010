@@ -99,6 +99,10 @@ export class ZATCAAdapter implements EInvoicingProvider {
 
   /**
    * Generate QR Code (ZATCA requirement)
+   *
+   * PRODUCTION NOTE: This implementation returns base64-encoded payload.
+   * For full compliance, integrate with a QR code library (qrcode, qr-image, etc.)
+   * and ensure the QR code follows ZATCA specifications.
    */
   async generateQRCode(invoice: ZATCAInvoice): Promise<string> {
     try {
@@ -115,13 +119,14 @@ export class ZATCAAdapter implements EInvoicingProvider {
       // Generate base64 encoded QR payload
       const qrData = this.generateQRData(payload)
 
-      // TODO: In production, use a QR code library (qrcode, qr-image, etc.)
-      // For now, return the base64 encoded payload
+      // Generate QR code - currently returns base64 encoded payload
+      // Production deployments should use a dedicated QR code library
       const qrCode = Buffer.from(qrData).toString('base64')
 
       logger.info('ZATCA QR code generated', {
         invoiceNumber: invoice.invoiceNumber,
         qrSize: qrCode.length,
+        note: 'Generated QR payload - implement with QR library for production'
       })
 
       return qrCode
@@ -207,13 +212,31 @@ export class ZATCAAdapter implements EInvoicingProvider {
 
   /**
    * Submit invoice to ZATCA
+   *
+   * PRODUCTION NOTE: This is a mock implementation. Integration with actual ZATCA API
+   * requires:
+   * - Valid ZATCA client credentials and API secret
+   * - Proper certificate management and digital signing
+   * - Error handling for ZATCA-specific status codes
+   * - Compliance with ZATCA Phase 2 specifications
    */
   async submit(invoice: ZATCAInvoice): Promise<SubmissionResult> {
     try {
       if (!this.apiSecret) {
+        const errorMsg = 'ZATCA API secret not configured - cannot submit in production'
+        logger.error('ZATCA submission blocked - missing credentials', {
+          invoiceNumber: invoice.invoiceNumber,
+          environment: process.env.NODE_ENV,
+        })
+
+        // In production, fail loudly
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error(errorMsg)
+        }
+
         return {
           success: false,
-          message: 'ZATCA API secret not configured',
+          message: errorMsg,
           errors: [
             {
               code: 'CONFIG_ERROR',
@@ -223,16 +246,16 @@ export class ZATCAAdapter implements EInvoicingProvider {
         }
       }
 
-      // TODO: In production, make actual API call to ZATCA
-      // For now, return mock response
-      logger.info('ZATCA submission initiated', {
+      logger.warn('ZATCA submission: Using mock implementation - integrate with real ZATCA API for production', {
         invoiceNumber: invoice.invoiceNumber,
         standard: this.standard,
+        environment: process.env.NODE_ENV,
       })
 
+      // Mock response - will be replaced with actual API call
       return {
         success: true,
-        message: 'Invoice submitted to ZATCA',
+        message: 'Invoice submitted to ZATCA (mock)',
         referenceNumber: `ZATCA-${Date.now()}`,
         submissionTime: new Date(),
       }
@@ -257,16 +280,27 @@ export class ZATCAAdapter implements EInvoicingProvider {
 
   /**
    * Validate signature
+   *
+   * PRODUCTION NOTE: This is a mock implementation. For production:
+   * - Implement proper signature verification against ZATCA certificates
+   * - Validate cryptographic signatures using public key infrastructure
+   * - Ensure compliance with Saudi Arabia e-invoicing standards
    */
   async validateSignature(invoice: ZATCAInvoice): Promise<boolean> {
     try {
       if (!invoice.signature) {
+        logger.warn('ZATCA signature validation: Missing signature', {
+          invoiceNumber: invoice.invoiceNumber,
+        })
         return false
       }
 
-      // TODO: In production, verify signature against certificate
-      logger.debug('ZATCA signature validated', {
+      // Mock validation - checks if signature exists
+      // In production, implement proper certificate-based verification
+      logger.debug('ZATCA signature validation: Using mock implementation', {
         invoiceNumber: invoice.invoiceNumber,
+        hasSignature: !!invoice.signature,
+        environment: process.env.NODE_ENV,
       })
 
       return true

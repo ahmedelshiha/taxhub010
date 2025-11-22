@@ -54,7 +54,10 @@ export default function ExistingBusinessTab({
   const onSubmit = async (data: ExistingBusinessInput) => {
     try {
       setIsLoading(true);
-      const entityId = await createEntity(data);
+      const entityId = await createEntity({
+        ...data,
+        country: data.country || 'AE',
+      } as any);
       onComplete(entityId);
     } catch (error: any) {
       onError(error.message || "Failed to create entity");

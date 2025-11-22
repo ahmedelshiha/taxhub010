@@ -83,7 +83,7 @@ export default function CommentsPanel({ taskId }: { taskId: string }) {
         <div className="text-sm text-gray-800 mt-1">{c.content}</div>
         {c.attachments?.length > 0 && (
           <div className="mt-2 flex gap-2 flex-wrap">
-            {c.attachments.map((a: any, idx: number) => (
+            {c.attachments.map((a: { dataUrl: string; name: string }, idx: number) => (
               <a key={idx} href={a.dataUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-600 underline">{a.name}</a>
             ))}
           </div>

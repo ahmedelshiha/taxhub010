@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withTenantContext } from "@/lib/api-wrapper";
 import { requireTenantContext } from "@/lib/tenant-utils";
+import type { TenantContext } from "@/lib/tenant-context";
 import { billsService } from "@/lib/services/bills/bills-service";
 import { logger } from "@/lib/logger";
 import type { BillFilters } from "@/types/bills";
@@ -40,8 +41,9 @@ const BillCreateSchema = z.object({
  * List bills with filters and pagination
  */
 const _api_GET = async (request: NextRequest) => {
+  let ctx: TenantContext | undefined;
+
   try {
-    let ctx;
     try {
       ctx = requireTenantContext();
     } catch (contextError) {
@@ -82,9 +84,26 @@ const _api_GET = async (request: NextRequest) => {
       );
     }
 
-    logger.error("Error listing bills", { error });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    logger.error("Error listing bills", {
+      error: errorMsg,
+      userId: ctx?.userId,
+      tenantId: ctx?.tenantId,
+    });
+
+    console.error('[BILLS_API_ERROR] GET failed:', {
+      message: errorMsg,
+      stack: errorStack,
+    });
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        message: errorMsg,
+        ...(process.env.NODE_ENV === 'development' && { details: errorStack }),
+      },
       { status: 500 }
     );
   }
@@ -95,8 +114,9 @@ const _api_GET = async (request: NextRequest) => {
  * Create new bill
  */
 const _api_POST = async (request: NextRequest) => {
+  let ctx: TenantContext | undefined;
+
   try {
-    let ctx;
     try {
       ctx = requireTenantContext();
     } catch (contextError) {
@@ -119,7 +139,10 @@ const _api_POST = async (request: NextRequest) => {
     const data = BillCreateSchema.parse(body);
 
     // Create bill
-    const bill = await billsService.createBill(tenantId, userId, data);
+    const bill = await billsService.createBill(tenantId, userId, {
+      ...data,
+      vendor: data.vendor || 'Unknown Vendor',
+    } as any);
 
     return NextResponse.json(
       {
@@ -136,9 +159,26 @@ const _api_POST = async (request: NextRequest) => {
       );
     }
 
-    logger.error("Error creating bill", { error });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    logger.error("Error creating bill", {
+      error: errorMsg,
+      userId: ctx?.userId,
+      tenantId: ctx?.tenantId,
+    });
+
+    console.error('[BILLS_API_ERROR] POST failed:', {
+      message: errorMsg,
+      stack: errorStack,
+    });
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        message: errorMsg,
+        ...(process.env.NODE_ENV === 'development' && { details: errorStack }),
+      },
       { status: 500 }
     );
   }

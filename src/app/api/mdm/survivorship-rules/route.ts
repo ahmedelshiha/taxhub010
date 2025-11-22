@@ -129,7 +129,7 @@ async function handlePOST(request: NextRequest) {
         ...data,
         createdBy: ctx.userId,
         updatedBy: ctx.userId,
-      },
+      } as any,
     });
 
     logger.info('Survivorship rule created', {

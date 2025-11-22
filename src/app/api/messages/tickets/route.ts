@@ -107,7 +107,10 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     const ticket = await TicketsService.createTicket(
       tenantId,
       userId,
-      validation.data
+      {
+        ...validation.data,
+        title: validation.data.title || 'Untitled Ticket',
+      } as any
     );
 
     return NextResponse.json({

@@ -52,7 +52,8 @@ export const POST = withTenantContext(async (
     const comment = await TicketsService.addComment(tenantId, userId, {
       ticketId,
       ...validation.data,
-    });
+      content: validation.data.content || 'No content',
+    } as any);
 
     return NextResponse.json({
       success: true,

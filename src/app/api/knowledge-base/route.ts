@@ -203,7 +203,7 @@ export const POST = withTenantContext(
           tenantId,
           authorId: userId,
           publishedAt: validated.published ? new Date() : null,
-        },
+        } as any,
         include: {
           category: {
             select: { id: true, name: true, slug: true },

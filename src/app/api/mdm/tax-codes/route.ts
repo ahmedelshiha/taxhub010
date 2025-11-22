@@ -168,7 +168,7 @@ async function handlePOST(request: NextRequest) {
         effectiveTo: data.effectiveTo ? new Date(data.effectiveTo) : null,
         createdBy: ctx.userId,
         updatedBy: ctx.userId,
-      },
+      } as any,
     });
 
     logger.info('Tax code created', {

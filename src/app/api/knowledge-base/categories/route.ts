@@ -104,7 +104,7 @@ export const POST = withTenantContext(
           ...validated,
           slug,
           tenantId,
-        },
+        } as any,
       })
 
       await logAuditSafe({

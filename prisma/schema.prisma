@@ -50,12 +50,18 @@ model User {
   autoAssign                Boolean?                // Auto-assign tasks
   certifications            String[]                // Team certifications
   experienceYears           Int?                    // Years of experience
+  isActive                  Boolean?                @default(true) // User active status
+  preferences               Json?
+  bio                       String?
+  isAdmin                   Boolean?                @default(false)
+  lastLogin                 DateTime?
   attachments               Attachment[]
   bookingPreferences        BookingPreferences?
   assignedByServiceRequests ServiceRequest[]        @relation("ServiceRequestAssignedBy")
   clientServiceRequests     ServiceRequest[]        @relation("ServiceRequestClient")
-  tasks                     Task[]
   taskComments              TaskComment[]
+  tasksAssigned             Task[]                  @relation("TaskAssignee")
+  tasksAsClient             Task[]                  @relation("TaskClient")
   assignedWorkOrders        WorkOrder[]             @relation("WorkOrderAssignee")
   workOrdersAsClient        WorkOrder[]             @relation("WorkOrderClient")
   accounts                  Account[]
@@ -75,6 +81,8 @@ model User {
   sessions                  Session[]
   settingChangeDiffs        SettingChangeDiff[]
   taskTemplates             TaskTemplate[]
+  tasksCreatedBy            Task[]                  @relation("TaskCreatedBy")
+  bookingsCreatedBy         Booking[]               @relation("BookingCreatedBy")
   teamMembers               TeamMember[]            @relation("UserTeamMember")
   tenantMemberships         TenantMembership[]
   grantedPermissions        UserPermission[]        @relation("GrantedBy")
@@ -116,6 +124,12 @@ model User {
   approvalsToApprove        Approval[]              @relation("ApprovalApprover")
   approvalsDecided          Approval[]              @relation("ApprovalDecider")
   approvalHistoryActions    ApprovalHistory[]       @relation("ApprovalHistoryPerformer")
+  notificationsReceived     Notification[]          @relation("NotificationsReceived")
+  notificationsSent         Notification[]          @relation("NotificationsSent")
+  notificationPreferences   NotificationPreference? @relation("NotificationPreferences")
+  signatureRequestsRequested DocumentSignatureRequest[] @relation("SignatureRequestRequester")
+  signatureRequestsAssigned  DocumentSignatureRequest[] @relation("SignatureRequestSigner")
+  documentSignatures        DocumentSignature[]     @relation("DocumentSigner")
 
   @@unique([tenantId, email])
   @@index([tenantId, role])
@@ -385,6 +399,11 @@ model Tenant {
   bills                 Bill[]
   approvals             Approval[]
   approvalHistory       ApprovalHistory[]
+  notifications         Notification[]
+  notificationPreferences NotificationPreference[]
+  documentSignatureRequests DocumentSignatureRequest[]
+  documentSignatures    DocumentSignature[]
+  analysisJobs          AnalysisJob[]
 
   @@index([status])
 }
@@ -563,9 +582,15 @@ model Booking {
   updatedAt            DateTime        @updatedAt
   assignedTeamMemberId String?
   serviceRequestId     String?
+  createdById          String?         // User who created the booking
+  completedAt          DateTime?
+  amount               Decimal?
+  rating               Int?
   workOrders           WorkOrder[]
+  tasks                Task[]
   assignedTeamMember   TeamMember?     @relation(fields: [assignedTeamMemberId], references: [id])
   client               User            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdBy            User?           @relation("BookingCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   service              Service         @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   serviceRequest       ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
   tenant               Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -686,13 +711,21 @@ model Task {
   priority           TaskPriority       @default(MEDIUM)
   status             TaskStatus         @default(OPEN)
   assigneeId         String?
+  createdById        String?            // User who created the task
   complianceRequired Boolean            @default(false)
   complianceDeadline DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
+  tags               String[]           @default([])
+  estimatedHours     Int?
+  clientId           String?
+  bookingId          String?
   complianceRecords  ComplianceRecord[]
-  assignee           User?              @relation(fields: [assigneeId], references: [id])
+  assignee           User?              @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdBy          User?              @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   tenant             Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client             User?              @relation("TaskClient", fields: [clientId], references: [id], onDelete: SetNull)
+  booking            Booking?           @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   comments           TaskComment[]
   requestTasks       RequestTask[]
 
@@ -702,6 +735,8 @@ model Task {
   @@index([tenantId, createdAt])
   @@index([tenantId, assigneeId])
   @@index([tenantId, status, dueAt])
+  @@index([clientId])
+  @@index([bookingId])
 }
 
 model ComplianceRecord {
@@ -855,6 +890,7 @@ model TeamMember {
   bookingBuffer           Int                @default(15)
   autoAssign              Boolean            @default(true)
   stats                   Json?
+  image                   String?
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
   availabilitySlots       AvailabilitySlot[]
@@ -947,34 +983,37 @@ model ScheduledReminder {
 }
 
 model Attachment {
-  id               String          @id @default(cuid())
-  key              String?         @unique
-  url              String?
-  name             String?
-  size             Int?
-  contentType      String?
-  avStatus         String?
-  avDetails        Json?
-  avScanAt         DateTime?
-  avThreatName     String?
-  avScanTime       Float?
-  provider         String?
-  isStarred        Boolean         @default(false)
-  metadata         Json?
-  uploadedAt       DateTime        @default(now())
-  uploaderId       String?
-  entityId         String?
-  serviceRequestId String?
-  tenantId         String
-  entity           Entity?         @relation(fields: [entityId], references: [id])
-  serviceRequest   ServiceRequest? @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
-  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  uploader         User?           @relation(fields: [uploaderId], references: [id])
-  expenses         Expense[]
-  versions         DocumentVersion[]
-  links            DocumentLink[]
-  auditLogs        DocumentAuditLog[]
-  bills            Bill[]
+  id                      String                      @id @default(cuid())
+  key                     String?                     @unique
+  url                     String?
+  name                    String?
+  size                    Int?
+  contentType             String?
+  avStatus                String?
+  avDetails               Json?
+  avScanAt                DateTime?
+  avThreatName            String?
+  avScanTime              Float?
+  provider                String?
+  isStarred               Boolean                     @default(false)
+  metadata                Json?
+  uploadedAt              DateTime                    @default(now())
+  uploaderId              String?
+  entityId                String?
+  serviceRequestId        String?
+  tenantId                String
+  entity                  Entity?                     @relation(fields: [entityId], references: [id])
+  serviceRequest          ServiceRequest?             @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  tenant                  Tenant                      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  uploader                User?                       @relation(fields: [uploaderId], references: [id])
+  expenses                Expense[]
+  versions                DocumentVersion[]
+  links                   DocumentLink[]
+  auditLogs               DocumentAuditLog[]
+  bills                   Bill[]
+  signatureRequests       DocumentSignatureRequest[]
+  signatures              DocumentSignature[]
+  analysisJobs            AnalysisJob[]
 
   @@index([serviceRequestId])
   @@index([tenantId])
@@ -3126,6 +3165,206 @@ model ApprovalHistory {
   @@index([approvalId])
   @@index([tenantId])
   @@map("approval_history")
+}
+
+model Notification {
+  id            String   @id @default(cuid())
+  tenantId      String
+  userId        String
+  type          String   @db.VarChar(50)
+  title         String   @db.VarChar(255)
+  message       String   @db.Text
+  description   String?  @db.Text
+  link          String?  @db.VarChar(500)
+  readAt        DateTime?
+  readBy        String?
+
+  // Notification type & source
+  entityType    String?  @db.VarChar(50) // e.g., "booking", "task", "document"
+  entityId      String?  @db.VarChar(100)
+  relatedUserId String?  @db.VarChar(100) // User who triggered notification
+
+  // Notification preferences
+  channels      String[] @default(["in_app"]) // in_app, email, sms
+  priority      String   @default("normal") @db.VarChar(20) // low, normal, high, urgent
+  status        String   @default("sent") @db.VarChar(20) // pending, sent, failed, deleted
+
+  // Metadata
+  metadata      Json?    // Additional data specific to notification type
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  sentAt        DateTime?
+
+  // Relations
+  user          User     @relation("NotificationsReceived", fields: [userId], references: [id], onDelete: Cascade)
+  relatedUser   User?    @relation("NotificationsSent", fields: [relatedUserId], references: [id], onDelete: SetNull)
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@index([tenantId, userId, createdAt])
+  @@index([tenantId, readAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  tenantId        String
+
+  // Channel preferences
+  inAppEnabled    Boolean  @default(true)
+  emailEnabled    Boolean  @default(true)
+  smsEnabled      Boolean  @default(false)
+
+  // Notification type preferences
+  types           Json     @default("{}")     // { "booking": { "enabled": true, "channels": ["email", "in_app"] } }
+
+  // Frequency settings
+  emailDigest     String   @default("instant") @db.VarChar(20) // instant, daily, weekly, none
+  doNotDisturb    Boolean  @default(false)
+  doNotDisturbStart String? // HH:mm format
+  doNotDisturbEnd   String? // HH:mm format
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation("NotificationPreferences", fields: [userId], references: [id], onDelete: Cascade)
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("notification_preferences")
+}
+
+// ============================================================================
+// Document Signature Models
+// ============================================================================
+
+model DocumentSignatureRequest {
+  id           String                     @id @default(cuid())
+  attachmentId String
+  requesterId  String
+  signerId     String
+  status       SignatureRequestStatus     @default(PENDING)
+  message      String?                    @db.Text
+  dueAt        DateTime?
+  expiresAt    DateTime?
+  completedAt  DateTime?
+  rejectedAt   DateTime?
+  rejectionReason String?                 @db.Text
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+  tenantId     String
+
+  // Relations
+  attachment   Attachment                 @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  requester    User                       @relation("SignatureRequestRequester", fields: [requesterId], references: [id])
+  signer       User                       @relation("SignatureRequestSigner", fields: [signerId], references: [id])
+  tenant       Tenant                     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  signatures   DocumentSignature[]
+
+  @@index([attachmentId])
+  @@index([requesterId])
+  @@index([signerId])
+  @@index([status])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+  @@map("document_signature_requests")
+}
+
+model DocumentSignature {
+  id                        String                    @id @default(cuid())
+  signatureRequestId        String?
+  attachmentId              String
+  signerId                  String
+  signatureData             String?                   @db.Text  // Base64 signature image or path
+  signatureType             String                    @default("digital") @db.VarChar(50) // digital, drawn, uploaded
+  signedAt                  DateTime                  @default(now())
+  ipAddress                 String?
+  userAgent                 String?
+  location                  String?                   // Geographic location if available
+  certificateId             String?                   // For advanced digital signatures
+  certificateFingerprint    String?                   // Hash of certificate
+  metadata                  Json?                     // Additional signature metadata
+  createdAt                 DateTime                  @default(now())
+  tenantId                  String
+
+  // Relations
+  signatureRequest          DocumentSignatureRequest? @relation(fields: [signatureRequestId], references: [id], onDelete: SetNull)
+  attachment                Attachment                @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  signer                    User                      @relation("DocumentSigner", fields: [signerId], references: [id])
+  tenant                    Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([attachmentId])
+  @@index([signerId])
+  @@index([signatureRequestId])
+  @@index([tenantId, signedAt])
+  @@map("document_signatures")
+}
+
+// ============================================================================
+// Document Analysis Models
+// ============================================================================
+
+model AnalysisJob {
+  id              String              @id @default(cuid())
+  attachmentId    String
+  status          AnalysisStatus      @default(PENDING)
+  analysisType    String              @default("general") @db.VarChar(50) // general, tax, compliance, ocr, etc.
+  priority        Priority            @default(MEDIUM)
+  startedAt       DateTime?
+  completedAt     DateTime?
+  failedAt        DateTime?
+  results         Json?               // Analysis results
+  errorMessage    String?             @db.Text
+  processingTime  Int?                // milliseconds
+  confidence      Decimal?            @db.Decimal(5, 2) // 0-100
+  extractedText   String?             @db.Text
+  extractedData   Json?               // Structured data extraction
+  metadata        Json?               // Job metadata
+  retryCount      Int                 @default(0)
+  maxRetries      Int                 @default(3)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  tenantId        String
+
+  // Relations
+  attachment      Attachment          @relation(fields: [attachmentId], references: [id], onDelete: Cascade)
+  tenant          Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([attachmentId])
+  @@index([status])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+  @@index([createdAt])
+  @@map("analysis_jobs")
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum SignatureRequestStatus {
+  PENDING
+  SIGNED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum AnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
 }
 
 enum ApprovalItemType {

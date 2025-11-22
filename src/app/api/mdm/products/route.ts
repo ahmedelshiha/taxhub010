@@ -170,7 +170,7 @@ async function handlePOST(request: NextRequest) {
         ...data,
         createdBy: ctx.userId,
         updatedBy: ctx.userId,
-      },
+      } as any,
       include: { taxCode: true },
     });
 

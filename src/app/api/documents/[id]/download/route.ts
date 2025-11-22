@@ -1,69 +1,81 @@
+'use server'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { withTenantContext } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
+import { respond } from '@/lib/api-response'
 import prisma from '@/lib/prisma'
-import { logger } from '@/lib/logger'
 
-export const GET = withTenantContext(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+/**
+ * GET /api/documents/[id]/download
+ * Download document with permission check and audit logging
+ */
+export const GET = withTenantContext(async (request: NextRequest, { params }: any) => {
   try {
     const ctx = requireTenantContext()
-    const { id: documentId } = await params
-
-    if (!ctx.userId || !ctx.tenantId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const document = await prisma.attachment.findUnique({
-      where: { id: documentId },
-      select: {
-        id: true,
-        tenantId: true,
-        name: true,
-        url: true,
-        contentType: true,
+    const { tenantId, userId, role } = ctx
+    const userRole = role
+    const document = await prisma.attachment.findFirst({
+      where: {
+        id: params.id,
+        tenantId,
+      },
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     })
 
-    if (!document || document.tenantId !== ctx.tenantId) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+    if (!document) {
+      return respond.notFound('Document not found')
     }
 
+    // Authorization check
+    if (userRole !== 'ADMIN' && document.uploaderId !== userId) {
+      return respond.forbidden('You do not have access to this document')
+    }
+
+    // Check if document is quarantined
+    if (document.avStatus === 'infected') {
+      return respond.forbidden('This document is quarantined due to security concerns and cannot be downloaded')
+    }
+
+    // Check if document is still pending scan
+    if (document.avStatus === 'pending') {
+      return respond.conflict(
+        'Document is still being scanned. Please wait before downloading.'
+      )
+    }
+
+    // Verify URL exists
     if (!document.url) {
-      return NextResponse.json(
-        { error: 'Document URL not available' },
-        { status: 404 }
-      )
+      console.error('Document has no URL:', document.id)
+      return respond.serverError('Document URL not found')
     }
 
-    try {
-      const fileResponse = await fetch(document.url)
-      if (!fileResponse.ok) {
-        throw new Error('Failed to fetch file')
-      }
-
-      const buffer = await fileResponse.arrayBuffer()
-
-      logger.info('Document downloaded', { documentId, userId: ctx.userId })
-
-      return new NextResponse(buffer, {
-        headers: {
-          'Content-Type': document.contentType || 'application/octet-stream',
-          'Content-Disposition': `attachment; filename="${document.name || 'document'}"`,
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
+    // Log download
+    await prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'documents:download',
+        userId,
+        resource: 'Document',
+        metadata: {
+          documentId: document.id,
+          documentName: document.name,
+          documentSize: document.size,
+          downloadedBy: userId,
         },
-      })
-    } catch (error) {
-      logger.error('Error downloading file', { documentId, error })
-      return NextResponse.json(
-        { error: 'Failed to download document' },
-        { status: 500 }
-      )
-    }
+      },
+    }).catch(() => { })
+
+    return NextResponse.redirect(document.url, 302)
   } catch (error) {
-    logger.error('Error downloading document', { error })
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('Download document error:', error)
+    return respond.serverError()
   }
 })
