@@ -144,7 +144,14 @@ export function useFilterUsers(
 
       result = result.filter((user) => {
         return searchFields!.some((field) => {
-          const value = field.split('.').reduce((obj: Record<string, any>, key) => obj?.[key], user) as string
+          // Navigate nested properties safely
+          const value = field.split('.').reduce<unknown>((obj, key) => {
+            if (obj && typeof obj === 'object' && key in obj) {
+              return (obj as Record<string, unknown>)[key]
+            }
+            return undefined
+          }, user)
+
           if (!value) return false
 
           const valueStr = caseInsensitive ? String(value).toLowerCase() : String(value)
