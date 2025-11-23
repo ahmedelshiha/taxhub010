@@ -9,7 +9,7 @@ export interface AuditLogEntry {
   userId: string | null
   action: string
   resource: string | null
-  metadata: any
+  metadata: Record<string, unknown>
   ipAddress: string | null
   userAgent: string | null
   createdAt: string
