@@ -20,7 +20,9 @@ import { useFilterHistory } from '../hooks/useFilterHistory'
 import { FilterHistoryPanel } from './FilterHistoryPanel'
 import { FilterState } from '../hooks/useFilterState'
 import { UserItem } from '../contexts/UserDataContext'
-import { FilterGroup, FilterCondition } from '../types/query-builder'
+import { FilterGroup, FilterCondition, QueryTemplate } from '../types/query-builder'
+import { Suggestion } from '../hooks/useSearchSuggestions'
+import { FilterPreset } from '../hooks/useFilterPresets'
 
 export interface UserDirectoryFilterBarEnhancedProps {
   filters: FilterState
@@ -125,15 +127,15 @@ export function UserDirectoryFilterBarEnhanced({
     filterHistory.addEntry(next)
   }, [filters, onFiltersChange, filterHistory])
 
-  const handleSuggestionSelect = useCallback((suggestion: Record<string, unknown>) => {
-    const next: FilterState = { ...filters, search: (suggestion as any).text, roles: filters.roles || [], statuses: filters.statuses || [] }
+  const handleSuggestionSelect = useCallback((suggestion: Suggestion) => {
+    const next: FilterState = { ...filters, search: suggestion.text, roles: filters.roles || [], statuses: filters.statuses || [] }
     onFiltersChange(next)
     setSuggestionsOpen(false)
   }, [filters, onFiltersChange])
 
-  const handleLoadPreset = useCallback((preset: Record<string, unknown>) => {
-    onFiltersChange((preset as any).filters)
-    filterHistory.addEntry((preset as any).filters)
+  const handleLoadPreset = useCallback((preset: FilterPreset) => {
+    onFiltersChange(preset.filters)
+    filterHistory.addEntry(preset.filters)
     setPresetsOpen(false)
   }, [onFiltersChange, filterHistory])
 
@@ -165,11 +167,9 @@ export function UserDirectoryFilterBarEnhanced({
     filterHistory.addEntry(newFilters)
   }, [queryBuilder, filters, onFiltersChange, filterHistory])
 
-  const handleLoadTemplate = useCallback((template: Record<string, unknown>) => {
-    if ((template as any).query) {
-      queryBuilder.setQuery((template as any).query)
-      handleApplyAdvancedQuery((template as any).query)
-    }
+  const handleLoadTemplate = useCallback((template: QueryTemplate) => {
+    queryBuilder.setQuery(template.query)
+    handleApplyAdvancedQuery(template.query)
   }, [queryBuilder, handleApplyAdvancedQuery])
 
   const handleSelectAllChange = useCallback((checked: boolean) => {
