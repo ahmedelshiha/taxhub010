@@ -124,7 +124,7 @@ export default function CommunicationSettingsPage() {
             <Toggle label="Transactional Enabled" value={pending.sms?.transactionalEnabled ?? current.sms?.transactionalEnabled ?? false} onChange={(v) => onChange('sms', 'transactionalEnabled', v)} />
             <Toggle label="Marketing Enabled" value={pending.sms?.marketingEnabled ?? current.sms?.marketingEnabled ?? false} onChange={(v) => onChange('sms', 'marketingEnabled', v)} />
             <Toggle label="Fallback To Email" value={pending.sms?.fallbackToEmail ?? current.sms?.fallbackToEmail ?? true} onChange={(v) => onChange('sms', 'fallbackToEmail', v)} />
-            <TextField label="Routes (key:dest; comma-separated)" value={(pending.sms?.routes ?? current.sms?.routes ?? []).map((r: any) => `${r.key}:${r.destination}`).join(', ')} onChange={(v) => {
+            <TextField label="Routes (key:dest; comma-separated)" value={(pending.sms?.routes ?? current.sms?.routes ?? []).map((r: {key: string; destination: string}) => `${r.key}:${r.destination}`).join(', ')} onChange={(v) => {
               const arr = String(v).split(',').map((s) => s.trim()).filter(Boolean).map((p) => { const [key, ...rest] = p.split(':'); return { key: key || '', destination: rest.join(':') || '' } })
               onChange('sms', 'routes', arr)
             }} />
@@ -158,7 +158,7 @@ export default function CommunicationSettingsPage() {
             <TextField label="Default Sender Name" value={pending.newsletters?.defaultSenderName ?? current.newsletters?.defaultSenderName ?? ''} onChange={(v) => onChange('newsletters', 'defaultSenderName', v)} />
             <TextField label="Default Sender Email" value={pending.newsletters?.defaultSenderEmail ?? current.newsletters?.defaultSenderEmail ?? ''} onChange={(v) => onChange('newsletters', 'defaultSenderEmail', v)} />
             <TextField label="Archive URL" value={pending.newsletters?.archiveUrl ?? current.newsletters?.archiveUrl ?? ''} onChange={(v) => onChange('newsletters', 'archiveUrl', v)} />
-            <TextField label="Topics (key:label; comma-separated)" value={(pending.newsletters?.topics ?? current.newsletters?.topics ?? []).map((t: any) => `${t.key}:${t.label}`).join(', ')} onChange={(v) => {
+            <TextField label="Topics (key:label; comma-separated)" value={(pending.newsletters?.topics ?? current.newsletters?.topics ?? []).map((t: {key: string; label: string}) => `${t.key}:${t.label}`).join(', ')} onChange={(v) => {
               const arr = String(v).split(',').map((s) => s.trim()).filter(Boolean).map((p) => { const [key, ...rest] = p.split(':'); return { key: key || '', label: rest.join(':') || '' } })
               onChange('newsletters', 'topics', arr)
             }} />
@@ -199,7 +199,7 @@ export default function CommunicationSettingsPage() {
   )
 }
 
-function ReminderSection({ title, data, onChange }: { title: string; data: any; onChange: (field: string, value: any) => void }) {
+function ReminderSection({ title, data, onChange }: { title: string; data: Record<string, any>; onChange: (field: string, value: Record<string, any>) => void }) {
   const channels = Array.isArray(data?.channels) ? data.channels : ['email']
   const has = (c: string) => channels.includes(c)
   const toggleChannel = (c: string) => {

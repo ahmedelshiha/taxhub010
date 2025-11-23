@@ -220,7 +220,7 @@ export default function AdminCalendar() {
     }
   }
 
-  const toggleAvailability = async (slot: any) => {
+  const toggleAvailability = async (slot: Record<string, any>) => {
     // Requires serviceId; calendar API includes serviceId for slots
     if (!slot?.id || !slot?.serviceId) return
     try {

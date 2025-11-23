@@ -60,7 +60,7 @@ export default async function AdminRemindersPage() {
             </tr>
           </thead>
           <tbody>
-            {pending.map((r: any) => (
+            {pending.map((r: typeof pending[0]) => (
               <tr key={r.id} className="border-t">
                 <td className="px-4 py-2">{r.id}</td>
                 <td className="px-4 py-2">{r.serviceRequest?.service?.name || '-'}</td>

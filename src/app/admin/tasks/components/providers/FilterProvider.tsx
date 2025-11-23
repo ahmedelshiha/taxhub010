@@ -5,7 +5,14 @@ import type { TaskFilters } from '@/lib/tasks/types'
 import { applyFilters } from '@/lib/tasks/utils'
 
 const defaultFilters: TaskFilters = { search: '', status: [], priority: [], category: [], assignee: [], client: [], dateRange: {}, overdue: false, compliance: false, tags: [] }
-const FilterContext = createContext<any>(null)
+interface FilterContextType {
+  filters: TaskFilters
+  setFilters: (filters: TaskFilters) => void
+  resetFilters: () => void
+  filteredTasks: any[]
+}
+
+const FilterContext = createContext<FilterContextType | null>(null)
 
 export const FilterProvider = ({ children, tasks }: { children: React.ReactNode; tasks: any[] }) => {
   const [filters, setFilters] = useState<TaskFilters>(defaultFilters)

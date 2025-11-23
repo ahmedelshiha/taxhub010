@@ -13,118 +13,270 @@ EXCEPTION
 END $$;
 
 -- CreateEnum
-CREATE TYPE "TenantStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'DECOMMISSIONED');
+DO $$ BEGIN
+    CREATE TYPE "TenantStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'DECOMMISSIONED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "InvoiceStatus" AS ENUM ('DRAFT', 'SENT', 'UNPAID', 'PAID', 'VOID');
+DO $$ BEGIN
+    CREATE TYPE "InvoiceStatus" AS ENUM ('DRAFT', 'SENT', 'UNPAID', 'PAID', 'VOID');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "ExpertiseLevel" AS ENUM ('junior', 'mid', 'senior', 'lead', 'expert');
+DO $$ BEGIN
+    CREATE TYPE "ExpertiseLevel" AS ENUM ('junior', 'mid', 'senior', 'lead', 'expert');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "AvailabilityStatus" AS ENUM ('AVAILABLE', 'BUSY', 'OFFLINE', 'ON_LEAVE');
+DO $$ BEGIN
+    CREATE TYPE "AvailabilityStatus" AS ENUM ('AVAILABLE', 'BUSY', 'OFFLINE', 'ON_LEAVE');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "ServiceStatus" AS ENUM ('DRAFT', 'ACTIVE', 'INACTIVE', 'DEPRECATED', 'RETIRED');
+DO $$ BEGIN
+    CREATE TYPE "ServiceStatus" AS ENUM ('DRAFT', 'ACTIVE', 'INACTIVE', 'DEPRECATED', 'RETIRED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "RequestPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'URGENT');
+DO $$ BEGIN
+    CREATE TYPE "RequestPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'URGENT');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "RequestStatus" AS ENUM ('DRAFT', 'SUBMITTED', 'IN_REVIEW', 'APPROVED', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
+DO $$ BEGIN
+    CREATE TYPE "RequestStatus" AS ENUM ('DRAFT', 'SUBMITTED', 'IN_REVIEW', 'APPROVED', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "DefaultRole" AS ENUM ('TEAM_MEMBER', 'TEAM_LEAD', 'ADMIN');
+DO $$ BEGIN
+    CREATE TYPE "DefaultRole" AS ENUM ('TEAM_MEMBER', 'TEAM_LEAD', 'ADMIN');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED');
+DO $$ BEGIN
+    CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "PostPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+DO $$ BEGIN
+    CREATE TYPE "PostPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "BookingStatus" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED');
+DO $$ BEGIN
+    CREATE TYPE "BookingStatus" AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "WorkflowStatus" AS ENUM ('DRAFT', 'PENDING', 'IN_PROGRESS', 'PAUSED', 'COMPLETED', 'FAILED', 'CANCELLED');
+DO $$ BEGIN
+    CREATE TYPE "WorkflowStatus" AS ENUM ('DRAFT', 'PENDING', 'IN_PROGRESS', 'PAUSED', 'COMPLETED', 'FAILED', 'CANCELLED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "StepStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED', 'SKIPPED');
+DO $$ BEGIN
+    CREATE TYPE "StepStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED', 'SKIPPED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "WorkflowType" AS ENUM ('ONBOARDING', 'OFFBOARDING', 'ROLE_CHANGE');
+DO $$ BEGIN
+    CREATE TYPE "WorkflowType" AS ENUM ('ONBOARDING', 'OFFBOARDING', 'ROLE_CHANGE');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "TaskPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+DO $$ BEGIN
+    CREATE TYPE "TaskPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "TaskStatus" AS ENUM ('OPEN', 'IN_PROGRESS', 'REVIEW', 'COMPLETED', 'BLOCKED');
+DO $$ BEGIN
+    CREATE TYPE "TaskStatus" AS ENUM ('OPEN', 'IN_PROGRESS', 'REVIEW', 'COMPLETED', 'BLOCKED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "PaymentStatus" AS ENUM ('UNPAID', 'PAID', 'FAILED', 'REFUNDED', 'PARTIAL');
+DO $$ BEGIN
+    CREATE TYPE "PaymentStatus" AS ENUM ('UNPAID', 'PAID', 'FAILED', 'REFUNDED', 'PARTIAL');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "WorkOrderStatus" AS ENUM ('DRAFT', 'OPEN', 'IN_PROGRESS', 'ON_HOLD', 'BLOCKED', 'APPROVAL_PENDING', 'COMPLETED', 'CANCELLED');
+DO $$ BEGIN
+    CREATE TYPE "WorkOrderStatus" AS ENUM ('DRAFT', 'OPEN', 'IN_PROGRESS', 'ON_HOLD', 'BLOCKED', 'APPROVAL_PENDING', 'COMPLETED', 'CANCELLED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "BookingType" AS ENUM ('STANDARD', 'RECURRING', 'EMERGENCY', 'CONSULTATION');
+DO $$ BEGIN
+    CREATE TYPE "BookingType" AS ENUM ('STANDARD', 'RECURRING', 'EMERGENCY', 'CONSULTATION');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('CLIENT', 'TEAM_MEMBER', 'STAFF', 'TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN');
+DO $$ BEGIN
+    CREATE TYPE "UserRole" AS ENUM ('CLIENT', 'TEAM_MEMBER', 'STAFF', 'TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "BulkOperationType" AS ENUM ('ROLE_CHANGE', 'STATUS_UPDATE', 'PERMISSION_GRANT', 'PERMISSION_REVOKE', 'SEND_EMAIL', 'IMPORT_CSV', 'CUSTOM');
+DO $$ BEGIN
+    CREATE TYPE "BulkOperationType" AS ENUM ('ROLE_CHANGE', 'STATUS_UPDATE', 'PERMISSION_GRANT', 'PERMISSION_REVOKE', 'SEND_EMAIL', 'IMPORT_CSV', 'CUSTOM');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "BulkOperationStatus" AS ENUM ('DRAFT', 'READY', 'IN_PROGRESS', 'COMPLETED', 'FAILED', 'CANCELLED', 'PAUSED');
+DO $$ BEGIN
+    CREATE TYPE "BulkOperationStatus" AS ENUM ('DRAFT', 'READY', 'IN_PROGRESS', 'COMPLETED', 'FAILED', 'CANCELLED', 'PAUSED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "PartyType" AS ENUM ('VENDOR', 'CUSTOMER', 'EMPLOYEE', 'PARTNER', 'INTERNAL');
+DO $$ BEGIN
+    CREATE TYPE "PartyType" AS ENUM ('VENDOR', 'CUSTOMER', 'EMPLOYEE', 'PARTNER', 'INTERNAL');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "PartyStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'MERGED', 'DELETED');
+DO $$ BEGIN
+    CREATE TYPE "PartyStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'MERGED', 'DELETED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "ProductType" AS ENUM ('GOOD', 'SERVICE', 'BUNDLE');
+DO $$ BEGIN
+    CREATE TYPE "ProductType" AS ENUM ('GOOD', 'SERVICE', 'BUNDLE');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "ProductStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'DISCONTINUED', 'MERGED');
+DO $$ BEGIN
+    CREATE TYPE "ProductStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'DISCONTINUED', 'MERGED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "TaxType" AS ENUM ('VAT', 'INCOME_TAX', 'WITHHOLDING_TAX', 'ZAKAT', 'CORPORATE_TAX', 'STAMP_DUTY', 'OTHER');
+DO $$ BEGIN
+    CREATE TYPE "TaxType" AS ENUM ('VAT', 'INCOME_TAX', 'WITHHOLDING_TAX', 'ZAKAT', 'CORPORATE_TAX', 'STAMP_DUTY', 'OTHER');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "TaxCodeStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'SUPERSEDED', 'MERGED');
+DO $$ BEGIN
+    CREATE TYPE "TaxCodeStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'SUPERSEDED', 'MERGED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "MergeRecordType" AS ENUM ('PARTY', 'PRODUCT', 'TAX_CODE');
+DO $$ BEGIN
+    CREATE TYPE "MergeRecordType" AS ENUM ('PARTY', 'PRODUCT', 'TAX_CODE');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "MergeStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'ROLLED_BACK');
+DO $$ BEGIN
+    CREATE TYPE "MergeStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'ROLLED_BACK');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "SurvivorshipStrategy" AS ENUM ('MANUAL', 'AUTOMATIC', 'RULE_BASED');
+DO $$ BEGIN
+    CREATE TYPE "SurvivorshipStrategy" AS ENUM ('MANUAL', 'AUTOMATIC', 'RULE_BASED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "BillStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'PAID');
+DO $$ BEGIN
+    CREATE TYPE "BillStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'PAID');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "OcrStatus" AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED');
+DO $$ BEGIN
+    CREATE TYPE "OcrStatus" AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "SignatureRequestStatus" AS ENUM ('PENDING', 'SIGNED', 'REJECTED', 'EXPIRED', 'CANCELLED');
+DO $$ BEGIN
+    CREATE TYPE "SignatureRequestStatus" AS ENUM ('PENDING', 'SIGNED', 'REJECTED', 'EXPIRED', 'CANCELLED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "AnalysisStatus" AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED');
+DO $$ BEGIN
+    CREATE TYPE "AnalysisStatus" AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "ApprovalItemType" AS ENUM ('BILL', 'EXPENSE', 'DOCUMENT', 'INVOICE', 'SERVICE_REQUEST', 'ENTITY', 'USER', 'OTHER');
+DO $$ BEGIN
+    CREATE TYPE "ApprovalItemType" AS ENUM ('BILL', 'EXPENSE', 'DOCUMENT', 'INVOICE', 'SERVICE_REQUEST', 'ENTITY', 'USER', 'OTHER');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "ApprovalStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'DELEGATED', 'ESCALATED', 'EXPIRED');
+DO $$ BEGIN
+    CREATE TYPE "ApprovalStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'DELEGATED', 'ESCALATED', 'EXPIRED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateEnum
-CREATE TYPE "ApprovalPriority" AS ENUM ('LOW', 'NORMAL', 'HIGH', 'URGENT');
+DO $$ BEGIN
+    CREATE TYPE "ApprovalPriority" AS ENUM ('LOW', 'NORMAL', 'HIGH', 'URGENT');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateTable
 CREATE TABLE "languages" (

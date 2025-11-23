@@ -50,10 +50,10 @@ export default function AnalyticsSettingsPage() {
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between"><div className="text-sm text-gray-700">Dashboards</div><button onClick={() => { const next = [...boards, { id: undefined, name: 'New Dashboard', widgets: [] }]; onChange('dashboards', 'dashboards', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Add</button></div>
-            <div className="space-y-3">{boards.map((b: any, i: number) => (
+            <div className="space-y-3">{boards.map((b: Record<string, any>, i: number) => (
               <div key={i} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end bg-white border border-gray-200 rounded-lg p-3">
                 <TextField label="Name" value={b.name || ''} onChange={(v) => { const next = [...boards]; next[i] = { ...b, name: v }; onChange('dashboards', 'dashboards', next) }} />
-                <div className="md:col-span-1 flex items-center"><button onClick={() => { const next = boards.filter((_: any, idx: number) => idx !== i); onChange('dashboards', 'dashboards', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Remove</button></div>
+                <div className="md:col-span-1 flex items-center"><button onClick={() => { const next = boards.filter((_: Record<string, any>, idx: number) => idx !== i); onChange('dashboards', 'dashboards', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Remove</button></div>
               </div>
             ))}</div>
           </div>
@@ -64,11 +64,11 @@ export default function AnalyticsSettingsPage() {
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between"><div className="text-sm text-gray-700">Metrics</div><button onClick={() => { const next = [...metrics, { id: undefined, key: 'new_metric', label: 'New Metric', aggregation: 'count' }]; onChange('metrics', 'metrics', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Add</button></div>
-            <div className="space-y-3">{metrics.map((m: any, i: number) => (
+            <div className="space-y-3">{metrics.map((m: Record<string, any>, i: number) => (
               <div key={i} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end bg-white border border-gray-200 rounded-lg p-3">
                 <TextField label="Key" value={m.key || ''} onChange={(v) => { const next = [...metrics]; next[i] = { ...m, key: v }; onChange('metrics', 'metrics', next) }} />
                 <TextField label="Label" value={m.label || ''} onChange={(v) => { const next = [...metrics]; next[i] = { ...m, label: v }; onChange('metrics', 'metrics', next) }} />
-                <div className="md:col-span-1 flex items-center"><button onClick={() => { const next = metrics.filter((_: any, idx: number) => idx !== i); onChange('metrics', 'metrics', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Remove</button></div>
+                <div className="md:col-span-1 flex items-center"><button onClick={() => { const next = metrics.filter((_: Record<string, any>, idx: number) => idx !== i); onChange('metrics', 'metrics', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Remove</button></div>
               </div>
             ))}</div>
           </div>
@@ -87,10 +87,10 @@ export default function AnalyticsSettingsPage() {
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between"><div className="text-sm text-gray-700">Integrations</div><button onClick={() => { const next = [...ints, '']; onChange('integrations', 'integrations', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Add</button></div>
-            <div className="space-y-3">{ints.map((it: any, i: number) => (
+            <div className="space-y-3">{ints.map((it: string, i: number) => (
               <div key={i} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end bg-white border border-gray-200 rounded-lg p-3">
                 <TextField label="Integration ID" value={it || ''} onChange={(v) => { const next = [...ints]; next[i] = v; onChange('integrations', 'integrations', next) }} />
-                <div className="md:col-span-1 flex items-center"><button onClick={() => { const next = ints.filter((_: any, idx: number) => idx !== i); onChange('integrations', 'integrations', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Remove</button></div>
+                <div className="md:col-span-1 flex items-center"><button onClick={() => { const next = ints.filter((_: string, idx: number) => idx !== i); onChange('integrations', 'integrations', next) }} className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50">Remove</button></div>
               </div>
             ))}</div>
           </div>
