@@ -25,9 +25,9 @@ interface ServiceRow {
   updatedAt?: string | Date | null
 }
 
-const fetcher = async (url: string) => {
+const fetcher = async (url: string): Promise<{ services: any[]; total: number; analytics: ServiceAnalytics | null }> => {
   const res = await apiFetch(url)
-  const defaultAnalytics = {
+  const defaultAnalytics: ServiceAnalytics = {
     monthlyBookings: [],
     revenueByService: [],
     popularServices: [],
