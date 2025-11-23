@@ -28,7 +28,7 @@ export const GET = withTenantContext(
       const ctx = requireTenantContext()
       // Fetch user settings from database
       const userSettings = await prisma.user.findUnique({
-        where: { id: ctx.userId },
+        where: { id: ctx.userId || undefined },
         select: {
           id: true,
           preferences: true, // Assuming a JSON field in the schema
@@ -75,7 +75,7 @@ export const PUT = withTenantContext(
 
       // Get current settings
       const currentUser = await prisma.user.findUnique({
-        where: { id: ctx.userId },
+        where: { id: ctx.userId || undefined },
         select: { preferences: true },
       })
 
@@ -100,7 +100,7 @@ export const PUT = withTenantContext(
 
       // Update settings
       const updated = await prisma.user.update({
-        where: { id: ctx.userId },
+        where: { id: ctx.userId || undefined },
         data: {
           preferences: updatedSettings,
         },
@@ -116,7 +116,7 @@ export const PUT = withTenantContext(
         userId: ctx.userId,
         action: 'SETTINGS_UPDATED',
         entity: 'UserSettings',
-        entityId: ctx.userId,
+        entityId: ctx.userId || undefined,
         changes: input,
       })
 
