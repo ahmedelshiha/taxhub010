@@ -26,9 +26,9 @@ vi.mock('@/lib/prisma', () => {
 describe('api/admin/tasks/export route', () => {
   it('returns CSV with headers and rows', async () => {
     const { GET } = await import('@/app/api/admin/tasks/export/route')
-    const res: any = await GET(new Request('https://example.com/api/admin/tasks/export?format=csv'))
+    const res: Response = await (GET as Function)(new Request('https://example.com/api/admin/tasks/export?format=csv'))
     expect(res.status).toBe(200)
-    const text = await res.text()
+    const text: string = await res.text()
     expect(text.startsWith('id,title,priority,status,assignee,dueAt,createdAt,updatedAt')).toBe(true)
     expect(text).toContain('A')
     expect(text).toContain('HIGH')

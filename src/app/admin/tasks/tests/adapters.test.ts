@@ -22,7 +22,7 @@ describe('adapters', () => {
   })
 
   it('converts api task to ui task', () => {
-    const apiTask: any = {
+    const apiTask: Record<string, unknown> = {
       id: '1', title: 'T', dueAt: null, priority: 'HIGH', status: 'IN_PROGRESS', assigneeId: null, createdAt: '2025-01-01T00:00:00.000Z', updatedAt: '2025-01-02T00:00:00.000Z'
     }
     const ui = apiTaskToUiTask(apiTask)
