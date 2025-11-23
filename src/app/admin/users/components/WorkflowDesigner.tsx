@@ -40,7 +40,7 @@ export function WorkflowDesigner({
   const handleAddNode = (nodeType: string) => {
     const newNode: WorkflowNode = {
       id: `node-${Date.now()}`,
-      type: nodeType,
+      type: nodeType as NodeType,
       label: `${nodeType.charAt(0).toUpperCase() + nodeType.slice(1)}`,
       x: 100 + Math.random() * 200,
       y: 100 + Math.random() * 200,
