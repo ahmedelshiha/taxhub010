@@ -305,7 +305,7 @@ export class NotificationHub {
     // Filter out null values to avoid JsonValue type issues
     const filteredPreferences = Object.fromEntries(
       Object.entries(preferences).filter(([_, value]) => value !== null)
-    ) as Partial<NotificationPreference>
+    )
 
     return prisma.notificationPreference.upsert({
       where: { userId },
@@ -313,8 +313,8 @@ export class NotificationHub {
         userId,
         tenantId,
         ...filteredPreferences,
-      },
-      update: filteredPreferences,
+      } as any, // Type assertion after null filtering
+      update: filteredPreferences as any, // Type assertion after null filtering
     })
   }
 
