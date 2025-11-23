@@ -50,6 +50,7 @@ if [[ -n "$DATABASE_URL" || -n "$NETLIFY_DATABASE_URL" ]]; then
       # Try to resolve failed migrations by marking them as rolled back
       pnpm prisma migrate resolve --rolled-back 20251114145300_add_user_on_entity 2>/dev/null || true
       pnpm prisma migrate resolve --rolled-back 20251122170506_init 2>/dev/null || true
+      pnpm prisma migrate resolve --rolled-back 20251123231126_init 2>/dev/null || true
       # Retry the migration
       if pnpm db:migrate; then
         echo "✅ Database migrations completed after resolution"
