@@ -2040,807 +2040,1007 @@ EXCEPTION
 END $$;
 
 -- CreateTable
-CREATE TABLE "workflow_notifications" (
-    "id" TEXT NOT NULL,
-    "workflowId" TEXT NOT NULL,
-    "emailTo" TEXT NOT NULL,
-    "emailSubject" TEXT NOT NULL,
-    "emailBody" TEXT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'PENDING',
-    "sentAt" TIMESTAMP(3),
-    "errorMessage" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "workflow_notifications" (
+        "id" TEXT NOT NULL,
+        "workflowId" TEXT NOT NULL,
+        "emailTo" TEXT NOT NULL,
+        "emailSubject" TEXT NOT NULL,
+        "emailBody" TEXT NOT NULL,
+        "status" TEXT NOT NULL DEFAULT 'PENDING',
+        "sentAt" TIMESTAMP(3),
+        "errorMessage" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "workflow_notifications_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "workflow_notifications_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "workflow_history" (
-    "id" TEXT NOT NULL,
-    "workflowId" TEXT NOT NULL,
-    "eventType" TEXT NOT NULL,
-    "eventDescription" TEXT,
-    "changedBy" TEXT NOT NULL,
-    "oldValue" JSONB,
-    "newValue" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "workflow_history" (
+        "id" TEXT NOT NULL,
+        "workflowId" TEXT NOT NULL,
+        "eventType" TEXT NOT NULL,
+        "eventDescription" TEXT,
+        "changedBy" TEXT NOT NULL,
+        "oldValue" JSONB,
+        "newValue" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "workflow_history_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "workflow_history_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "support_tickets" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "assignedToId" TEXT,
-    "title" TEXT NOT NULL,
-    "description" TEXT,
-    "category" TEXT NOT NULL DEFAULT 'GENERAL',
-    "priority" TEXT NOT NULL DEFAULT 'MEDIUM',
-    "status" TEXT NOT NULL DEFAULT 'OPEN',
-    "resolution" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "resolvedAt" TIMESTAMP(3),
-    "dueAt" TIMESTAMP(3),
-    "slaFirstResponseAt" TIMESTAMP(3),
-    "slaResolutionAt" TIMESTAMP(3),
-    "attachmentIds" TEXT[],
-    "tags" TEXT[],
-    "metadata" JSONB,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "support_tickets" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        "assignedToId" TEXT,
+        "title" TEXT NOT NULL,
+        "description" TEXT,
+        "category" TEXT NOT NULL DEFAULT 'GENERAL',
+        "priority" TEXT NOT NULL DEFAULT 'MEDIUM',
+        "status" TEXT NOT NULL DEFAULT 'OPEN',
+        "resolution" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "resolvedAt" TIMESTAMP(3),
+        "dueAt" TIMESTAMP(3),
+        "slaFirstResponseAt" TIMESTAMP(3),
+        "slaResolutionAt" TIMESTAMP(3),
+        "attachmentIds" TEXT[],
+        "tags" TEXT[],
+        "metadata" JSONB,
 
-    CONSTRAINT "support_tickets_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "support_tickets_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "support_ticket_comments" (
-    "id" TEXT NOT NULL,
-    "ticketId" TEXT NOT NULL,
-    "authorId" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
-    "attachmentIds" TEXT[],
-    "isInternal" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "support_ticket_comments" (
+        "id" TEXT NOT NULL,
+        "ticketId" TEXT NOT NULL,
+        "authorId" TEXT NOT NULL,
+        "content" TEXT NOT NULL,
+        "attachmentIds" TEXT[],
+        "isInternal" BOOLEAN NOT NULL DEFAULT false,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "support_ticket_comments_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "support_ticket_comments_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "support_ticket_status_history" (
-    "id" TEXT NOT NULL,
-    "ticketId" TEXT NOT NULL,
-    "previousStatus" TEXT,
-    "newStatus" TEXT NOT NULL,
-    "changedBy" TEXT,
-    "reason" TEXT,
-    "changedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "support_ticket_status_history" (
+        "id" TEXT NOT NULL,
+        "ticketId" TEXT NOT NULL,
+        "previousStatus" TEXT,
+        "newStatus" TEXT NOT NULL,
+        "changedBy" TEXT,
+        "reason" TEXT,
+        "changedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "support_ticket_status_history_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "support_ticket_status_history_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "knowledge_base_categories" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "slug" VARCHAR(255) NOT NULL,
-    "description" TEXT,
-    "icon" VARCHAR(50),
-    "order" INTEGER NOT NULL DEFAULT 0,
-    "published" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "knowledge_base_categories" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "name" VARCHAR(255) NOT NULL,
+        "slug" VARCHAR(255) NOT NULL,
+        "description" TEXT,
+        "icon" VARCHAR(50),
+        "order" INTEGER NOT NULL DEFAULT 0,
+        "published" BOOLEAN NOT NULL DEFAULT true,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "knowledge_base_categories_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "knowledge_base_categories_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "knowledge_base_articles" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "categoryId" TEXT NOT NULL,
-    "title" VARCHAR(500) NOT NULL,
-    "slug" VARCHAR(500) NOT NULL,
-    "content" TEXT NOT NULL,
-    "excerpt" VARCHAR(1000),
-    "authorId" TEXT NOT NULL,
-    "published" BOOLEAN NOT NULL DEFAULT false,
-    "featured" BOOLEAN NOT NULL DEFAULT false,
-    "viewCount" INTEGER NOT NULL DEFAULT 0,
-    "helpfulCount" INTEGER NOT NULL DEFAULT 0,
-    "notHelpfulCount" INTEGER NOT NULL DEFAULT 0,
-    "tags" TEXT[],
-    "relatedArticleIds" TEXT[],
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "publishedAt" TIMESTAMP(3),
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "knowledge_base_articles" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "categoryId" TEXT NOT NULL,
+        "title" VARCHAR(500) NOT NULL,
+        "slug" VARCHAR(500) NOT NULL,
+        "content" TEXT NOT NULL,
+        "excerpt" VARCHAR(1000),
+        "authorId" TEXT NOT NULL,
+        "published" BOOLEAN NOT NULL DEFAULT false,
+        "featured" BOOLEAN NOT NULL DEFAULT false,
+        "viewCount" INTEGER NOT NULL DEFAULT 0,
+        "helpfulCount" INTEGER NOT NULL DEFAULT 0,
+        "notHelpfulCount" INTEGER NOT NULL DEFAULT 0,
+        "tags" TEXT[],
+        "relatedArticleIds" TEXT[],
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "publishedAt" TIMESTAMP(3),
 
-    CONSTRAINT "knowledge_base_articles_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "knowledge_base_articles_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "bulk_operations" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "description" TEXT,
-    "type" "BulkOperationType" NOT NULL,
-    "userFilter" JSONB,
-    "operationConfig" JSONB NOT NULL,
-    "status" "BulkOperationStatus" NOT NULL DEFAULT 'DRAFT',
-    "createdBy" TEXT NOT NULL,
-    "approvalRequired" BOOLEAN NOT NULL DEFAULT false,
-    "approvalStatus" TEXT,
-    "approvedBy" TEXT,
-    "approvedAt" TIMESTAMP(3),
-    "scheduledFor" TIMESTAMP(3),
-    "notifyUsers" BOOLEAN NOT NULL DEFAULT true,
-    "dryRunResults" JSONB,
-    "totalUsersAffected" INTEGER NOT NULL DEFAULT 0,
-    "successCount" INTEGER NOT NULL DEFAULT 0,
-    "failureCount" INTEGER NOT NULL DEFAULT 0,
-    "startedAt" TIMESTAMP(3),
-    "completedAt" TIMESTAMP(3),
-    "errorMessage" TEXT,
-    "rollbackAvailable" BOOLEAN NOT NULL DEFAULT true,
-    "rollbackUntilDate" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "bulk_operations" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "name" VARCHAR(255) NOT NULL,
+        "description" TEXT,
+        "type" "BulkOperationType" NOT NULL,
+        "userFilter" JSONB,
+        "operationConfig" JSONB NOT NULL,
+        "status" "BulkOperationStatus" NOT NULL DEFAULT 'DRAFT',
+        "createdBy" TEXT NOT NULL,
+        "approvalRequired" BOOLEAN NOT NULL DEFAULT false,
+        "approvalStatus" TEXT,
+        "approvedBy" TEXT,
+        "approvedAt" TIMESTAMP(3),
+        "scheduledFor" TIMESTAMP(3),
+        "notifyUsers" BOOLEAN NOT NULL DEFAULT true,
+        "dryRunResults" JSONB,
+        "totalUsersAffected" INTEGER NOT NULL DEFAULT 0,
+        "successCount" INTEGER NOT NULL DEFAULT 0,
+        "failureCount" INTEGER NOT NULL DEFAULT 0,
+        "startedAt" TIMESTAMP(3),
+        "completedAt" TIMESTAMP(3),
+        "errorMessage" TEXT,
+        "rollbackAvailable" BOOLEAN NOT NULL DEFAULT true,
+        "rollbackUntilDate" TIMESTAMP(3),
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "bulk_operations_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "bulk_operations_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "bulk_operation_results" (
-    "id" TEXT NOT NULL,
-    "bulkOperationId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "status" TEXT NOT NULL,
-    "errorMessage" TEXT,
-    "changesBefore" JSONB,
-    "changesAfter" JSONB,
-    "executionTimeMs" INTEGER,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "bulk_operation_results" (
+        "id" TEXT NOT NULL,
+        "bulkOperationId" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        "status" TEXT NOT NULL,
+        "errorMessage" TEXT,
+        "changesBefore" JSONB,
+        "changesAfter" JSONB,
+        "executionTimeMs" INTEGER,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "bulk_operation_results_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "bulk_operation_results_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "bulk_operation_history" (
-    "id" TEXT NOT NULL,
-    "bulkOperationId" TEXT NOT NULL,
-    "eventType" TEXT NOT NULL,
-    "eventDescription" TEXT,
-    "changedBy" TEXT,
-    "oldValue" JSONB,
-    "newValue" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "bulk_operation_history" (
+        "id" TEXT NOT NULL,
+        "bulkOperationId" TEXT NOT NULL,
+        "eventType" TEXT NOT NULL,
+        "eventDescription" TEXT,
+        "changedBy" TEXT,
+        "oldValue" JSONB,
+        "newValue" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "bulk_operation_history_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "bulk_operation_history_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "entities" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "country" VARCHAR(2) NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "legalForm" VARCHAR(50),
-    "status" VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    "fiscalYearStart" TIMESTAMP(3),
-    "registrationCertUrl" TEXT,
-    "registrationCertHash" TEXT,
-    "activityCode" VARCHAR(20),
-    "parentEntityId" TEXT,
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "createdBy" TEXT NOT NULL,
-    "updatedBy" TEXT,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "entities" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "country" VARCHAR(2) NOT NULL,
+        "name" VARCHAR(255) NOT NULL,
+        "legalForm" VARCHAR(50),
+        "status" VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+        "fiscalYearStart" TIMESTAMP(3),
+        "registrationCertUrl" TEXT,
+        "registrationCertHash" TEXT,
+        "activityCode" VARCHAR(20),
+        "parentEntityId" TEXT,
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "createdBy" TEXT NOT NULL,
+        "updatedBy" TEXT,
 
-    CONSTRAINT "entities_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "entities_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "user_on_entities" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "entityId" TEXT NOT NULL,
-    "role" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "user_on_entities" (
+        "id" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        "entityId" TEXT NOT NULL,
+        "role" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "user_on_entities_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "user_on_entities_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "entity_licenses" (
-    "id" TEXT NOT NULL,
-    "entityId" TEXT NOT NULL,
-    "country" VARCHAR(2) NOT NULL,
-    "authority" VARCHAR(100) NOT NULL,
-    "licenseNumber" VARCHAR(100) NOT NULL,
-    "legalForm" VARCHAR(50),
-    "issuedAt" TIMESTAMP(3),
-    "expiresAt" TIMESTAMP(3),
-    "economicZoneId" TEXT,
-    "status" VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "verifiedAt" TIMESTAMP(3),
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "entity_licenses" (
+        "id" TEXT NOT NULL,
+        "entityId" TEXT NOT NULL,
+        "country" VARCHAR(2) NOT NULL,
+        "authority" VARCHAR(100) NOT NULL,
+        "licenseNumber" VARCHAR(100) NOT NULL,
+        "legalForm" VARCHAR(50),
+        "issuedAt" TIMESTAMP(3),
+        "expiresAt" TIMESTAMP(3),
+        "economicZoneId" TEXT,
+        "status" VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "verifiedAt" TIMESTAMP(3),
 
-    CONSTRAINT "entity_licenses_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "entity_licenses_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "entity_registrations" (
-    "id" TEXT NOT NULL,
-    "entityId" TEXT NOT NULL,
-    "type" VARCHAR(20) NOT NULL,
-    "value" VARCHAR(100) NOT NULL,
-    "verifiedAt" TIMESTAMP(3),
-    "source" VARCHAR(50),
-    "status" VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "entity_registrations" (
+        "id" TEXT NOT NULL,
+        "entityId" TEXT NOT NULL,
+        "type" VARCHAR(20) NOT NULL,
+        "value" VARCHAR(100) NOT NULL,
+        "verifiedAt" TIMESTAMP(3),
+        "source" VARCHAR(50),
+        "status" VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "entity_registrations_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "entity_registrations_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "economic_zones" (
-    "id" TEXT NOT NULL,
-    "country" VARCHAR(2) NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "authorityCode" VARCHAR(50),
-    "city" VARCHAR(100),
-    "region" VARCHAR(100),
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "economic_zones" (
+        "id" TEXT NOT NULL,
+        "country" VARCHAR(2) NOT NULL,
+        "name" VARCHAR(255) NOT NULL,
+        "authorityCode" VARCHAR(50),
+        "city" VARCHAR(100),
+        "region" VARCHAR(100),
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "economic_zones_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "economic_zones_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "obligations" (
-    "id" TEXT NOT NULL,
-    "entityId" TEXT NOT NULL,
-    "type" VARCHAR(50) NOT NULL,
-    "country" VARCHAR(2) NOT NULL,
-    "frequency" VARCHAR(20) NOT NULL,
-    "ruleConfig" JSONB,
-    "active" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "obligations" (
+        "id" TEXT NOT NULL,
+        "entityId" TEXT NOT NULL,
+        "type" VARCHAR(50) NOT NULL,
+        "country" VARCHAR(2) NOT NULL,
+        "frequency" VARCHAR(20) NOT NULL,
+        "ruleConfig" JSONB,
+        "active" BOOLEAN NOT NULL DEFAULT true,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "obligations_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "obligations_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "filing_periods" (
-    "id" TEXT NOT NULL,
-    "obligationId" TEXT NOT NULL,
-    "periodStart" TIMESTAMP(3) NOT NULL,
-    "periodEnd" TIMESTAMP(3) NOT NULL,
-    "dueAt" TIMESTAMP(3) NOT NULL,
-    "status" VARCHAR(20) NOT NULL DEFAULT 'UPCOMING',
-    "assigneeId" TEXT,
-    "snoozeUntil" TIMESTAMP(3),
-    "notes" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "filing_periods" (
+        "id" TEXT NOT NULL,
+        "obligationId" TEXT NOT NULL,
+        "periodStart" TIMESTAMP(3) NOT NULL,
+        "periodEnd" TIMESTAMP(3) NOT NULL,
+        "dueAt" TIMESTAMP(3) NOT NULL,
+        "status" VARCHAR(20) NOT NULL DEFAULT 'UPCOMING',
+        "assigneeId" TEXT,
+        "snoozeUntil" TIMESTAMP(3),
+        "notes" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "filing_periods_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "filing_periods_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "consents" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "entityId" TEXT,
-    "userId" TEXT,
-    "type" VARCHAR(50) NOT NULL,
-    "version" VARCHAR(20) NOT NULL,
-    "acceptedBy" TEXT NOT NULL,
-    "acceptedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "ip" VARCHAR(45),
-    "userAgent" TEXT,
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "consents" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "entityId" TEXT,
+        "userId" TEXT,
+        "type" VARCHAR(50) NOT NULL,
+        "version" VARCHAR(20) NOT NULL,
+        "acceptedBy" TEXT NOT NULL,
+        "acceptedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "ip" VARCHAR(45),
+        "userAgent" TEXT,
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "consents_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "consents_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "verification_attempts" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "type" VARCHAR(50) NOT NULL,
-    "value" VARCHAR(255) NOT NULL,
-    "country" VARCHAR(2) NOT NULL,
-    "status" VARCHAR(20) NOT NULL,
-    "result" JSONB,
-    "attemptedBy" TEXT,
-    "attemptedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "correlationId" VARCHAR(100),
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "verification_attempts" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "type" VARCHAR(50) NOT NULL,
+        "value" VARCHAR(255) NOT NULL,
+        "country" VARCHAR(2) NOT NULL,
+        "status" VARCHAR(20) NOT NULL,
+        "result" JSONB,
+        "attemptedBy" TEXT,
+        "attemptedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "correlationId" VARCHAR(100),
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "verification_attempts_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "verification_attempts_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "entity_audit_logs" (
-    "id" TEXT NOT NULL,
-    "entityId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "action" VARCHAR(50) NOT NULL,
-    "changes" JSONB,
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "entity_audit_logs" (
+        "id" TEXT NOT NULL,
+        "entityId" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        "action" VARCHAR(50) NOT NULL,
+        "changes" JSONB,
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "entity_audit_logs_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "entity_audit_logs_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "workflows" (
-    "id" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "description" TEXT,
-    "version" INTEGER NOT NULL DEFAULT 1,
-    "status" TEXT NOT NULL DEFAULT 'DRAFT',
-    "nodes" JSONB NOT NULL DEFAULT '[]',
-    "edges" JSONB NOT NULL DEFAULT '[]',
-    "createdBy" TEXT NOT NULL DEFAULT 'system',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "workflows" (
+        "id" TEXT NOT NULL,
+        "name" VARCHAR(255) NOT NULL,
+        "description" TEXT,
+        "version" INTEGER NOT NULL DEFAULT 1,
+        "status" TEXT NOT NULL DEFAULT 'DRAFT',
+        "nodes" JSONB NOT NULL DEFAULT '[]',
+        "edges" JSONB NOT NULL DEFAULT '[]',
+        "createdBy" TEXT NOT NULL DEFAULT 'system',
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "workflows_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "workflows_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "workflow_simulations" (
-    "id" TEXT NOT NULL,
-    "workflowId" TEXT NOT NULL,
-    "testData" JSONB,
-    "executionPath" JSONB NOT NULL DEFAULT '[]',
-    "totalDuration" INTEGER NOT NULL DEFAULT 0,
-    "success" BOOLEAN NOT NULL DEFAULT false,
-    "errors" TEXT[] DEFAULT ARRAY[]::TEXT[],
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "workflow_simulations" (
+        "id" TEXT NOT NULL,
+        "workflowId" TEXT NOT NULL,
+        "testData" JSONB,
+        "executionPath" JSONB NOT NULL DEFAULT '[]',
+        "totalDuration" INTEGER NOT NULL DEFAULT 0,
+        "success" BOOLEAN NOT NULL DEFAULT false,
+        "errors" TEXT[] DEFAULT ARRAY[]::TEXT[],
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "workflow_simulations_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "workflow_simulations_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "reports" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "description" TEXT,
-    "format" TEXT NOT NULL DEFAULT 'table',
-    "sections" JSONB NOT NULL DEFAULT '[]',
-    "pageSize" TEXT NOT NULL DEFAULT 'A4',
-    "orientation" TEXT NOT NULL DEFAULT 'portrait',
-    "includeHeader" BOOLEAN NOT NULL DEFAULT true,
-    "includeFooter" BOOLEAN NOT NULL DEFAULT true,
-    "headerText" TEXT,
-    "footerText" TEXT,
-    "templateId" TEXT,
-    "lastGeneratedAt" TIMESTAMP(3),
-    "generationCount" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "reports" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        "name" VARCHAR(255) NOT NULL,
+        "description" TEXT,
+        "format" TEXT NOT NULL DEFAULT 'table',
+        "sections" JSONB NOT NULL DEFAULT '[]',
+        "pageSize" TEXT NOT NULL DEFAULT 'A4',
+        "orientation" TEXT NOT NULL DEFAULT 'portrait',
+        "includeHeader" BOOLEAN NOT NULL DEFAULT true,
+        "includeFooter" BOOLEAN NOT NULL DEFAULT true,
+        "headerText" TEXT,
+        "footerText" TEXT,
+        "templateId" TEXT,
+        "lastGeneratedAt" TIMESTAMP(3),
+        "generationCount" INTEGER NOT NULL DEFAULT 0,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "reports_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "reports_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "report_executions" (
-    "id" TEXT NOT NULL,
-    "reportId" TEXT NOT NULL,
-    "status" TEXT NOT NULL,
-    "filePath" TEXT,
-    "fileSizeBytes" INTEGER,
-    "generationTimeMs" INTEGER,
-    "errorMessage" TEXT,
-    "executedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "completedAt" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "report_executions" (
+        "id" TEXT NOT NULL,
+        "reportId" TEXT NOT NULL,
+        "status" TEXT NOT NULL,
+        "filePath" TEXT,
+        "fileSizeBytes" INTEGER,
+        "generationTimeMs" INTEGER,
+        "errorMessage" TEXT,
+        "executedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "completedAt" TIMESTAMP(3),
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "report_executions_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "report_executions_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "export_schedules" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "description" TEXT,
-    "frequency" TEXT NOT NULL,
-    "format" TEXT NOT NULL,
-    "recipients" TEXT[],
-    "dayOfWeek" TEXT,
-    "dayOfMonth" INTEGER,
-    "time" TEXT DEFAULT '09:00',
-    "emailSubject" TEXT,
-    "emailBody" TEXT,
-    "filterPresetId" TEXT,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "lastExecutedAt" TIMESTAMP(3),
-    "nextExecutedAt" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "export_schedules" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        "name" VARCHAR(255) NOT NULL,
+        "description" TEXT,
+        "frequency" TEXT NOT NULL,
+        "format" TEXT NOT NULL,
+        "recipients" TEXT[],
+        "dayOfWeek" TEXT,
+        "dayOfMonth" INTEGER,
+        "time" TEXT DEFAULT '09:00',
+        "emailSubject" TEXT,
+        "emailBody" TEXT,
+        "filterPresetId" TEXT,
+        "isActive" BOOLEAN NOT NULL DEFAULT true,
+        "lastExecutedAt" TIMESTAMP(3),
+        "nextExecutedAt" TIMESTAMP(3),
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "export_schedules_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "export_schedules_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "export_schedule_executions" (
-    "id" TEXT NOT NULL,
-    "scheduleId" TEXT NOT NULL,
-    "status" TEXT NOT NULL,
-    "executedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "recordCount" INTEGER NOT NULL DEFAULT 0,
-    "fileSizeBytes" INTEGER,
-    "errorMessage" TEXT,
-    "deliveryStatus" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "export_schedule_executions" (
+        "id" TEXT NOT NULL,
+        "scheduleId" TEXT NOT NULL,
+        "status" TEXT NOT NULL,
+        "executedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "recordCount" INTEGER NOT NULL DEFAULT 0,
+        "fileSizeBytes" INTEGER,
+        "errorMessage" TEXT,
+        "deliveryStatus" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "export_schedule_executions_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "export_schedule_executions_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "tax_filings" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "entityId" TEXT NOT NULL,
-    "country" VARCHAR(3) NOT NULL,
-    "taxType" VARCHAR(50) NOT NULL,
-    "periodStartDate" TIMESTAMP(3) NOT NULL,
-    "periodEndDate" TIMESTAMP(3) NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'DRAFT',
-    "data" TEXT NOT NULL,
-    "calculations" TEXT NOT NULL,
-    "taxAmount" DECIMAL(19,4) NOT NULL,
-    "attachmentIds" TEXT[] DEFAULT ARRAY[]::TEXT[],
-    "submittedAt" TIMESTAMP(3),
-    "submittedBy" TEXT,
-    "rejectionReason" TEXT,
-    "metadata" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "tax_filings" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "entityId" TEXT NOT NULL,
+        "country" VARCHAR(3) NOT NULL,
+        "taxType" VARCHAR(50) NOT NULL,
+        "periodStartDate" TIMESTAMP(3) NOT NULL,
+        "periodEndDate" TIMESTAMP(3) NOT NULL,
+        "status" TEXT NOT NULL DEFAULT 'DRAFT',
+        "data" TEXT NOT NULL,
+        "calculations" TEXT NOT NULL,
+        "taxAmount" DECIMAL(19,4) NOT NULL,
+        "attachmentIds" TEXT[] DEFAULT ARRAY[]::TEXT[],
+        "submittedAt" TIMESTAMP(3),
+        "submittedBy" TEXT,
+        "rejectionReason" TEXT,
+        "metadata" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "tax_filings_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "tax_filings_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "parties" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "partyType" "PartyType" NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "legalName" VARCHAR(255),
-    "registrationNumber" VARCHAR(100),
-    "taxId" VARCHAR(100),
-    "email" VARCHAR(255),
-    "phone" VARCHAR(20),
-    "address" TEXT,
-    "city" VARCHAR(100),
-    "country" VARCHAR(2),
-    "status" "PartyStatus" NOT NULL DEFAULT 'ACTIVE',
-    "isMasterRecord" BOOLEAN NOT NULL DEFAULT false,
-    "masterRecordId" TEXT,
-    "dataQualityScore" DECIMAL(5,2) NOT NULL DEFAULT 0,
-    "lastValidatedAt" TIMESTAMP(3),
-    "validationErrors" TEXT[] DEFAULT ARRAY[]::TEXT[],
-    "metadata" JSONB,
-    "externalId" VARCHAR(255),
-    "source" VARCHAR(100),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "createdBy" TEXT,
-    "updatedBy" TEXT,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "parties" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "partyType" "PartyType" NOT NULL,
+        "name" VARCHAR(255) NOT NULL,
+        "legalName" VARCHAR(255),
+        "registrationNumber" VARCHAR(100),
+        "taxId" VARCHAR(100),
+        "email" VARCHAR(255),
+        "phone" VARCHAR(20),
+        "address" TEXT,
+        "city" VARCHAR(100),
+        "country" VARCHAR(2),
+        "status" "PartyStatus" NOT NULL DEFAULT 'ACTIVE',
+        "isMasterRecord" BOOLEAN NOT NULL DEFAULT false,
+        "masterRecordId" TEXT,
+        "dataQualityScore" DECIMAL(5,2) NOT NULL DEFAULT 0,
+        "lastValidatedAt" TIMESTAMP(3),
+        "validationErrors" TEXT[] DEFAULT ARRAY[]::TEXT[],
+        "metadata" JSONB,
+        "externalId" VARCHAR(255),
+        "source" VARCHAR(100),
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "createdBy" TEXT,
+        "updatedBy" TEXT,
 
-    CONSTRAINT "parties_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "parties_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "products" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "productCode" VARCHAR(100) NOT NULL,
-    "productName" VARCHAR(255) NOT NULL,
-    "description" TEXT,
-    "productType" "ProductType" NOT NULL,
-    "category" VARCHAR(100),
-    "unitOfMeasure" VARCHAR(50),
-    "standardPrice" DECIMAL(19,4),
-    "currency" VARCHAR(3),
-    "taxCodeId" TEXT,
-    "taxRate" DECIMAL(5,2),
-    "isMasterRecord" BOOLEAN NOT NULL DEFAULT false,
-    "masterRecordId" TEXT,
-    "status" "ProductStatus" NOT NULL DEFAULT 'ACTIVE',
-    "effectiveFrom" TIMESTAMP(3),
-    "effectiveTo" TIMESTAMP(3),
-    "dataQualityScore" DECIMAL(5,2) NOT NULL DEFAULT 0,
-    "lastValidatedAt" TIMESTAMP(3),
-    "metadata" JSONB,
-    "externalId" VARCHAR(255),
-    "source" VARCHAR(100),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "createdBy" TEXT,
-    "updatedBy" TEXT,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "products" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "productCode" VARCHAR(100) NOT NULL,
+        "productName" VARCHAR(255) NOT NULL,
+        "description" TEXT,
+        "productType" "ProductType" NOT NULL,
+        "category" VARCHAR(100),
+        "unitOfMeasure" VARCHAR(50),
+        "standardPrice" DECIMAL(19,4),
+        "currency" VARCHAR(3),
+        "taxCodeId" TEXT,
+        "taxRate" DECIMAL(5,2),
+        "isMasterRecord" BOOLEAN NOT NULL DEFAULT false,
+        "masterRecordId" TEXT,
+        "status" "ProductStatus" NOT NULL DEFAULT 'ACTIVE',
+        "effectiveFrom" TIMESTAMP(3),
+        "effectiveTo" TIMESTAMP(3),
+        "dataQualityScore" DECIMAL(5,2) NOT NULL DEFAULT 0,
+        "lastValidatedAt" TIMESTAMP(3),
+        "metadata" JSONB,
+        "externalId" VARCHAR(255),
+        "source" VARCHAR(100),
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "createdBy" TEXT,
+        "updatedBy" TEXT,
 
-    CONSTRAINT "products_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "products_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "tax_codes" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "taxCodeValue" VARCHAR(50) NOT NULL,
-    "description" VARCHAR(255),
-    "taxType" "TaxType" NOT NULL,
-    "country" VARCHAR(2) NOT NULL,
-    "taxRate" DECIMAL(5,2) NOT NULL,
-    "isMasterRecord" BOOLEAN NOT NULL DEFAULT false,
-    "masterRecordId" TEXT,
-    "status" "TaxCodeStatus" NOT NULL DEFAULT 'ACTIVE',
-    "effectiveFrom" TIMESTAMP(3) NOT NULL,
-    "effectiveTo" TIMESTAMP(3),
-    "metadata" JSONB,
-    "externalId" VARCHAR(255),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "createdBy" TEXT,
-    "updatedBy" TEXT,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "tax_codes" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "taxCodeValue" VARCHAR(50) NOT NULL,
+        "description" VARCHAR(255),
+        "taxType" "TaxType" NOT NULL,
+        "country" VARCHAR(2) NOT NULL,
+        "taxRate" DECIMAL(5,2) NOT NULL,
+        "isMasterRecord" BOOLEAN NOT NULL DEFAULT false,
+        "masterRecordId" TEXT,
+        "status" "TaxCodeStatus" NOT NULL DEFAULT 'ACTIVE',
+        "effectiveFrom" TIMESTAMP(3) NOT NULL,
+        "effectiveTo" TIMESTAMP(3),
+        "metadata" JSONB,
+        "externalId" VARCHAR(255),
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "createdBy" TEXT,
+        "updatedBy" TEXT,
 
-    CONSTRAINT "tax_codes_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "tax_codes_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "merge_logs" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "recordType" "MergeRecordType" NOT NULL,
-    "masterRecordId" TEXT NOT NULL,
-    "masterRecordName" VARCHAR(255) NOT NULL,
-    "duplicateRecordId" TEXT NOT NULL,
-    "duplicateRecordName" VARCHAR(255) NOT NULL,
-    "mergeReason" TEXT,
-    "survivorshipRuleId" TEXT,
-    "survivorshipStrategy" "SurvivorshipStrategy" NOT NULL DEFAULT 'MANUAL',
-    "mergeStatus" "MergeStatus" NOT NULL DEFAULT 'PENDING',
-    "mergeErrors" TEXT[] DEFAULT ARRAY[]::TEXT[],
-    "canUnmerge" BOOLEAN NOT NULL DEFAULT true,
-    "unmergeReason" TEXT,
-    "unmergedAt" TIMESTAMP(3),
-    "unmergedBy" TEXT,
-    "mergedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "mergedBy" TEXT NOT NULL,
-    "metadata" JSONB,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "merge_logs" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "recordType" "MergeRecordType" NOT NULL,
+        "masterRecordId" TEXT NOT NULL,
+        "masterRecordName" VARCHAR(255) NOT NULL,
+        "duplicateRecordId" TEXT NOT NULL,
+        "duplicateRecordName" VARCHAR(255) NOT NULL,
+        "mergeReason" TEXT,
+        "survivorshipRuleId" TEXT,
+        "survivorshipStrategy" "SurvivorshipStrategy" NOT NULL DEFAULT 'MANUAL',
+        "mergeStatus" "MergeStatus" NOT NULL DEFAULT 'PENDING',
+        "mergeErrors" TEXT[] DEFAULT ARRAY[]::TEXT[],
+        "canUnmerge" BOOLEAN NOT NULL DEFAULT true,
+        "unmergeReason" TEXT,
+        "unmergedAt" TIMESTAMP(3),
+        "unmergedBy" TEXT,
+        "mergedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "mergedBy" TEXT NOT NULL,
+        "metadata" JSONB,
 
-    CONSTRAINT "merge_logs_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "merge_logs_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "survivorship_rules" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "recordType" "MergeRecordType" NOT NULL,
-    "ruleName" VARCHAR(255) NOT NULL,
-    "description" TEXT,
-    "fieldMappings" JSONB NOT NULL,
-    "customLogic" TEXT,
-    "priority" INTEGER NOT NULL DEFAULT 0,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "createdBy" TEXT,
-    "updatedBy" TEXT,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "survivorship_rules" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "recordType" "MergeRecordType" NOT NULL,
+        "ruleName" VARCHAR(255) NOT NULL,
+        "description" TEXT,
+        "fieldMappings" JSONB NOT NULL,
+        "customLogic" TEXT,
+        "priority" INTEGER NOT NULL DEFAULT 0,
+        "isActive" BOOLEAN NOT NULL DEFAULT true,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "createdBy" TEXT,
+        "updatedBy" TEXT,
 
-    CONSTRAINT "survivorship_rules_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "survivorship_rules_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "bills" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "entityId" TEXT,
-    "billNumber" TEXT,
-    "vendor" TEXT NOT NULL,
-    "amount" DOUBLE PRECISION NOT NULL,
-    "currency" TEXT NOT NULL DEFAULT 'USD',
-    "date" TIMESTAMP(3) NOT NULL,
-    "dueDate" TIMESTAMP(3),
-    "status" "BillStatus" NOT NULL DEFAULT 'PENDING',
-    "approvedBy" TEXT,
-    "approvedAt" TIMESTAMP(3),
-    "ocrStatus" "OcrStatus" NOT NULL DEFAULT 'PENDING',
-    "ocrData" JSONB,
-    "ocrConfidence" DOUBLE PRECISION,
-    "attachmentId" TEXT,
-    "category" TEXT,
-    "description" TEXT,
-    "notes" TEXT,
-    "tags" TEXT[],
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "bills" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "entityId" TEXT,
+        "billNumber" TEXT,
+        "vendor" TEXT NOT NULL,
+        "amount" DOUBLE PRECISION NOT NULL,
+        "currency" TEXT NOT NULL DEFAULT 'USD',
+        "date" TIMESTAMP(3) NOT NULL,
+        "dueDate" TIMESTAMP(3),
+        "status" "BillStatus" NOT NULL DEFAULT 'PENDING',
+        "approvedBy" TEXT,
+        "approvedAt" TIMESTAMP(3),
+        "ocrStatus" "OcrStatus" NOT NULL DEFAULT 'PENDING',
+        "ocrData" JSONB,
+        "ocrConfidence" DOUBLE PRECISION,
+        "attachmentId" TEXT,
+        "category" TEXT,
+        "description" TEXT,
+        "notes" TEXT,
+        "tags" TEXT[],
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "bills_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "bills_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "approvals" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "itemType" "ApprovalItemType" NOT NULL,
-    "itemId" TEXT NOT NULL,
-    "itemData" JSONB,
-    "requesterId" TEXT NOT NULL,
-    "requesterName" TEXT,
-    "requestedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "approverId" TEXT NOT NULL,
-    "approverName" TEXT,
-    "status" "ApprovalStatus" NOT NULL DEFAULT 'PENDING',
-    "priority" "ApprovalPriority" NOT NULL DEFAULT 'NORMAL',
-    "decision" TEXT,
-    "decisionAt" TIMESTAMP(3),
-    "decisionBy" TEXT,
-    "decisionNotes" TEXT,
-    "workflowId" TEXT,
-    "workflowStep" INTEGER DEFAULT 1,
-    "totalSteps" INTEGER DEFAULT 1,
-    "reason" TEXT,
-    "notes" TEXT,
-    "tags" TEXT[],
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "expiresAt" TIMESTAMP(3),
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "approvals" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "itemType" "ApprovalItemType" NOT NULL,
+        "itemId" TEXT NOT NULL,
+        "itemData" JSONB,
+        "requesterId" TEXT NOT NULL,
+        "requesterName" TEXT,
+        "requestedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "approverId" TEXT NOT NULL,
+        "approverName" TEXT,
+        "status" "ApprovalStatus" NOT NULL DEFAULT 'PENDING',
+        "priority" "ApprovalPriority" NOT NULL DEFAULT 'NORMAL',
+        "decision" TEXT,
+        "decisionAt" TIMESTAMP(3),
+        "decisionBy" TEXT,
+        "decisionNotes" TEXT,
+        "workflowId" TEXT,
+        "workflowStep" INTEGER DEFAULT 1,
+        "totalSteps" INTEGER DEFAULT 1,
+        "reason" TEXT,
+        "notes" TEXT,
+        "tags" TEXT[],
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "expiresAt" TIMESTAMP(3),
 
-    CONSTRAINT "approvals_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "approvals_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "approval_history" (
-    "id" TEXT NOT NULL,
-    "approvalId" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "action" TEXT NOT NULL,
-    "performedBy" TEXT NOT NULL,
-    "performedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "fromStatus" "ApprovalStatus",
-    "toStatus" "ApprovalStatus",
-    "notes" TEXT,
-    "metadata" JSONB,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "approval_history" (
+        "id" TEXT NOT NULL,
+        "approvalId" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "action" TEXT NOT NULL,
+        "performedBy" TEXT NOT NULL,
+        "performedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "fromStatus" "ApprovalStatus",
+        "toStatus" "ApprovalStatus",
+        "notes" TEXT,
+        "metadata" JSONB,
 
-    CONSTRAINT "approval_history_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "approval_history_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "notifications" (
-    "id" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "type" VARCHAR(50) NOT NULL,
-    "title" VARCHAR(255) NOT NULL,
-    "message" TEXT NOT NULL,
-    "description" TEXT,
-    "link" VARCHAR(500),
-    "readAt" TIMESTAMP(3),
-    "readBy" TEXT,
-    "entityType" VARCHAR(50),
-    "entityId" VARCHAR(100),
-    "relatedUserId" VARCHAR(100),
-    "channels" TEXT[] DEFAULT ARRAY['in_app']::TEXT[],
-    "priority" VARCHAR(20) NOT NULL DEFAULT 'normal',
-    "status" VARCHAR(20) NOT NULL DEFAULT 'sent',
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "sentAt" TIMESTAMP(3),
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "notifications" (
+        "id" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        "type" VARCHAR(50) NOT NULL,
+        "title" VARCHAR(255) NOT NULL,
+        "message" TEXT NOT NULL,
+        "description" TEXT,
+        "link" VARCHAR(500),
+        "readAt" TIMESTAMP(3),
+        "readBy" TEXT,
+        "entityType" VARCHAR(50),
+        "entityId" VARCHAR(100),
+        "relatedUserId" VARCHAR(100),
+        "channels" TEXT[] DEFAULT ARRAY['in_app']::TEXT[],
+        "priority" VARCHAR(20) NOT NULL DEFAULT 'normal',
+        "status" VARCHAR(20) NOT NULL DEFAULT 'sent',
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "sentAt" TIMESTAMP(3),
 
-    CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "notification_preferences" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "tenantId" TEXT NOT NULL,
-    "inAppEnabled" BOOLEAN NOT NULL DEFAULT true,
-    "emailEnabled" BOOLEAN NOT NULL DEFAULT true,
-    "smsEnabled" BOOLEAN NOT NULL DEFAULT false,
-    "types" JSONB NOT NULL DEFAULT '{}',
-    "emailDigest" VARCHAR(20) NOT NULL DEFAULT 'instant',
-    "doNotDisturb" BOOLEAN NOT NULL DEFAULT false,
-    "doNotDisturbStart" TEXT,
-    "doNotDisturbEnd" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "notification_preferences" (
+        "id" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        "tenantId" TEXT NOT NULL,
+        "inAppEnabled" BOOLEAN NOT NULL DEFAULT true,
+        "emailEnabled" BOOLEAN NOT NULL DEFAULT true,
+        "smsEnabled" BOOLEAN NOT NULL DEFAULT false,
+        "types" JSONB NOT NULL DEFAULT '{}',
+        "emailDigest" VARCHAR(20) NOT NULL DEFAULT 'instant',
+        "doNotDisturb" BOOLEAN NOT NULL DEFAULT false,
+        "doNotDisturbStart" TEXT,
+        "doNotDisturbEnd" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "notification_preferences_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "notification_preferences_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "document_signature_requests" (
-    "id" TEXT NOT NULL,
-    "attachmentId" TEXT NOT NULL,
-    "requesterId" TEXT NOT NULL,
-    "signerId" TEXT NOT NULL,
-    "status" "SignatureRequestStatus" NOT NULL DEFAULT 'PENDING',
-    "message" TEXT,
-    "dueAt" TIMESTAMP(3),
-    "expiresAt" TIMESTAMP(3),
-    "completedAt" TIMESTAMP(3),
-    "rejectedAt" TIMESTAMP(3),
-    "rejectionReason" TEXT,
-    "ipAddress" TEXT,
-    "userAgent" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "tenantId" TEXT NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "document_signature_requests" (
+        "id" TEXT NOT NULL,
+        "attachmentId" TEXT NOT NULL,
+        "requesterId" TEXT NOT NULL,
+        "signerId" TEXT NOT NULL,
+        "status" "SignatureRequestStatus" NOT NULL DEFAULT 'PENDING',
+        "message" TEXT,
+        "dueAt" TIMESTAMP(3),
+        "expiresAt" TIMESTAMP(3),
+        "completedAt" TIMESTAMP(3),
+        "rejectedAt" TIMESTAMP(3),
+        "rejectionReason" TEXT,
+        "ipAddress" TEXT,
+        "userAgent" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "tenantId" TEXT NOT NULL,
 
-    CONSTRAINT "document_signature_requests_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "document_signature_requests_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "document_signatures" (
-    "id" TEXT NOT NULL,
-    "signatureRequestId" TEXT,
-    "attachmentId" TEXT NOT NULL,
-    "signerId" TEXT NOT NULL,
-    "signatureData" TEXT,
-    "signatureType" VARCHAR(50) NOT NULL DEFAULT 'digital',
-    "signedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "ipAddress" TEXT,
-    "userAgent" TEXT,
-    "location" TEXT,
-    "certificateId" TEXT,
-    "certificateFingerprint" TEXT,
-    "metadata" JSONB,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "tenantId" TEXT NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "document_signatures" (
+        "id" TEXT NOT NULL,
+        "signatureRequestId" TEXT,
+        "attachmentId" TEXT NOT NULL,
+        "signerId" TEXT NOT NULL,
+        "signatureData" TEXT,
+        "signatureType" VARCHAR(50) NOT NULL DEFAULT 'digital',
+        "signedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "ipAddress" TEXT,
+        "userAgent" TEXT,
+        "location" TEXT,
+        "certificateId" TEXT,
+        "certificateFingerprint" TEXT,
+        "metadata" JSONB,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "tenantId" TEXT NOT NULL,
 
-    CONSTRAINT "document_signatures_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "document_signatures_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "analysis_jobs" (
-    "id" TEXT NOT NULL,
-    "attachmentId" TEXT NOT NULL,
-    "status" "AnalysisStatus" NOT NULL DEFAULT 'PENDING',
-    "analysisType" VARCHAR(50) NOT NULL DEFAULT 'general',
-    "priority" "Priority" NOT NULL DEFAULT 'MEDIUM',
-    "startedAt" TIMESTAMP(3),
-    "completedAt" TIMESTAMP(3),
-    "failedAt" TIMESTAMP(3),
-    "results" JSONB,
-    "errorMessage" TEXT,
-    "processingTime" INTEGER,
-    "confidence" DECIMAL(5,2),
-    "extractedText" TEXT,
-    "extractedData" JSONB,
-    "metadata" JSONB,
-    "retryCount" INTEGER NOT NULL DEFAULT 0,
-    "maxRetries" INTEGER NOT NULL DEFAULT 3,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "tenantId" TEXT NOT NULL,
+-- CreateTable
+DO $$ BEGIN
+    CREATE TABLE "analysis_jobs" (
+        "id" TEXT NOT NULL,
+        "attachmentId" TEXT NOT NULL,
+        "status" "AnalysisStatus" NOT NULL DEFAULT 'PENDING',
+        "analysisType" VARCHAR(50) NOT NULL DEFAULT 'general',
+        "priority" "Priority" NOT NULL DEFAULT 'MEDIUM',
+        "startedAt" TIMESTAMP(3),
+        "completedAt" TIMESTAMP(3),
+        "failedAt" TIMESTAMP(3),
+        "results" JSONB,
+        "errorMessage" TEXT,
+        "processingTime" INTEGER,
+        "confidence" DECIMAL(5,2),
+        "extractedText" TEXT,
+        "extractedData" JSONB,
+        "metadata" JSONB,
+        "retryCount" INTEGER NOT NULL DEFAULT 0,
+        "maxRetries" INTEGER NOT NULL DEFAULT 3,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        "tenantId" TEXT NOT NULL,
 
-    CONSTRAINT "analysis_jobs_pkey" PRIMARY KEY ("id")
-);
+        CONSTRAINT "analysis_jobs_pkey" PRIMARY KEY ("id")
+    );
+EXCEPTION
+    WHEN duplicate_table THEN null;
+END $$;
 
 -- CreateIndex
 CREATE INDEX "languages_enabled_idx" ON "languages"("enabled");
