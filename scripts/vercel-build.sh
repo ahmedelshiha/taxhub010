@@ -40,35 +40,32 @@ if [[ -n "$DATABASE_URL" || -n "$NETLIFY_DATABASE_URL" ]]; then
   fi
 
   # Run migrations with error handling
-  if pnpm db:migrate; then
-    echo "✅ Database migrations completed"
-  else
-    MIGRATE_EXIT=$?
-    # Check if the error is a P3009 (failed migration) error
-    if [ $MIGRATE_EXIT -eq 1 ]; then
-      echo "⚠️  Migration conflict detected, attempting to resolve..."
-      # Try to resolve failed migrations by marking them as rolled back
-      pnpm prisma migrate resolve --rolled-back 20251114145300_add_user_on_entity 2>/dev/null || true
-      pnpm prisma migrate resolve --rolled-back 20251122170506_init 2>/dev/null || true
-      pnpm prisma migrate resolve --rolled-back 20251123231126_init 2>/dev/null || true
-      # Retry the migration
-      if pnpm db:migrate; then
-        echo "✅ Database migrations completed after resolution"
-      else
-        echo "⚠️  Database migration warning (exit code: $MIGRATE_EXIT)"
-        echo "This might be okay if no migrations are pending"
-      fi
+  # NUCLEAR OPTION: Force reset requested by user
+  echo "☢️  NUCLEAR OPTION: Forcing database reset via db push..."
+  
+  # 1. Force reset the database schema (Drops data, recreates schema from prisma file)
+  if pnpm prisma db push --force-reset --accept-data-loss; then
+    echo "✅ Database reset and schema pushed successfully"
+    
+    # 2. Mark the fresh migration as applied (since db push created the tables)
+    echo "📝 Marking fresh migration as applied..."
+    if pnpm prisma migrate resolve --applied 20251123232226_init; then
+      echo "✅ Migration history synced"
     else
-      # Check if the error is because all migrations were already applied (exit code 0)
-      if [ $MIGRATE_EXIT -eq 0 ]; then
-        echo "✅ Database is up to date"
-      else
-        # Migration failed
-        echo "⚠️  Database migration warning (exit code: $MIGRATE_EXIT)"
-        echo "This might be okay if no migrations are pending"
-      fi
+      echo "⚠️ Failed to mark migration as applied (might already be applied)"
     fi
-    # Don't fail the build - migrations might have already been applied
+    
+    # 3. Verify with migrate deploy (should be no-op or clean)
+    if pnpm db:migrate; then
+      echo "✅ Final migration verification passed"
+    else
+      echo "❌ Final migration verification failed"
+      exit 1
+    fi
+    
+  else
+    echo "❌ Failed to reset database"
+    exit 1
   fi
 else
   echo "⚠️  Skipping migrations - no database URL configured"
