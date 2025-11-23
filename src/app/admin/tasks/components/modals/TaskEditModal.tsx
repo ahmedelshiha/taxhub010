@@ -61,8 +61,8 @@ interface TaskFormData {
 interface TaskEditModalProps {
   open: boolean
   onClose: () => void
-  task?: any
-  onSave: (data: any) => Promise<void>
+  task?: Record<string, any>
+  onSave: (data: Partial<TaskFormData>) => Promise<void>
   availableUsers?: { id: string; name: string }[]
 }
 
@@ -118,7 +118,7 @@ export default function TaskEditModal({ open, onClose, task, onSave, availableUs
         dueDate: task.dueDate ? String(task.dueDate).slice(0, 10) : '',
         estimatedHours: Number(task.estimatedHours || 1),
         assigneeId: task.assigneeId || task.assignee?.id || undefined,
-        collaboratorIds: Array.isArray(task.collaborators) ? task.collaborators.map((u: any) => u.id).filter(Boolean) : [],
+        collaboratorIds: Array.isArray(task.collaborators) ? task.collaborators.map((u: UserItem) => u.id).filter(Boolean) : [],
         clientId: task.clientId || task.client?.id || undefined,
         bookingId: task.bookingId || task.booking?.id || undefined,
         tags: Array.isArray(task.tags) ? task.tags : [],
@@ -176,7 +176,7 @@ export default function TaskEditModal({ open, onClose, task, onSave, availableUs
     if (!validateForm()) return
     setIsLoading(true)
     try {
-      const payload: any = {
+      const payload: Partial<TaskFormData> = {
         title: formData.title.trim(),
         priority: formData.priority,
         status: formData.status,
@@ -185,7 +185,7 @@ export default function TaskEditModal({ open, onClose, task, onSave, availableUs
       }
       await onSave(payload)
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       setErrors({ submit: error?.message || 'Failed to save task' })
     } finally {
       setIsLoading(false)
@@ -433,8 +433,8 @@ function useAssignees() {
         const data = await response.json().catch(() => ({}))
         const list = Array.isArray(data) ? data : (data?.teamMembers || [])
         let mapped: UserItem[] = list
-          .map((member: any) => ({ id: member.userId, name: member.name || member.email || 'Unknown', email: member.email || '', avatar: member.avatar, role: member.role || 'STAFF' }))
-          .filter((u: any) => !!u.id)
+          .map((member: Record<string, any>) => ({ id: member.userId, name: member.name || member.email || 'Unknown', email: member.email || '', avatar: member.avatar, role: member.role || 'STAFF' }))
+          .filter((u: UserItem) => !!u.id)
 
         if (!mapped.length) {
           try {
@@ -442,8 +442,8 @@ function useAssignees() {
             const usersJson = await resUsers.json().catch(() => ({}))
             const users = Array.isArray(usersJson) ? usersJson : (usersJson?.users || [])
             mapped = users
-              .filter((u: any) => hasRole(String(u.role || '').toUpperCase(), ['ADMIN', 'STAFF']))
-              .map((u: any) => ({ id: u.id, name: u.name || u.email || 'User', email: u.email || '', role: u.role || 'STAFF' }))
+              .filter((u: Record<string, any>) => hasRole(String(u.role || '').toUpperCase(), ['ADMIN', 'STAFF']))
+              .map((u: Record<string, any>) => ({ id: u.id, name: u.name || u.email || 'User', email: u.email || '', role: u.role || 'STAFF' }))
           } catch {}
         }
 
@@ -464,8 +464,8 @@ function useClients() {
         const response = await apiFetch('/api/admin/users', { signal: abortController.signal })
         const data = await response.json().catch(() => ({}))
         const users = Array.isArray(data) ? data : (data?.users || [])
-        const clients = users.filter((user: any) => String(user.role || '').toUpperCase() === 'CLIENT')
-        const mapped: ClientItem[] = clients.map((client: any) => ({ id: client.id, name: client.name || client.email || 'Unknown', tier: (() => { const cnt = Number(client.totalBookings || 0); if (cnt >= 20) return 'Enterprise'; if (cnt >= 1) return 'SMB'; return 'Individual' })() }))
+        const clients = users.filter((user: Record<string, any>) => String(user.role || '').toUpperCase() === 'CLIENT')
+        const mapped: ClientItem[] = clients.map((client: Record<string, any>) => ({ id: client.id, name: client.name || client.email || 'Unknown', tier: (() => { const cnt = Number(client.totalBookings || 0); if (cnt >= 20) return 'Enterprise'; if (cnt >= 1) return 'SMB'; return 'Individual' })() }))
         setItems(mapped)
       } catch {}
     })()
