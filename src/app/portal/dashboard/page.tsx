@@ -32,6 +32,7 @@ import { GlobalSearchModal } from "@/components/portal/GlobalSearchModal";
 import { TaskQuickCreateModal } from "@/components/portal/modals/TaskQuickCreateModal";
 import { BookingCreateModal } from "@/components/portal/modals/BookingCreateModal";
 import { UploadModal } from "@/components/portal/bills/BillUpload/UploadModal";
+import { NotificationBell } from "@/components/portal/NotificationBell";
 
 interface Entity {
   id: string;
@@ -171,6 +172,7 @@ export default function DashboardPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+              <NotificationBell />
               <Button
                 variant="outline"
                 size="sm"
