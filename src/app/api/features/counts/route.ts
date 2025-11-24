@@ -10,6 +10,12 @@ interface FeatureCounts {
   invoicesPending: number;
   billsPending: number;
   approvalsPending: number;
+  // Phase 3 additions
+  tasksPending: number;
+  upcomingBookings: number;
+  unreadNotifications: number;
+  outstandingInvoices: number;
+  pendingExpenses: number;
 }
 
 /**
@@ -45,38 +51,78 @@ const _api_GET = async (request: NextRequest) => {
       query.entityId = entityId;
     }
 
+    // Run all count queries in parallel
+    const [
+      tasksPending,
+      upcomingBookings,
+      unreadNotifications,
+      outstandingInvoicesCount,
+      pendingExpenses,
+    ] = await Promise.all([
+      // Tasks pending (IN_PROGRESS or PENDING status)
+      prisma.task.count({
+        where: {
+          tenantId: ctx.tenantId as string,
+          status: {
+            in: ['OPEN', 'IN_PROGRESS'],
+          },
+        },
+      }),
+
+      // Upcoming bookings (next 30 days, PENDING or CONFIRMED)
+      prisma.booking.count({
+        where: {
+          tenantId: ctx.tenantId as string,
+          status: {
+            in: ['PENDING', 'CONFIRMED'],
+          },
+          scheduledAt: {
+            gte: new Date(),
+            lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          },
+        },
+      }),
+
+      // Unread notifications
+      prisma.notification.count({
+        where: {
+          userId: ctx.userId as string,
+          status: 'sent',
+        },
+      }),
+
+      // Outstanding invoices (unpaid)
+      prisma.invoice.count({
+        where: {
+          tenantId: ctx.tenantId as string,
+          status: 'UNPAID',
+        },
+      }),
+
+      // Pending expenses
+      prisma.expense.count({
+        where: {
+          tenantId: ctx.tenantId as string,
+          status: 'PENDING',
+        },
+      }),
+    ]);
+
     const counts: FeatureCounts = {
+      // Legacy counts (kept for backwards compatibility)
       kycPending: 0,
       documentsPending: 0,
-      invoicesPending: 0,
+      invoicesPending: outstandingInvoicesCount, // Map to new field
       billsPending: 0,
       approvalsPending: 0,
+
+      // Phase 3 counts
+      tasksPending,
+      upcomingBookings,
+      unreadNotifications,
+      outstandingInvoices: outstandingInvoicesCount,
+      pendingExpenses,
     };
-
-    // KYC pending - count incomplete KYC records
-    // This would be implemented with actual KYC model once created
-    // For now: 0
-    counts.kycPending = 0;
-
-    // Documents pending - count documents awaiting review or action
-    // This would count based on document status and assignments
-    // For now: 0
-    counts.documentsPending = 0;
-
-    // Invoices pending - count unpaid invoices
-    // This would be implemented with actual invoicing model
-    // For now: 0
-    counts.invoicesPending = 0;
-
-    // Bills pending - count bills awaiting categorization/approval
-    // This would count unprocessed receipt uploads
-    // For now: 0
-    counts.billsPending = 0;
-
-    // Approvals pending - count items awaiting approval
-    // This would aggregate across all approval types
-    // For now: 0
-    counts.approvalsPending = 0;
 
     return NextResponse.json({
       success: true,

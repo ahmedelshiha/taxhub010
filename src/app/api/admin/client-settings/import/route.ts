@@ -20,17 +20,17 @@ export const POST = withTenantContext(async (request: Request) => {
     const key = `client-settings:import:${tenantId}:${ip}`
     const rl = await applyRateLimit(key, 3, 60_000)
     if (!rl.allowed) {
-      try { await logAudit({ action: 'security.ratelimit.block', actorId: ctx.userId ?? null, details: { tenantId, ip, key, route: new URL(request.url).pathname } }) } catch {}
+      try { await logAudit({ action: 'security.ratelimit.block', actorId: ctx.userId ?? null, details: { tenantId, ip, key, route: new URL(request.url).pathname } }) } catch { }
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     const body = await request.json().catch(() => ({}))
     const data = validateImportWithSchema(body, ClientManagementSettingsSchema)
-    const updated = await clientService.upsert(tenantId, data)
-    try { await logAudit({ action: 'client-settings:import', actorId: ctx.userId, details: { tenantId } }) } catch {}
+    const updated = await clientService.upsert(tenantId, data as any)
+    try { await logAudit({ action: 'client-settings:import', actorId: ctx.userId, details: { tenantId } }) } catch { }
     return NextResponse.json(updated)
   } catch (e) {
-    try { Sentry.captureException(e as any) } catch {}
+    try { Sentry.captureException(e as any) } catch { }
     return NextResponse.json({ error: 'Failed to import client settings' }, { status: 500 })
   }
 })

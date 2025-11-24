@@ -96,7 +96,7 @@ export default function PortalPage() {
     if (!bookings.length) return
     const rows = bookings.map(b => ({
       id: b.id,
-      service: b.service.name,
+      service: b.service?.name || 'Unknown Service',
       date: new Date(b.scheduledAt).toLocaleDateString(),
       time: new Date(b.scheduledAt).toLocaleTimeString(),
       status: b.status
@@ -193,7 +193,7 @@ export default function PortalPage() {
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg">{booking.service.name}</CardTitle>
+                        <CardTitle className="text-lg">{booking.service?.name || 'Unknown Service'}</CardTitle>
                         <CardDescription>
                           {formatDate(booking.scheduledAt)} {t('time.at')} {formatTime(booking.scheduledAt)}
                         </CardDescription>
@@ -210,7 +210,7 @@ export default function PortalPage() {
                           <Clock className="h-4 w-4 mr-1" />
                           {booking.duration} {minuteLabel(booking.duration)}
                         </div>
-                        {booking.service.price && (
+                        {booking.service?.price && (
                           <div className="flex items-center">
                             <DollarSign className="h-4 w-4 mr-1" />
                             {formatCurrencyFromDecimal(booking.service.price)}
@@ -287,7 +287,7 @@ export default function PortalPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div>
-                          <h3 className="font-medium text-gray-900">{booking.service.name}</h3>
+                          <h3 className="font-medium text-gray-900">{booking.service?.name || 'Unknown Service'}</h3>
                           <p className="text-sm text-gray-600">
                             {formatDate(booking.scheduledAt)} {t('time.at')} {formatTime(booking.scheduledAt)}
                           </p>

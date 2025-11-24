@@ -34,7 +34,7 @@ export interface ProgressIndicatorProps {
 export interface BaseModalProps {
     open: boolean;
     onClose: () => void;
-    title: string;
+    title: ReactNode | string;
     description?: string;
     size?: "sm" | "md" | "lg" | "xl";
     showProgress?: ProgressIndicatorProps;

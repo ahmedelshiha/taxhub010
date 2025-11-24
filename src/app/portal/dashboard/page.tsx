@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import Link from "next/link";
@@ -25,6 +25,10 @@ import { BookingsCalendarWidget } from "@/components/portal/dashboard/widgets/Bo
 import { OutstandingInvoicesWidget } from "@/components/portal/dashboard/widgets/OutstandingInvoicesWidget";
 import { ComplianceTrackerWidget } from "@/components/portal/dashboard/widgets/ComplianceTrackerWidget";
 import { ActivityFeedWidget } from "@/components/portal/dashboard/widgets/ActivityFeedWidget";
+import { NotificationsWidget } from "@/components/portal/dashboard/widgets/NotificationsWidget";
+import { FinancialOverviewWidget } from "@/components/portal/dashboard/widgets/FinancialOverviewWidget";
+import MiniCalendarWidget from "@/components/portal/dashboard/widgets/MiniCalendarWidget";
+import { GlobalSearchModal } from "@/components/portal/GlobalSearchModal";
 import { TaskQuickCreateModal } from "@/components/portal/modals/TaskQuickCreateModal";
 import { BookingCreateModal } from "@/components/portal/modals/BookingCreateModal";
 import { UploadModal } from "@/components/portal/bills/BillUpload/UploadModal";
@@ -44,6 +48,7 @@ export default function DashboardPage() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSetupModalOpen, setSetupModalOpen] = useState(false);
+  const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
 
   // Modal States
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
@@ -86,8 +91,22 @@ export default function DashboardPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-    toast.info("Global search coming soon");
+    // Open global search modal
+    setGlobalSearchOpen(true);
   };
+
+  // Cmd+K / Ctrl+K keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setGlobalSearchOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const countryFlags: Record<string, string> = {
     AE: "🇦🇪",
@@ -103,6 +122,10 @@ export default function DashboardPage() {
       />
 
       {/* Modals */}
+      <GlobalSearchModal
+        open={globalSearchOpen}
+        onOpenChange={setGlobalSearchOpen}
+      />
       <TaskQuickCreateModal
         open={createTaskOpen}
         onClose={() => setCreateTaskOpen(false)}
@@ -274,10 +297,13 @@ export default function DashboardPage() {
               loading={dashboardLoading}
               error={dashboardError ? "Failed to load compliance" : undefined}
             />
+            <FinancialOverviewWidget />
           </div>
 
           {/* Column 3 */}
           <div className="space-y-6">
+            <NotificationsWidget />
+            <MiniCalendarWidget />
             <OutstandingInvoicesWidget
               invoices={dashboardData.invoices}
               totalOutstanding={dashboardData.totalOutstanding}
@@ -306,8 +332,8 @@ export default function DashboardPage() {
                           </div>
                           <span
                             className={`text-[10px] px-1.5 py-0.5 rounded ${entity.status === "ACTIVE"
-                                ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                                : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                              ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                              : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
                               }`}
                           >
                             {entity.status}

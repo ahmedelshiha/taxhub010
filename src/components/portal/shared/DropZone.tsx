@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useDropzone, FileRejection } from 'react-dropzone'
-import { Upload } from 'lucide-react'
+import { Upload, Clipboard } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -11,6 +11,7 @@ interface DropZoneProps {
     maxFiles?: number
     disabled?: boolean
     className?: string
+    enablePaste?: boolean // New prop
 }
 
 export function DropZone({
@@ -19,8 +20,11 @@ export function DropZone({
     maxSize = 10 * 1024 * 1024, // 10MB default
     maxFiles = 5,
     disabled = false,
-    className
+    className,
+    enablePaste = true // Default enabled
 }: DropZoneProps) {
+    const dropZoneRef = useRef<HTMLDivElement>(null)
+
     const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
         if (acceptedFiles.length > 0) {
             onFilesAccepted(acceptedFiles)
@@ -51,8 +55,70 @@ export function DropZone({
         disabled
     })
 
+    // Clipboard paste support
+    useEffect(() => {
+        if (!enablePaste || disabled) return
+
+        const handlePaste = async (e: ClipboardEvent) => {
+            // Only handle paste events when DropZone is in view/focused
+            if (!dropZoneRef.current) return
+
+            const items = e.clipboardData?.items
+            if (!items) return
+
+            const files: File[] = []
+
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i]
+
+                // Check if it's an image
+                if (item.type.startsWith('image/')) {
+                    const blob = item.getAsFile()
+                    if (blob) {
+                        // Create a File object with a generated name
+                        const timestamp = new Date().getTime()
+                        const extension = item.type.split('/')[1] || 'png'
+                        const file = new File(
+                            [blob],
+                            `pasted-image-${timestamp}.${extension}`,
+                            { type: item.type }
+                        )
+
+                        // Validate file size
+                        if (file.size > maxSize) {
+                            toast.error(`Pasted image is too large. Max size is ${maxSize / 1024 / 1024}MB`)
+                            continue
+                        }
+
+                        files.push(file)
+                    }
+                }
+            }
+
+            if (files.length > 0) {
+                // Check maxFiles limit
+                if (files.length > maxFiles) {
+                    toast.error(`Too many files pasted. Max allowed is ${maxFiles}`)
+                    onFilesAccepted(files.slice(0, maxFiles))
+                } else {
+                    toast.success(`${files.length} image${files.length > 1 ? 's' : ''} pasted from clipboard`)
+                    onFilesAccepted(files)
+                }
+                e.preventDefault()
+            }
+        }
+
+        // Add global paste listener
+        window.addEventListener('paste', handlePaste)
+
+        return () => {
+            window.removeEventListener('paste', handlePaste)
+        }
+    }, [enablePaste, disabled, onFilesAccepted, maxSize, maxFiles])
+
     return (
         <div
+            ref={dropZoneRef}
             {...getRootProps()}
             className={cn(
                 "relative border-2 border-dashed rounded-lg p-8 transition-colors duration-200 ease-in-out cursor-pointer flex flex-col items-center justify-center text-center gap-4",
@@ -78,7 +144,16 @@ export function DropZone({
                 <p className="text-xs text-gray-500">
                     Max {maxFiles} files, up to {maxSize / 1024 / 1024}MB each
                 </p>
+                {enablePaste && !disabled && (
+                    <div className="flex items-center justify-center gap-2 mt-2 text-xs text-gray-600">
+                        <Clipboard className="w-3 h-3" />
+                        <span>
+                            or press <kbd className="px-1.5 py-0.5 bg-gray-200 rounded border text-xs font-mono">Ctrl+V</kbd> to paste
+                        </span>
+                    </div>
+                )}
             </div>
         </div>
     )
 }
+

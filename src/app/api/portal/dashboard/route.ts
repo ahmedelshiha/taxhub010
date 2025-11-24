@@ -44,7 +44,7 @@ export const GET = withTenantContext(async (req: NextRequest) => {
             prisma.booking.findMany({
                 where: {
                     tenantId,
-                    clientId: userId, // Show bookings for the current user
+                    clientId: userId || undefined, // Ensure not null
                     status: { in: ['PENDING', 'CONFIRMED'] },
                     scheduledAt: { gte: new Date() }
                 },
@@ -55,7 +55,7 @@ export const GET = withTenantContext(async (req: NextRequest) => {
                         select: { name: true }
                     }
                 }
-            }),
+            }) as Promise<Array<any>>, // Cast to any to bypass inference issues with Promise.all and includes
 
             // 3. Outstanding Invoices
             prisma.invoice.findMany({
@@ -135,7 +135,7 @@ export const GET = withTenantContext(async (req: NextRequest) => {
             })),
             bookings: bookings.map(b => ({
                 id: b.id,
-                serviceName: b.service.name,
+                serviceName: b.service?.name || 'Unknown Service',
                 date: b.scheduledAt.toISOString(),
                 time: b.scheduledAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 status: b.status.toLowerCase()

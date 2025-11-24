@@ -16,6 +16,10 @@ import {
   MessageCircle,
   ChevronRight,
   AlertCircle,
+  Calendar,
+  ClipboardList,
+  BarChart3,
+  CalendarDays,
 } from "lucide-react";
 
 interface FeatureTile {
@@ -36,6 +40,12 @@ interface FeatureCounts {
   invoicesPending: number;
   billsPending: number;
   approvalsPending: number;
+  // Phase 3 additions
+  tasksPending: number;
+  upcomingBookings: number;
+  unreadNotifications: number;
+  outstandingInvoices: number;
+  pendingExpenses: number;
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -74,11 +84,11 @@ interface FeaturesHubProps {
 export default function FeaturesHub({ entityId }: FeaturesHubProps) {
   const router = useRouter();
 
-  // Fetch feature counts
+  // Fetch feature counts (fetch even without entityId for dashboard counts)
   const { data: countsResponse, isLoading } = useSWR<{
     success: boolean;
     data: FeatureCounts;
-  }>(entityId ? `/api/features/counts?entityId=${entityId}` : null, fetcher, {
+  }>('/api/features/counts', fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 30000, // Revalidate every 30 seconds
   });
@@ -89,6 +99,11 @@ export default function FeaturesHub({ entityId }: FeaturesHubProps) {
     invoicesPending: 0,
     billsPending: 0,
     approvalsPending: 0,
+    tasksPending: 0,
+    upcomingBookings: 0,
+    unreadNotifications: 0,
+    outstandingInvoices: 0,
+    pendingExpenses: 0,
   };
 
   // Define feature tiles
@@ -159,6 +174,56 @@ export default function FeaturesHub({ entityId }: FeaturesHubProps) {
         color: "gray",
         enabled: true,
       },
+      // Phase 3 additions
+      {
+        id: "tasks",
+        title: "My Tasks",
+        description: "View and manage your active tasks",
+        icon: <ClipboardList className="h-6 w-6" />,
+        href: "/portal/tasks",
+        badge: counts.tasksPending,
+        badgeLabel: "active",
+        color: "blue",
+        enabled: true,
+      },
+      {
+        id: "bookings",
+        title: "Bookings",
+        description: "Schedule and manage appointments",
+        icon: <Calendar className="h-6 w-6" />,
+        href: "/portal/bookings",
+        badge: counts.upcomingBookings,
+        badgeLabel: "upcoming",
+        color: "green",
+        enabled: true,
+      },
+      {
+        id: "service-requests",
+        title: "Service Requests",
+        description: "Submit and track service requests",
+        icon: <CheckSquare className="h-6 w-6" />,
+        href: "/portal/service-requests",
+        color: "purple",
+        enabled: true,
+      },
+      {
+        id: "reports",
+        title: "Reports",
+        description: "View financial reports and analytics",
+        icon: <BarChart3 className="h-6 w-6" />,
+        href: "/portal/reports",
+        color: "orange",
+        enabled: true,
+      },
+      {
+        id: "calendar",
+        title: "Calendar",
+        description: "Manage your schedule and deadlines",
+        icon: <CalendarDays className="h-6 w-6" />,
+        href: "/portal/calendar",
+        color: "gray",
+        enabled: false, // Phase 4 feature
+      },
     ],
     [counts]
   );
@@ -195,60 +260,60 @@ export default function FeaturesHub({ entityId }: FeaturesHubProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {isLoading
           ? // Loading skeleton
-            Array.from({ length: 6 }).map((_, idx) => (
-              <Card key={idx} className="overflow-hidden">
-                <CardContent className="pt-6">
-                  <Skeleton className="h-12 w-12 rounded mb-4" />
-                  <Skeleton className="h-5 w-32 mb-2" />
-                  <Skeleton className="h-4 w-40 mb-4" />
-                  <Skeleton className="h-9 w-24" />
-                </CardContent>
-              </Card>
-            ))
+          Array.from({ length: 6 }).map((_, idx) => (
+            <Card key={idx} className="overflow-hidden">
+              <CardContent className="pt-6">
+                <Skeleton className="h-12 w-12 rounded mb-4" />
+                <Skeleton className="h-5 w-32 mb-2" />
+                <Skeleton className="h-4 w-40 mb-4" />
+                <Skeleton className="h-9 w-24" />
+              </CardContent>
+            </Card>
+          ))
           : // Feature tiles
-            enabledTiles.map((tile) => (
-              <Card
-                key={tile.id}
-                className={`border ${colorClasses[tile.color]} overflow-hidden hover:shadow-md transition-shadow cursor-pointer`}
-                onClick={() => router.push(tile.href)}
-              >
-                <CardContent className="pt-6">
-                  {/* Icon & Badge */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`${colorIconClasses[tile.color]}`}>
-                      {tile.icon}
-                    </div>
-                    {tile.badge !== undefined && tile.badge > 0 && (
-                      <Badge className={badgeColorClasses[tile.color]} variant="secondary">
-                        {tile.badge} {tile.badgeLabel}
-                      </Badge>
-                    )}
+          enabledTiles.map((tile) => (
+            <Card
+              key={tile.id}
+              className={`border ${colorClasses[tile.color]} overflow-hidden hover:shadow-md transition-shadow cursor-pointer`}
+              onClick={() => router.push(tile.href)}
+            >
+              <CardContent className="pt-6">
+                {/* Icon & Badge */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`${colorIconClasses[tile.color]}`}>
+                    {tile.icon}
                   </div>
+                  {tile.badge !== undefined && tile.badge > 0 && (
+                    <Badge className={badgeColorClasses[tile.color]} variant="secondary">
+                      {tile.badge} {tile.badgeLabel}
+                    </Badge>
+                  )}
+                </div>
 
-                  {/* Title & Description */}
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                    {tile.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    {tile.description}
-                  </p>
+                {/* Title & Description */}
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                  {tile.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  {tile.description}
+                </p>
 
-                  {/* CTA Button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-between group"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(tile.href);
-                    }}
-                  >
-                    Open
-                    <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                {/* CTA Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-between group"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(tile.href);
+                  }}
+                >
+                  Open
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
       </div>
 
       {/* Help Section */}
