@@ -68,7 +68,6 @@ export function NotificationBell() {
                 throw new Error('Failed to mark as read')
             }
 
-            // Optimistically update
             mutate()
             toast.success('Marked as read')
         } catch (err) {
@@ -82,7 +81,7 @@ export function NotificationBell() {
             const response = await fetch('/api/notifications', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'read' }), // No notificationIds = mark all
+                body: JSON.stringify({ action: 'read' }),
             })
 
             if (!response.ok) {
@@ -111,6 +110,18 @@ export function NotificationBell() {
                         <Badge
                             variant="destructive"
                             className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px]"
+                        >
+                            {unreadCount > 99 ? '99+' : unreadCount}
+                        </Badge>
+                    )}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-96 p-0">
+                <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                        Notifications
+                    </h3>
+                    {unreadCount > 0 && (
                         <Button
                             variant="ghost"
                             size="sm"
@@ -123,7 +134,6 @@ export function NotificationBell() {
                     )}
                 </div>
 
-                {/* Notification List */}
                 <div className="max-h-[400px] overflow-y-auto">
                     {isLoading ? (
                         <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -157,13 +167,11 @@ export function NotificationBell() {
                                             !notification.readAt && 'bg-blue-50/50 dark:bg-blue-900/10'
                                         )}
                                     >
-                                        {/* Type indicator dot */}
                                         {!notification.readAt && (
                                             <div className="absolute top-4 left-2 h-2 w-2 rounded-full bg-blue-500" />
                                         )}
 
                                         <div className="pl-3">
-                                            {/* Type badge */}
                                             <div className="flex items-start justify-between gap-2 mb-1">
                                                 <span
                                                     className={cn(
@@ -188,17 +196,14 @@ export function NotificationBell() {
                                                 </Button>
                                             </div>
 
-                                            {/* Title */}
                                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1 line-clamp-1">
                                                 {notification.title}
                                             </p>
 
-                                            {/* Message */}
                                             <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
                                                 {notification.message}
                                             </p>
 
-                                            {/* Timestamp */}
                                             <p className="text-[10px] text-gray-500 dark:text-gray-500">
                                                 {formatDistanceToNow(new Date(notification.createdAt), {
                                                     addSuffix: true,
@@ -208,7 +213,6 @@ export function NotificationBell() {
                                     </div>
                                 )
 
-                                // If notification has a link, wrap in Link component
                                 if (notification.link) {
                                     return (
                                         <Link key={notification.id} href={notification.link} onClick={() => setOpen(false)}>
@@ -223,7 +227,6 @@ export function NotificationBell() {
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="p-3 border-t border-gray-200 dark:border-gray-700">
                     <Link
                         href="/portal/notifications"
@@ -237,4 +240,3 @@ export function NotificationBell() {
         </Popover>
     )
 }
-

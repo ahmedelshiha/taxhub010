@@ -4,18 +4,6 @@ import { Suspense, lazy } from 'react'
 import { Loader2 } from 'lucide-react'
 
 // Lazy load modal components for better performance
-export const TaskCreateModal = lazy(() =>
-    import('@/components/portal/modals/TaskCreateModal').then((mod) => ({
-        default: mod.TaskCreateModal,
-    }))
-)
-
-export const BookingCreateModal = lazy(() =>
-    import('@/components/portal/modals/BookingCreateModal').then((mod) => ({
-        default: mod.BookingCreateModal,
-    }))
-)
-
 export const ApprovalActionModal = lazy(() =>
     import('@/components/portal/modals/ApprovalActionModal').then((mod) => ({
         default: mod.ApprovalActionModal,
