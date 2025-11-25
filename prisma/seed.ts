@@ -819,6 +819,204 @@ Effective cash flow management requires ongoing attention and planning. Regular 
 
   console.log('✅ Blog posts created')
 
+  // Support & Knowledge Base
+  const kbCategories = [
+    { id: 'kb_cat_1', name: 'Tax Guides', slug: 'tax-guides', description: 'Comprehensive guides on tax topics', tenantId: defaultTenant.id, displayOrder: 1 },
+    { id: 'kb_cat_2', name: 'Portal Help', slug: 'portal-help', description: 'Help articles for using the client portal', tenantId: defaultTenant.id, displayOrder: 2 },
+    { id: 'kb_cat_3', name: 'Accounting Basics', slug: 'accounting-basics', description: 'Introduction to accounting concepts', tenantId: defaultTenant.id, displayOrder: 3 },
+    { id: 'kb_cat_4', name: 'Compliance', slug: 'compliance', description: 'Compliance and regulatory information', tenantId: defaultTenant.id, displayOrder: 4 },
+  ]
+
+  for (const cat of kbCategories) {
+    await prisma.knowledgeBaseCategory.upsert({
+      where: { id: cat.id },
+      update: { ...cat, id: undefined },
+      create: cat,
+    })
+  }
+
+  console.log('✅ Knowledge base categories created')
+
+  const kbArticles = [
+    {
+      id: 'kb_art_1',
+      categoryId: 'kb_cat_1',
+      tenantId: defaultTenant.id,
+      title: 'Understanding Quarterly Tax Payments',
+      slug: 'quarterly-tax-payments',
+      content: 'Quarterly tax payments are required if you expect to owe $1,000 or more in taxes. Learn how to calculate and submit your estimated tax payments.',
+      authorId: admin.id,
+      published: true,
+      views: 245,
+      helpfulVotes: 18,
+      displayOrder: 1,
+    },
+    {
+      id: 'kb_art_2',
+      categoryId: 'kb_cat_1',
+      tenantId: defaultTenant.id,
+      title: 'Deductions vs Credits: What\'s the Difference?',
+      slug: 'deductions-vs-credits',
+      content: 'Understanding the difference between tax deductions and tax credits is essential for maximizing your tax savings. Deductions reduce your taxable income, while credits directly reduce your tax liability.',
+      authorId: admin.id,
+      published: true,
+      views: 189,
+      helpfulVotes: 14,
+      displayOrder: 2,
+    },
+    {
+      id: 'kb_art_3',
+      categoryId: 'kb_cat_2',
+      tenantId: defaultTenant.id,
+      title: 'How to Upload Documents to Your Portal',
+      slug: 'upload-documents-portal',
+      content: 'Follow these simple steps to upload your financial documents to the client portal for easy sharing with your accountant.',
+      authorId: staff.id,
+      published: true,
+      views: 567,
+      helpfulVotes: 52,
+      displayOrder: 1,
+    },
+    {
+      id: 'kb_art_4',
+      categoryId: 'kb_cat_2',
+      tenantId: defaultTenant.id,
+      title: 'Viewing Your Financial Reports',
+      slug: 'viewing-reports',
+      content: 'Learn how to access and interpret your financial reports in the portal, including income statements, balance sheets, and cash flow summaries.',
+      authorId: staff.id,
+      published: true,
+      views: 423,
+      helpfulVotes: 35,
+      displayOrder: 2,
+    },
+    {
+      id: 'kb_art_5',
+      categoryId: 'kb_cat_3',
+      tenantId: defaultTenant.id,
+      title: 'What is Bookkeeping?',
+      slug: 'what-is-bookkeeping',
+      content: 'Bookkeeping is the process of recording, classifying, and organizing all financial transactions of a business. It\'s the foundation of good financial management.',
+      authorId: admin.id,
+      published: true,
+      views: 312,
+      helpfulVotes: 28,
+      displayOrder: 1,
+    },
+    {
+      id: 'kb_art_6',
+      categoryId: 'kb_cat_4',
+      tenantId: defaultTenant.id,
+      title: 'GDPR Compliance Requirements',
+      slug: 'gdpr-compliance',
+      content: 'General Data Protection Regulation (GDPR) imposes strict requirements on how you handle personal data. Learn about your compliance obligations.',
+      authorId: admin.id,
+      published: true,
+      views: 178,
+      helpfulVotes: 12,
+      displayOrder: 1,
+    },
+  ]
+
+  for (const article of kbArticles) {
+    await prisma.knowledgeBaseArticle.upsert({
+      where: { id: article.id },
+      update: { ...article, id: undefined },
+      create: article as any,
+    })
+  }
+
+  console.log('✅ Knowledge base articles created')
+
+  // Support Tickets
+  const supportTickets = [
+    {
+      id: 'ticket_1',
+      tenantId: defaultTenant.id,
+      createdById: client1.id,
+      assignedToId: staff.id,
+      title: 'Unable to upload quarterly documents',
+      description: 'I\'m having trouble uploading my quarterly financial documents. The upload keeps failing.',
+      priority: 'HIGH' as const,
+      status: 'IN_PROGRESS' as const,
+      category: 'PORTAL_HELP' as const,
+    },
+    {
+      id: 'ticket_2',
+      tenantId: defaultTenant.id,
+      createdById: client2.id,
+      assignedToId: staff.id,
+      title: 'Question about tax deductions',
+      description: 'Can you clarify which business expenses are deductible this year?',
+      priority: 'MEDIUM' as const,
+      status: 'OPEN' as const,
+      category: 'TAX_QUESTION' as const,
+    },
+    {
+      id: 'ticket_3',
+      tenantId: defaultTenant.id,
+      createdById: client1.id,
+      assignedToId: staff.id,
+      title: 'Invoice not reflecting in my account',
+      description: 'The recent invoice from your firm is not showing up in my portal.',
+      priority: 'MEDIUM' as const,
+      status: 'RESOLVED' as const,
+      category: 'BILLING' as const,
+    },
+  ]
+
+  for (const ticket of supportTickets) {
+    await prisma.supportTicket.upsert({
+      where: { id: ticket.id },
+      update: { ...ticket, id: undefined },
+      create: ticket,
+    })
+  }
+
+  console.log('✅ Support tickets created')
+
+  // Support Ticket Comments
+  const ticketComments = [
+    {
+      id: 'comment_1',
+      ticketId: 'ticket_1',
+      tenantId: defaultTenant.id,
+      createdById: staff.id,
+      content: 'I\'ve reviewed your account. It looks like the file size exceeded our limit. Try uploading files under 10MB.',
+    },
+    {
+      id: 'comment_2',
+      ticketId: 'ticket_1',
+      tenantId: defaultTenant.id,
+      createdById: client1.id,
+      content: 'Thank you! I\'ll try splitting the documents and upload them separately.',
+    },
+    {
+      id: 'comment_3',
+      ticketId: 'ticket_2',
+      tenantId: defaultTenant.id,
+      createdById: staff.id,
+      content: 'Generally, ordinary and necessary business expenses are deductible. This includes office supplies, equipment, professional fees, etc. Let me schedule a detailed consultation to review your specific situation.',
+    },
+    {
+      id: 'comment_4',
+      ticketId: 'ticket_3',
+      tenantId: defaultTenant.id,
+      createdById: staff.id,
+      content: 'We\'ve corrected the billing issue. The invoice should now appear in your portal. Please refresh your browser.',
+    },
+  ]
+
+  for (const comment of ticketComments) {
+    await prisma.supportTicketComment.upsert({
+      where: { id: comment.id },
+      update: { ...comment, id: undefined },
+      create: comment,
+    })
+  }
+
+  console.log('✅ Support ticket comments created')
+
   // Create task templates
   const templates = [
     {
