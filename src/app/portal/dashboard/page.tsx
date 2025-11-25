@@ -87,16 +87,20 @@ export default function DashboardPage() {
     activity: any[];
   }>("/api/portal/dashboard", fetcher, {
     refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true
+    revalidateOnFocus: true,
+    shouldRetryOnError: true,
+    errorRetryCount: 3,
+    errorRetryInterval: 5000,
   });
 
-  const dashboardData = dashboardResponse || {
-    tasks: [],
-    bookings: [],
-    invoices: [],
-    totalOutstanding: 0,
-    compliance: [],
-    activity: []
+  // Ensure all properties are arrays, even on error
+  const dashboardData = {
+    tasks: Array.isArray(dashboardResponse?.tasks) ? dashboardResponse.tasks : [],
+    bookings: Array.isArray(dashboardResponse?.bookings) ? dashboardResponse.bookings : [],
+    invoices: Array.isArray(dashboardResponse?.invoices) ? dashboardResponse.invoices : [],
+    totalOutstanding: typeof dashboardResponse?.totalOutstanding === 'number' ? dashboardResponse.totalOutstanding : 0,
+    compliance: Array.isArray(dashboardResponse?.compliance) ? dashboardResponse.compliance : [],
+    activity: Array.isArray(dashboardResponse?.activity) ? dashboardResponse.activity : [],
   };
 
   const handleSearch = (e: React.FormEvent) => {
