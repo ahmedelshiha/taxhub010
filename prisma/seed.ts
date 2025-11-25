@@ -954,42 +954,42 @@ Effective cash flow management requires ongoing attention and planning. Regular 
     {
       id: 'ticket_1',
       tenantId: defaultTenant.id,
-      createdById: client1.id,
+      userId: client1.id,
       assignedToId: staff.id,
       title: 'Unable to upload quarterly documents',
       description: 'I\'m having trouble uploading my quarterly financial documents. The upload keeps failing.',
-      priority: 'HIGH' as const,
-      status: 'IN_PROGRESS' as const,
-      category: 'PORTAL_HELP' as const,
+      priority: 'HIGH',
+      status: 'IN_PROGRESS',
+      category: 'PORTAL_HELP',
     },
     {
       id: 'ticket_2',
       tenantId: defaultTenant.id,
-      createdById: client2.id,
+      userId: client2.id,
       assignedToId: staff.id,
       title: 'Question about tax deductions',
       description: 'Can you clarify which business expenses are deductible this year?',
-      priority: 'MEDIUM' as const,
-      status: 'OPEN' as const,
-      category: 'TAX_QUESTION' as const,
+      priority: 'MEDIUM',
+      status: 'OPEN',
+      category: 'TAX_QUESTION',
     },
     {
       id: 'ticket_3',
       tenantId: defaultTenant.id,
-      createdById: client1.id,
+      userId: client1.id,
       assignedToId: staff.id,
       title: 'Invoice not reflecting in my account',
       description: 'The recent invoice from your firm is not showing up in my portal.',
-      priority: 'MEDIUM' as const,
-      status: 'RESOLVED' as const,
-      category: 'BILLING' as const,
+      priority: 'MEDIUM',
+      status: 'RESOLVED',
+      category: 'BILLING',
     },
   ]
 
   for (const ticket of supportTickets) {
     await prisma.supportTicket.upsert({
       where: { id: ticket.id },
-      update: { ...ticket, id: undefined },
+      update: { title: ticket.title, description: ticket.description, priority: ticket.priority, status: ticket.status, category: ticket.category, assignedToId: ticket.assignedToId },
       create: ticket,
     })
   }
@@ -2334,7 +2334,7 @@ Effective cash flow management requires ongoing attention and planning. Regular 
     })
   }
 
-  console.log('��� Workflow templates created')
+  console.log('✅ Workflow templates created')
 
   // User Workflows
   const userWorkflows = [
