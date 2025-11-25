@@ -374,6 +374,76 @@ async function main() {
 
   console.log('✅ Team members created')
 
+  // User Profile Enhancements
+  const userProfiles = [
+    { userId: admin.id, organization: 'Primary Accounting Firm', phoneNumber: '+1-555-0100', timezone: 'America/New_York', preferredLanguage: 'en' },
+    { userId: staff.id, organization: 'Primary Accounting Firm', phoneNumber: '+1-555-0101', timezone: 'America/Chicago', preferredLanguage: 'en' },
+    { userId: client1.id, organization: 'Tech Startup Inc', phoneNumber: '+1-555-0102', timezone: 'America/Los_Angeles', preferredLanguage: 'en' },
+    { userId: client2.id, organization: 'Wilson Consulting', phoneNumber: '+1-555-0103', timezone: 'America/Denver', preferredLanguage: 'en' },
+    { userId: lead.id, organization: 'Primary Accounting Firm', phoneNumber: '+1-555-0104', timezone: 'America/New_York', preferredLanguage: 'en' },
+    { userId: superadmin.id, organization: 'Primary Accounting Firm', phoneNumber: '+1-555-0105', timezone: 'UTC', preferredLanguage: 'en' },
+  ]
+
+  for (const profile of userProfiles) {
+    await prisma.userProfile.upsert({
+      where: { userId: profile.userId },
+      update: profile,
+      create: {
+        ...profile,
+        twoFactorEnabled: false,
+        bookingEmailCancellation: true,
+        bookingEmailConfirm: true,
+        bookingEmailReminder: true,
+        bookingEmailReschedule: true,
+        bookingSmsConfirmation: false,
+        bookingSmsReminder: false,
+        reminderHours: [24, 2],
+      },
+    })
+  }
+
+  console.log('✅ User profiles created')
+
+  // NotificationSettings for users
+  const notificationSettings = [
+    { userId: admin.id, emailOnBookingConfirmed: true, emailOnBookingRescheduled: true, emailOnBookingCancelled: true, smsNotifications: false },
+    { userId: staff.id, emailOnBookingConfirmed: true, emailOnBookingRescheduled: true, emailOnBookingCancelled: true, smsNotifications: false },
+    { userId: client1.id, emailOnBookingConfirmed: true, emailOnBookingRescheduled: true, emailOnBookingCancelled: true, smsNotifications: true },
+    { userId: client2.id, emailOnBookingConfirmed: true, emailOnBookingRescheduled: true, emailOnBookingCancelled: true, smsNotifications: false },
+    { userId: lead.id, emailOnBookingConfirmed: true, emailOnBookingRescheduled: true, emailOnBookingCancelled: true, smsNotifications: true },
+    { userId: superadmin.id, emailOnBookingConfirmed: true, emailOnBookingRescheduled: true, emailOnBookingCancelled: true, smsNotifications: true },
+  ]
+
+  for (const settings of notificationSettings) {
+    await prisma.notificationSettings.upsert({
+      where: { userId: settings.userId },
+      update: settings,
+      create: settings,
+    })
+  }
+
+  console.log('✅ Notification settings created')
+
+  // SidebarPreferences for users
+  const sidebarPrefs = [
+    { userId: admin.id, collapsed: false, theme: 'light', sidebarWidth: 280, showLabels: true, favoriteItems: ['dashboard', 'clients', 'services', 'invoices'] },
+    { userId: staff.id, collapsed: false, theme: 'light', sidebarWidth: 280, showLabels: true, favoriteItems: ['dashboard', 'bookings', 'tasks'] },
+    { userId: client1.id, collapsed: false, theme: 'light', sidebarWidth: 280, showLabels: true, favoriteItems: ['dashboard', 'services', 'invoices'] },
+    { userId: client2.id, collapsed: false, theme: 'light', sidebarWidth: 280, showLabels: true, favoriteItems: ['dashboard', 'bookings'] },
+    { userId: lead.id, collapsed: false, theme: 'light', sidebarWidth: 280, showLabels: true, favoriteItems: ['dashboard', 'team', 'reports', 'clients'] },
+    { userId: superadmin.id, collapsed: false, theme: 'light', sidebarWidth: 280, showLabels: true, favoriteItems: ['dashboard', 'users', 'settings', 'audit-logs'] },
+  ]
+
+  for (const prefs of sidebarPrefs) {
+    await prisma.sidebarPreferences.upsert({
+      where: { userId: prefs.userId },
+      update: { ...prefs, userId: undefined },
+      create: prefs,
+    })
+  }
+
+  console.log('✅ Sidebar preferences created')
+
   // Create services
   const services = [
     {
