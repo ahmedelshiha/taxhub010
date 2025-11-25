@@ -1113,8 +1113,9 @@ Effective cash flow management requires ongoing attention and planning. Regular 
       senderId: admin.id,
       recipientId: staff.id,
       subject: 'Follow up on Client Request',
-      content: 'Can you please follow up with Client One regarding their bookkeeping setup? They should have received our initial questionnaire.',
-      isRead: true,
+      body: 'Can you please follow up with Client One regarding their bookkeeping setup? They should have received our initial questionnaire.',
+      status: 'read',
+      readAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24),
     },
     {
       id: 'msg_2',
@@ -1122,8 +1123,9 @@ Effective cash flow management requires ongoing attention and planning. Regular 
       senderId: staff.id,
       recipientId: admin.id,
       subject: 'Re: Follow up on Client Request',
-      content: 'I\'ll reach out to them today. I\'ll send you an update by end of day.',
-      isRead: true,
+      body: 'I\'ll reach out to them today. I\'ll send you an update by end of day.',
+      status: 'read',
+      readAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 23),
     },
     {
       id: 'msg_3',
@@ -1131,8 +1133,8 @@ Effective cash flow management requires ongoing attention and planning. Regular 
       senderId: client1.id,
       recipientId: admin.id,
       subject: 'Question about Invoice',
-      content: 'Hi, I received your invoice but have a question about the service breakdown. Can we discuss?',
-      isRead: false,
+      body: 'Hi, I received your invoice but have a question about the service breakdown. Can we discuss?',
+      status: 'sent',
     },
     {
       id: 'msg_4',
@@ -1140,15 +1142,16 @@ Effective cash flow management requires ongoing attention and planning. Regular 
       senderId: lead.id,
       recipientId: staff.id,
       subject: 'Great Work on Tax Return',
-      content: 'Excellent job on the tax return preparation. Your attention to detail is appreciated.',
-      isRead: true,
+      body: 'Excellent job on the tax return preparation. Your attention to detail is appreciated.',
+      status: 'read',
+      readAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 12),
     },
   ]
 
   for (const msg of messages) {
     await prisma.message.upsert({
       where: { id: msg.id },
-      update: { ...msg, id: undefined },
+      update: { subject: msg.subject, body: msg.body, status: msg.status, readAt: msg.readAt },
       create: msg,
     })
   }
@@ -2198,7 +2201,7 @@ Effective cash flow management requires ongoing attention and planning. Regular 
     })
   }
 
-  console.log('�� Sample invoices created')
+  console.log('✅ Sample invoices created')
 
   // Seed sample expenses (new feature)
   const expenseCategories = ['Office Supplies', 'Travel', 'Software', 'Training', 'Equipment']
