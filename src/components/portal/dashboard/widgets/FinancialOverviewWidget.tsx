@@ -67,17 +67,17 @@ export function FinancialOverviewWidget({ className }: FinancialOverviewWidgetPr
     const hasError = error || (data && !data.success)
 
     // Calculate changes
-    const invoiceChange = financialData
+    const invoiceChange = financialData?.currentMonth && financialData?.previousMonth
         ? calculateChange(
-            financialData.currentMonth.invoicesTotal,
-            financialData.previousMonth.invoicesTotal
+            financialData.currentMonth.invoicesTotal || 0,
+            financialData.previousMonth.invoicesTotal || 0
         )
         : null
 
-    const paidChange = financialData
+    const paidChange = financialData?.currentMonth && financialData?.previousMonth
         ? calculateChange(
-            financialData.currentMonth.invoicesPaid,
-            financialData.previousMonth.invoicesPaid
+            financialData.currentMonth.invoicesPaid || 0,
+            financialData.previousMonth.invoicesPaid || 0
         )
         : null
 
@@ -116,7 +116,7 @@ export function FinancialOverviewWidget({ className }: FinancialOverviewWidgetPr
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Invoices</p>
                                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-                                    {formatCurrency(financialData.currentMonth.invoicesTotal)}
+                                    {formatCurrency(financialData.currentMonth?.invoicesTotal || 0)}
                                 </p>
                             </div>
                             {invoiceChange && (
@@ -145,7 +145,7 @@ export function FinancialOverviewWidget({ className }: FinancialOverviewWidgetPr
                             <div className="bg-green-50 dark:bg-green-900/10 p-3 rounded-lg border border-green-100 dark:border-green-900/30">
                                 <p className="text-xs text-green-700 dark:text-green-400 font-medium mb-1">Paid</p>
                                 <p className="text-lg font-bold text-green-900 dark:text-green-300">
-                                    {formatCurrency(financialData.currentMonth.invoicesPaid)}
+                                    {formatCurrency(financialData.currentMonth?.invoicesPaid || 0)}
                                 </p>
                                 {paidChange && (
                                     <p className="text-[10px] text-green-600 dark:text-green-500 mt-1 flex items-center gap-1">
@@ -172,7 +172,7 @@ export function FinancialOverviewWidget({ className }: FinancialOverviewWidgetPr
                             <div className="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
                                 <p className="text-xs text-yellow-700 dark:text-yellow-400 font-medium mb-1">Unpaid</p>
                                 <p className="text-lg font-bold text-yellow-900 dark:text-yellow-300">
-                                    {formatCurrency(financialData.currentMonth.invoicesUnpaid)}
+                                    {formatCurrency(financialData.currentMonth?.invoicesUnpaid || 0)}
                                 </p>
                             </div>
                         </div>
@@ -188,14 +188,14 @@ export function FinancialOverviewWidget({ className }: FinancialOverviewWidgetPr
                             <div className="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-lg border border-blue-100 dark:border-blue-900/30">
                                 <p className="text-xs text-blue-700 dark:text-blue-400 font-medium mb-1">Approved</p>
                                 <p className="text-lg font-bold text-blue-900 dark:text-blue-300">
-                                    {formatCurrency(financialData.currentMonth.expensesApproved)}
+                                    {formatCurrency(financialData.currentMonth?.expensesApproved || 0)}
                                 </p>
                             </div>
 
                             <div className="bg-orange-50 dark:bg-orange-900/10 p-3 rounded-lg border border-orange-100 dark:border-orange-900/30">
                                 <p className="text-xs text-orange-700 dark:text-orange-400 font-medium mb-1">Pending</p>
                                 <p className="text-lg font-bold text-orange-900 dark:text-orange-300">
-                                    {formatCurrency(financialData.currentMonth.expensesPending)}
+                                    {formatCurrency(financialData.currentMonth?.expensesPending || 0)}
                                 </p>
                             </div>
                         </div>

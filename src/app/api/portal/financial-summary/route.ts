@@ -131,21 +131,19 @@ export const GET = withTenantContext(async (request: NextRequest) => {
         const previousExpenses = calculateExpenseTotals(previousMonthExpenses)
 
         return respond.ok({
-            data: {
-                currentMonth: {
-                    invoicesTotal: currentInvoices.total,
-                    invoicesPaid: currentInvoices.paid,
-                    invoicesUnpaid: currentInvoices.unpaid,
-                    expensesPending: currentExpenses.pending,
-                    expensesApproved: currentExpenses.approved,
-                },
-                previousMonth: {
-                    invoicesTotal: previousInvoices.total,
-                    invoicesPaid: previousInvoices.paid,
-                    invoicesUnpaid: previousInvoices.unpaid,
-                    expensesPending: previousExpenses.pending,
-                    expensesApproved: previousExpenses.approved,
-                },
+            currentMonth: {
+                invoicesTotal: currentInvoices.total,
+                invoicesPaid: currentInvoices.paid,
+                invoicesUnpaid: currentInvoices.unpaid,
+                expensesPending: currentExpenses.pending,
+                expensesApproved: currentExpenses.approved,
+            },
+            previousMonth: {
+                invoicesTotal: previousInvoices.total,
+                invoicesPaid: previousInvoices.paid,
+                invoicesUnpaid: previousInvoices.unpaid,
+                expensesPending: previousExpenses.pending,
+                expensesApproved: previousExpenses.approved,
             },
         })
     } catch (error) {
