@@ -16,6 +16,7 @@ import {
   Plus,
   ChevronRight,
   Zap,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
@@ -41,7 +42,17 @@ interface Entity {
   status: string;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  const data = await res.json();
+
+  // Handle error responses gracefully
+  if (!res.ok || data.error) {
+    throw new Error(data.error || `Failed to fetch ${url}`);
+  }
+
+  return data;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -77,16 +88,20 @@ export default function DashboardPage() {
     activity: any[];
   }>("/api/portal/dashboard", fetcher, {
     refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true
+    revalidateOnFocus: true,
+    shouldRetryOnError: true,
+    errorRetryCount: 3,
+    errorRetryInterval: 5000,
   });
 
-  const dashboardData = dashboardResponse || {
-    tasks: [],
-    bookings: [],
-    invoices: [],
-    totalOutstanding: 0,
-    compliance: [],
-    activity: []
+  // Ensure all properties are arrays, even on error
+  const dashboardData = {
+    tasks: Array.isArray(dashboardResponse?.tasks) ? dashboardResponse.tasks : [],
+    bookings: Array.isArray(dashboardResponse?.bookings) ? dashboardResponse.bookings : [],
+    invoices: Array.isArray(dashboardResponse?.invoices) ? dashboardResponse.invoices : [],
+    totalOutstanding: typeof dashboardResponse?.totalOutstanding === 'number' ? dashboardResponse.totalOutstanding : 0,
+    compliance: Array.isArray(dashboardResponse?.compliance) ? dashboardResponse.compliance : [],
+    activity: Array.isArray(dashboardResponse?.activity) ? dashboardResponse.activity : [],
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -205,6 +220,26 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Dashboard Error State */}
+        {dashboardError && (
+          <Alert className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+            <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+            <AlertDescription className="text-red-900 dark:text-red-200">
+              <div className="font-semibold mb-1">Unable to load dashboard</div>
+              <p className="text-sm mb-3">
+                {dashboardError.message || "We encountered an error loading your dashboard. Please try refreshing the page."}
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40"
+                onClick={() => window.location.reload()}
+              >
+                Refresh Page
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
         {/* Quick Actions Toolbar */}
         <div className="flex flex-wrap gap-2">
           <Button size="sm" onClick={() => setCreateTaskOpen(true)}>
