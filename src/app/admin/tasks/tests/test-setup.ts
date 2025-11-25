@@ -23,11 +23,11 @@ if (typeof globalThis.EventSource === 'undefined') {
 // Mock NextResponse to be test-friendly
 vi.mock('next/server', () => {
   class NextResponse {
-    body: any
+    body: unknown
     status: number
     headers: Map<string, string>
     ok: boolean
-    constructor(body?: any, init?: { status?: number, headers?: Record<string, string> }) {
+    constructor(body?: unknown, init?: { status?: number, headers?: Record<string, string> }) {
       this.body = body
       this.status = init?.status ?? 200
       this.headers = new Map<string, string>()
@@ -36,7 +36,7 @@ vi.mock('next/server', () => {
       }
       this.ok = this.status < 400
     }
-    static json(data: any, init?: { status?: number, headers?: Record<string, string> }) {
+    static json(data: unknown, init?: { status?: number, headers?: Record<string, string> }) {
       return new NextResponse(JSON.stringify(data), init)
     }
     async json() {
@@ -51,34 +51,34 @@ vi.mock('next/server', () => {
 
 // Stub UI components used in these tests to avoid pulling full design system
 vi.mock('@/components/ui/card', () => {
-  const Card = (props: any) => React.createElement('div', { role: 'region', ...props })
-  const CardContent = (props: any) => React.createElement('div', { role: 'group', ...props })
-  const CardHeader = (props: any) => React.createElement('div', { role: 'heading', ...props })
-  const CardTitle = (props: any) => React.createElement('div', { role: 'heading', ...props })
+  const Card = (props: Record<string, unknown>) => React.createElement('div', { role: 'region', ...props })
+  const CardContent = (props: Record<string, unknown>) => React.createElement('div', { role: 'group', ...props })
+  const CardHeader = (props: Record<string, unknown>) => React.createElement('div', { role: 'heading', ...props })
+  const CardTitle = (props: Record<string, unknown>) => React.createElement('div', { role: 'heading', ...props })
   return { Card, CardContent, CardHeader, CardTitle }
 }, { virtual: true })
 
 vi.mock('@/components/ui/button', () => {
-  const Button = (props: any) => React.createElement('button', { ...props })
+  const Button = (props: Record<string, unknown>) => React.createElement('button', { ...props })
   return { Button }
 }, { virtual: true })
 
 vi.mock('@/components/ui/input', () => {
-  const Input = (props: any) => React.createElement('input', { ...props })
+  const Input = (props: Record<string, unknown>) => React.createElement('input', { ...props })
   return { Input }
 }, { virtual: true })
 
 vi.mock('@/components/ui/badge', () => {
-  const Badge = (props: any) => React.createElement('span', { ...props })
+  const Badge = (props: Record<string, unknown>) => React.createElement('span', { ...props })
   return { Badge }
 }, { virtual: true })
 
 vi.mock('@/components/ui/dialog', () => {
-  const Dialog = (props: any) => React.createElement('div', { ...props })
-  const DialogContent = (props: any) => React.createElement('div', { ...props })
-  const DialogHeader = (props: any) => React.createElement('div', { ...props })
-  const DialogTitle = (props: any) => React.createElement('div', { ...props })
-  const DialogDescription = (props: any) => React.createElement('div', { ...props })
-  const DialogFooter = (props: any) => React.createElement('div', { ...props })
+  const Dialog = (props: Record<string, unknown>) => React.createElement('div', { ...props })
+  const DialogContent = (props: Record<string, unknown>) => React.createElement('div', { ...props })
+  const DialogHeader = (props: Record<string, unknown>) => React.createElement('div', { ...props })
+  const DialogTitle = (props: Record<string, unknown>) => React.createElement('div', { ...props })
+  const DialogDescription = (props: Record<string, unknown>) => React.createElement('div', { ...props })
+  const DialogFooter = (props: Record<string, unknown>) => React.createElement('div', { ...props })
   return { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter }
 }, { virtual: true })

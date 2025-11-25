@@ -1,11 +1,12 @@
 import { apiFetch } from '@/lib/api'
+import type { TaskFormData } from '@/app/admin/tasks/components/modals/TaskEditModal'
 
 export const useTaskActions = () => {
-  const create = async (input: any) => {
+  const create = async (input: Partial<TaskFormData>) => {
     const res = await apiFetch('/api/admin/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) })
     return res.ok ? await res.json() : Promise.reject(res)
   }
-  const update = async (id: string, updates: any) => {
+  const update = async (id: string, updates: Partial<TaskFormData>) => {
     const res = await apiFetch(`/api/admin/tasks/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) })
     return res.ok ? await res.json() : Promise.reject(res)
   }

@@ -13,7 +13,7 @@ import { Loader2, ShieldCheck, User as UserIcon } from "lucide-react"
 export interface ProfileManagementPanelProps {
   isOpen: boolean
   onClose?: () => void
-  defaultTab?: "profile" | "security" | "preferences"
+  defaultTab?: "profile" | "security" | "notifications" | "booking" | "localization"
   inline?: boolean
   fullPage?: boolean
 }
@@ -52,7 +52,10 @@ function ProfileTab({ loading, profile, onSave }: { loading: boolean; profile: a
 }
 
 import AccountActivity from './AccountActivity'
-import PreferencesTab from './PreferencesTab'
+import NotificationsTab from './NotificationsTab'
+import BookingNotificationsTab from './BookingNotificationsTab'
+import LocalizationTab from './LocalizationTab'
+import { useSession } from 'next-auth/react'
 
 function SecurityTab({ loading, profile, onPasswordSave, onMfaSetup }: { loading: boolean; profile: any; onPasswordSave: (val: string) => Promise<void>; onMfaSetup: () => Promise<void> }) {
   return (
@@ -116,13 +119,16 @@ export default function ProfileManagementPanel({ isOpen, onClose, defaultTab = "
   const { profile, loading, update } = useUserProfile()
   const { enrollMfa, mfaSetupData, clearMfaSetup } = useSecuritySettings()
   const [showMfaSetup, setShowMfaSetup] = useState(false)
+  const { data: session } = useSession()
+  const role = (session?.user as any)?.role as string | undefined
 
   useEffect(() => setTab(defaultTab), [defaultTab])
   useEffect(() => {
     if (!isOpen && !fullPage) return
     try {
       const saved = window.localStorage.getItem('profile-panel-last-tab')
-      if (!defaultTab && (saved === 'profile' || saved === 'security')) setTab(saved as any)
+      const validTabs = ['profile', 'security', 'booking', 'localization', 'notifications']
+      if (!defaultTab && saved && validTabs.includes(saved)) setTab(saved as any)
     } catch {}
   }, [isOpen, defaultTab, fullPage])
 
@@ -149,10 +155,11 @@ export default function ProfileManagementPanel({ isOpen, onClose, defaultTab = "
   const TabsBlock = (
     <Tabs value={tab} onValueChange={(v) => { setTab(v as any); try { window.localStorage.setItem('profile-panel-last-tab', v) } catch {} }}>
       <div className="sticky top-0 bg-white z-10 pt-1">
-        <TabsList>
+        <TabsList className="w-full h-auto flex-wrap justify-start">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Sign in & security</TabsTrigger>
-          <TabsTrigger value="preferences">Preferences</TabsTrigger>
+          <TabsTrigger value="booking">Booking Notifications</TabsTrigger>
+          <TabsTrigger value="localization">Localization</TabsTrigger>
         </TabsList>
       </div>
 
@@ -163,7 +170,12 @@ export default function ProfileManagementPanel({ isOpen, onClose, defaultTab = "
         onPasswordSave={(val) => handleProfileSave('password', val)}
         onMfaSetup={handleMfaSetup}
       />
-      <PreferencesTab loading={loading} />
+      <TabsContent value="booking" className="mt-4">
+        <BookingNotificationsTab loading={loading} />
+      </TabsContent>
+      <TabsContent value="localization" className="mt-4">
+        <LocalizationTab loading={loading} />
+      </TabsContent>
     </Tabs>
   )
 

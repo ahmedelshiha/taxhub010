@@ -85,6 +85,7 @@ vi.mock('@prisma/client', () => ({
 
 // Global Next.js navigation mocks for component tests
 vi.mock('next/navigation', () => ({
+  __esModule: true,
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
@@ -95,6 +96,8 @@ vi.mock('next/navigation', () => ({
   }),
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => '/',
+  // Server-side redirect helper used in app routers
+  redirect: vi.fn(),
 }))
 
 // Provide safe defaults for rate limiting in tests while preserving actual exports
@@ -384,6 +387,78 @@ vi.mock('@/lib/permissions', async () => {
     }
   }
 })
+
+// Polyfill Web APIs (Blob, File, URL) for jsdom/Node test environments
+// Create a blob storage for mock URLs
+const testBlobStore = new Map<string, any>()
+let blobIdCounter = 0
+
+// Ensure Blob exists and works properly
+if (typeof (globalThis as any).Blob === 'undefined' || !((globalThis as any).Blob && typeof (globalThis as any).Blob === 'function')) {
+  class NodeBlob {
+    parts: any[]
+    mimeType: string
+    constructor(parts: any[] = [], options: any = {}) {
+      this.parts = parts
+      this.mimeType = options.type || 'application/octet-stream'
+    }
+    get type() { return this.mimeType }
+    async text() { return this.parts.map(p => String(p)).join('') }
+    async arrayBuffer() { return Buffer.from(await this.text()) }
+    slice(start?: number, end?: number, contentType?: string) {
+      const sliced = this.parts.slice(start, end)
+      return new NodeBlob(sliced, { type: contentType || this.mimeType })
+    }
+  }
+  ;(globalThis as any).Blob = NodeBlob as any
+}
+
+// Ensure URL.createObjectURL and URL.revokeObjectURL exist
+try {
+  if (!((globalThis as any).URL && typeof (globalThis as any).URL.createObjectURL === 'function')) {
+    if (typeof (globalThis as any).URL !== 'function') {
+      // URL doesn't exist, create a minimal one
+      ;(globalThis as any).URL = class {
+        constructor(public href: string) {}
+      }
+    }
+    // Add createObjectURL to URL
+    ;(globalThis as any).URL.createObjectURL = (blob: any) => {
+      const id = `blob:mock-${++blobIdCounter}`
+      testBlobStore.set(id, blob)
+      return id
+    }
+    ;(globalThis as any).URL.revokeObjectURL = (url: string) => {
+      testBlobStore.delete(url)
+    }
+  }
+} catch (err) {
+  // Fallback
+  try {
+    if (!(globalThis as any).URL) {
+      ;(globalThis as any).URL = {}
+    }
+    if (typeof (globalThis as any).URL.createObjectURL !== 'function') {
+      ;(globalThis as any).URL.createObjectURL = (blob: any) => {
+        const id = `blob:mock-${++blobIdCounter}`
+        testBlobStore.set(id, blob)
+        return id
+      }
+    }
+    if (typeof (globalThis as any).URL.revokeObjectURL !== 'function') {
+      ;(globalThis as any).URL.revokeObjectURL = (url: string) => {
+        testBlobStore.delete(url)
+      }
+    }
+  } catch {}
+}
+
+// Stub HTMLAnchorElement.prototype.click to prevent navigation in tests
+if (typeof (globalThis as any).HTMLAnchorElement !== 'undefined' && typeof (globalThis as any).HTMLAnchorElement.prototype.click !== 'function') {
+  ;(globalThis as any).HTMLAnchorElement.prototype.click = function() {
+    // Stub: don't actually navigate in tests
+  }
+}
 
 // Polyfill Web File in Node test env
 

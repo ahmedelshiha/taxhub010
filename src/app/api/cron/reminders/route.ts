@@ -1,42 +1,37 @@
-import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import { captureErrorIfAvailable, logAuditSafe } from '@/lib/observability-helpers'
-import { sendBookingReminders } from '@/lib/cron'
-import { withTenantContext } from '@/lib/api-wrapper'
+import { NextRequest, NextResponse } from "next/server";
+import { ReminderService } from "@/lib/services/reminder-service";
+import { logger } from "@/lib/logger";
 
-export const runtime = 'nodejs'
-
-// POST /api/cron/reminders
-// Protected cron endpoint that scans upcoming confirmed appointments and sends reminders.
-const _api_POST = async (req: Request) => {
+/**
+ * GET /api/cron/reminders
+ * Triggered by Vercel Cron or external scheduler
+ */
+export async function GET(request: NextRequest) {
   try {
-    const secret = process.env.CRON_SECRET || process.env.NEXT_CRON_SECRET
-    const header = req.headers.get('x-cron-secret') || ''
-    if (secret && header && header !== secret) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Verify authorization (e.g., CRON_SECRET)
+    // For MVP, we'll check for a simple secret or allow if in development
+    const authHeader = request.headers.get("authorization");
+    const cronSecret = process.env.CRON_SECRET;
 
-    const hasDbEnv = !!process.env.NETLIFY_DATABASE_URL || !!process.env.DATABASE_URL
-    let hasDb = hasDbEnv
-    try {
-      if (hasDbEnv && typeof (prisma as any).$queryRaw === 'function') {
-        await (prisma as any).$queryRaw`SELECT 1`
-      }
-    } catch {
-      hasDb = false
+    // Allow if no secret configured (dev) or matches
+    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    if (!hasDb) {
-      try { await logAuditSafe({ action: 'cron:reminders:skipped', details: { reason: 'no_db' } }) } catch {}
-      return NextResponse.json({ success: true, processed: 0, note: 'Database not configured; skipping reminders' })
-    }
+    const result = await ReminderService.processReminders();
 
-    if (secret && !header && process.env.NODE_ENV !== 'test') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const result = await sendBookingReminders()
-    return NextResponse.json(result)
-  } catch (e) {
-    await captureErrorIfAvailable(e, { route: 'cron:reminders' })
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+    return NextResponse.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    logger.error("Cron job failed", { error });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
-
-export const POST = withTenantContext(_api_POST, { requireAuth: false })

@@ -5,7 +5,7 @@ vi.mock('@/lib/prisma', () => {
     default: {
       task: {
         findMany: vi.fn(async () => [{ id: '1' }]),
-        create: vi.fn(async ({ data }: any) => ({ id: '2', ...data }))
+        create: vi.fn(async ({ data }: Record<string, unknown>) => ({ id: '2', ...data }))
       }
     }
   }
@@ -14,19 +14,19 @@ vi.mock('@/lib/prisma', () => {
 describe('api/admin/tasks route', () => {
   it('GET returns tasks', async () => {
     const { GET } = await import('@/app/api/admin/tasks/route')
-    const res: any = await GET(new Request('https://example.com/api/admin/tasks?limit=10'))
-    const data = await res.json()
+    const res: Response = await (GET as (request: Request) => Promise<Response>)(new Request('https://example.com/api/admin/tasks?limit=10'))
+    const data: unknown = await res.json()
     expect(Array.isArray(data)).toBe(true)
   })
 
   it('POST validates and creates', async () => {
     const { POST } = await import('@/app/api/admin/tasks/route')
-    const resBad: any = await POST(new Request('https://example.com/api/admin/tasks', { method: 'POST', body: JSON.stringify({}) }))
+    const resBad: Response = await (POST as (request: Request) => Promise<Response>)(new Request('https://example.com/api/admin/tasks', { method: 'POST', body: JSON.stringify({}) }))
     expect(resBad.status).toBe(400)
 
-    const resOk: any = await POST(new Request('https://example.com/api/admin/tasks', { method: 'POST', body: JSON.stringify({ title: 'X', estimatedHours: 1 }) }))
+    const resOk: Response = await (POST as (request: Request) => Promise<Response>)(new Request('https://example.com/api/admin/tasks', { method: 'POST', body: JSON.stringify({ title: 'X', estimatedHours: 1 }) }))
     expect(resOk.status).toBe(201)
-    const data = await resOk.json()
-    expect(data.id).toBeDefined()
+    const data: Record<string, unknown> = await resOk.json()
+    expect((data as any).id).toBeDefined()
   })
 })

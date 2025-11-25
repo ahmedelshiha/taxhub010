@@ -19,17 +19,17 @@ export const POST = withTenantContext(async (req: Request) => {
     const key = `communication-settings:import:${ctx.tenantId}:${ip}`
     const rl = await applyRateLimit(key, 3, 60_000)
     if (!rl.allowed) {
-      try { await logAudit({ action: 'security.ratelimit.block', actorId: ctx.userId ?? null, details: { tenantId: ctx.tenantId ?? null, ip, key, route: new URL((req as any).url).pathname } }) } catch {}
+      try { await logAudit({ action: 'security.ratelimit.block', actorId: ctx.userId ?? null, details: { tenantId: ctx.tenantId ?? null, ip, key, route: new URL((req as any).url).pathname } }) } catch { }
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     const body = await req.json().catch(() => ({}))
     const data = validateImportWithSchema(body, CommunicationSettingsSchema)
-    const updated = await communicationService.upsert(ctx.tenantId, data)
-    try { await logAudit({ action: 'communication-settings:import', actorId: ctx.userId, details: { tenantId: ctx.tenantId } }) } catch {}
+    const updated = await communicationService.upsert(ctx.tenantId, data as any)
+    try { await logAudit({ action: 'communication-settings:import', actorId: ctx.userId, details: { tenantId: ctx.tenantId } }) } catch { }
     return NextResponse.json(updated)
   } catch (e) {
-    try { Sentry.captureException(e as any) } catch {}
+    try { Sentry.captureException(e as any) } catch { }
     return NextResponse.json({ error: 'Failed to import communication settings' }, { status: 500 })
   }
 })

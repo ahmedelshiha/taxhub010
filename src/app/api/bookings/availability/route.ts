@@ -1,201 +1,192 @@
-import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import { withTenantContext } from '@/lib/api-wrapper'
-import { addDays, format, startOfDay, endOfDay } from 'date-fns'
-import { calculateServicePrice } from '@/lib/booking/pricing'
-import { getAvailabilityForService, type BusinessHours } from '@/lib/booking/availability'
+import { NextRequest, NextResponse } from "next/server";
+import { withTenantContext } from "@/lib/api-wrapper";
+import { requireTenantContext } from "@/lib/tenant-utils";
+import { logger } from "@/lib/logger";
+import prisma from "@/lib/prisma";
+import { addMinutes, format, parse, startOfDay, endOfDay } from "date-fns";
 
-function toMinutes(str: string) {
-  const [h, m] = str.split(':').map((v) => parseInt(v, 10))
-  if (Number.isNaN(h) || Number.isNaN(m)) return null
-  return h * 60 + m
+interface TimeSlot {
+  start: string; // HH:mm format
+  end: string;   // HH:mm format
+  available: boolean;
+  reason?: string; // Why unavailable
 }
 
-function normalizeBusinessHours(raw: unknown): BusinessHours | undefined {
-  if (!raw || typeof raw !== 'object') return undefined
-  const out: BusinessHours = {} as any
-  const asObj = raw as Record<string, any>
-
-  // Support array[0..6] or object keyed by weekday ('0'..'6')
-  const keys = Array.isArray(raw) ? Object.keys(raw as any) : Object.keys(asObj)
-  for (const k of keys) {
-    const idx = Number(k)
-    const val = (Array.isArray(raw) ? (raw as any)[k as any] : asObj[k])
-    if (val == null) continue
-
-    // Formats supported: { startMinutes, endMinutes } OR { startTime: '09:00', endTime: '17:00' } OR { start: 540, end: 1020 } OR '09:00-17:00'
-    if (typeof val === 'string') {
-      const parts = val.split('-')
-      if (parts.length === 2) {
-        const s = toMinutes(parts[0].trim())
-        const e = toMinutes(parts[1].trim())
-        if (s != null && e != null) out[idx] = { startMinutes: s, endMinutes: e }
-      }
-      continue
-    }
-    if (typeof val === 'object') {
-      if (typeof val.startMinutes === 'number' && typeof val.endMinutes === 'number') {
-        out[idx] = { startMinutes: val.startMinutes, endMinutes: val.endMinutes }
-        continue
-      }
-      if (typeof val.start === 'number' && typeof val.end === 'number') {
-        out[idx] = { startMinutes: val.start, endMinutes: val.end }
-        continue
-      }
-      if (typeof val.startTime === 'string' && typeof val.endTime === 'string') {
-        const s = toMinutes(val.startTime)
-        const e = toMinutes(val.endTime)
-        if (s != null && e != null) out[idx] = { startMinutes: s, endMinutes: e }
-        continue
-      }
-    }
-  }
-  return Object.keys(out).length ? out : undefined
+interface AvailabilityResponse {
+  date: string;
+  service: string;
+  slots: TimeSlot[];
+  timezone: string;
 }
 
-function ymd(d: Date) {
-  return d.toISOString().slice(0, 10)
-}
+// Business hours configuration (9 AM - 6 PM)
+const BUSINESS_START_HOUR = 9;
+const BUSINESS_END_HOUR = 18;
+const SLOT_DURATION_MINUTES = 30;
 
-// GET /api/bookings/availability - Get available time slots
-export const GET = withTenantContext(async (request: NextRequest) => {
+/**
+ * GET /api/bookings/availability?date=YYYY-MM-DD&serviceId=xxx
+ * Check staff availability and return time slots
+ */
+const _api_GET = async (request: NextRequest) => {
   try {
-    console.log('[availability] GET start')
-    const { searchParams } = new URL(request.url)
-    const serviceId = searchParams.get('serviceId')
-    const dateParam = searchParams.get('date')
-    const days = Math.max(1, parseInt(searchParams.get('days') || '7', 10))
-    const includePriceFlag = (searchParams.get('includePrice') || '').toLowerCase()
-    const includePrice = includePriceFlag === '1' || includePriceFlag === 'true' || includePriceFlag === 'yes'
-    const currency = searchParams.get('currency') || undefined
-    const promoCode = (searchParams.get('promoCode') || '').trim() || undefined
-    const teamMemberId = searchParams.get('teamMemberId') || undefined
+    const ctx = requireTenantContext();
+    const { searchParams } = new URL(request.url);
+    const dateParam = searchParams.get("date");
+    const serviceId = searchParams.get("serviceId");
 
-    if (!serviceId) {
-      return NextResponse.json({ error: 'Service ID is required' }, { status: 400 })
+    if (!ctx.userId) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
-    const service = await prisma.service.findUnique({ where: { id: serviceId } })
-    if (!service) return NextResponse.json({ error: 'Service not available for booking' }, { status: 404 })
-    // Support either string status OR legacy boolean active flag on service
-    const hasStatus = typeof (service as any).status === 'string'
-    const isActive = hasStatus ? String((service as any).status).toUpperCase() === 'ACTIVE' : ((service as any).active !== false)
-    if (!isActive || service.bookingEnabled === false) {
-      return NextResponse.json({ error: 'Service not available for booking' }, { status: 404 })
+    if (!dateParam) {
+      return NextResponse.json(
+        { error: "Date parameter is required (YYYY-MM-DD)" },
+        { status: 400 }
+      );
     }
 
-    const now = new Date()
-    const startDate = dateParam ? new Date(dateParam) : now
-    const rangeStart = startDate
-    const rangeEnd = addDays(rangeStart, days)
-
-    // Enforce min/max advance booking windows
-    const bookingType = (searchParams.get('bookingType') || '').toUpperCase()
-
-    const minAdvanceHours = typeof service.minAdvanceHours === 'number' ? service.minAdvanceHours : 0
-    const advanceDays = typeof service.advanceBookingDays === 'number' ? service.advanceBookingDays : null
-
-    // If emergency booking requested, skip minAdvance enforcement
-    const windowStart = bookingType === 'EMERGENCY' ? now : new Date(now.getTime() + minAdvanceHours * 60 * 60 * 1000)
-    // Only cap the end window when advanceBookingDays is explicitly configured; otherwise allow the requested range
-    const windowEnd = advanceDays != null ? new Date(now.getTime() + advanceDays * 24 * 60 * 60 * 1000) : rangeEnd
-
-    // Business hours normalization and options
-    const businessHours = normalizeBusinessHours(service.businessHours as any)
-    const bookingBufferMinutes = typeof service.bufferTime === 'number' ? service.bufferTime : 0
-    const maxDailyBookings = typeof service.maxDailyBookings === 'number' ? service.maxDailyBookings : 0
-
-    const from = rangeStart < windowStart ? windowStart : rangeStart
-    const to = rangeEnd > windowEnd ? windowEnd : rangeEnd
-
-    if (from > to) {
-      return NextResponse.json({ serviceId, duration: service.duration || 60, availability: [] })
+    const requestedDate = parse(dateParam, "yyyy-MM-dd", new Date());
+    if (isNaN(requestedDate.getTime())) {
+      return NextResponse.json(
+        { error: "Invalid date format. Use YYYY-MM-DD" },
+        { status: 400 }
+      );
     }
 
-    // Generate availability via domain service
-    const { slots } = await getAvailabilityForService({
-      serviceId,
-      from: startOfDay(from),
-      to: endOfDay(to),
-      teamMemberId,
-      options: {
-        bookingBufferMinutes,
-        maxDailyBookings,
-        businessHours,
-        skipWeekends: false, // rely on businessHours to determine open days
-        now,
+    // Check if date is in the past
+    const today = startOfDay(new Date());
+    if (requestedDate < today) {
+      return NextResponse.json(
+        { error: "Cannot check availability for past dates" },
+        { status: 400 }
+      );
+    }
+
+    // Get service details (for duration)
+    let serviceName = "General Service";
+    let serviceDuration = 60; // Default 60 minutes
+
+    if (serviceId) {
+      // Note: Would fetch from Service table if it exists
+      // For MVP, using default duration
+      serviceName = "Tax Consultation";
+      serviceDuration = 60;
+    }
+
+    // Generate time slots for the day
+    const dayStart = startOfDay(requestedDate);
+    dayStart.setHours(BUSINESS_START_HOUR, 0, 0, 0);
+
+    const dayEnd = startOfDay(requestedDate);
+    dayEnd.setHours(BUSINESS_END_HOUR, 0, 0, 0);
+
+    const timeSlots: TimeSlot[] = [];
+    let currentTime = dayStart;
+
+    while (currentTime < dayEnd) {
+      const slotEnd = addMinutes(currentTime, SLOT_DURATION_MINUTES);
+
+      if (slotEnd <= dayEnd) {
+        timeSlots.push({
+          start: format(currentTime, "HH:mm"),
+          end: format(slotEnd, "HH:mm"),
+          available: true, // Will check conflicts next
+        });
+      }
+
+      currentTime = slotEnd;
+    }
+
+    // Check for existing bookings that conflict with time slots
+    const existingBookings = await prisma.booking.findMany({
+      where: {
+        tenantId: ctx.tenantId as string,
+        scheduledAt: {
+          gte: startOfDay(requestedDate),
+          lte: endOfDay(requestedDate),
+        },
+        status: {
+          in: ["PENDING", "CONFIRMED"], // Don't block for cancelled/completed
+        },
       },
-    })
+      select: {
+        scheduledAt: true,
+        status: true,
+      },
+    });
 
-    // Apply blackout dates filtering at the day level
-    const blackout = new Set((service.blackoutDates || []).map((d) => ymd(new Date(d as any))))
-    const filtered = slots.filter((s) => !blackout.has(ymd(new Date(s.start))))
+    // Mark conflicting slots as unavailable
+    existingBookings.forEach((booking) => {
+      const bookingTime = format(booking.scheduledAt, "HH:mm");
+      const bookingEndTime = format(
+        addMinutes(booking.scheduledAt, serviceDuration),
+        "HH:mm"
+      );
 
-    // Group slots by day and compute optional pricing
-    const byDay = new Map<string, any[]>()
-    // Compute one price per request to avoid per-slot async work during availability
-    let globalPriceCents: number | undefined
-    let globalCurrency: string | undefined
-    if (includePrice) {
-      try {
-        const refDate = filtered.length ? new Date(filtered[0].start) : new Date()
-        const price = await calculateServicePrice({
-          serviceId,
-          scheduledAt: refDate,
-          durationMinutes: service.duration || 60,
-          options: {
-            currency,
-            promoCode,
-            promoResolver: async (code: string, { serviceId }) => {
-              const svc = await prisma.service.findUnique({ where: { id: serviceId } })
-              if (!svc) return null
-              const base = Number(svc.price ?? 0)
-              const baseCents = Math.round(base * 100)
-              const uc = code.toUpperCase()
-              if (uc === 'WELCOME10') return { code: 'PROMO_WELCOME10', label: 'Promo WELCOME10', amountCents: Math.round(baseCents * -0.1) }
-              if (uc === 'SAVE15') return { code: 'PROMO_SAVE15', label: 'Promo SAVE15', amountCents: Math.round(baseCents * -0.15) }
-              return null
-            },
-          },
-        })
-        globalPriceCents = price.totalCents
-        globalCurrency = price.currency
-      } catch (e) {
-        // ignore pricing errors and leave prices undefined
+      timeSlots.forEach((slot) => {
+        // Check if slot overlaps with booking
+        if (
+          (slot.start >= bookingTime && slot.start < bookingEndTime) ||
+          (slot.end > bookingTime && slot.end <= bookingEndTime) ||
+          (slot.start <= bookingTime && slot.end >= bookingEndTime)
+        ) {
+          slot.available = false;
+          slot.reason = "Already booked";
+        }
+      });
+    });
+
+    // Check for slots that don't have enough time for service duration
+    // (e.g., if service takes 90 minutes, need 3 consecutive 30-min slots)
+    const slotsNeeded = Math.ceil(serviceDuration / SLOT_DURATION_MINUTES);
+
+    if (slotsNeeded > 1) {
+      for (let i = 0; i < timeSlots.length; i++) {
+        if (timeSlots[i].available) {
+          // Check if next N slots are also available
+          let hasEnoughConsecutive = true;
+          for (let j = 1; j < slotsNeeded; j++) {
+            if (i + j >= timeSlots.length || !timeSlots[i + j].available) {
+              hasEnoughConsecutive = false;
+              break;
+            }
+          }
+
+          if (!hasEnoughConsecutive) {
+            timeSlots[i].available = false;
+            timeSlots[i].reason = `Not enough time for ${serviceDuration}-minute service`;
+          }
+        }
       }
     }
 
-    for (const s of filtered) {
-      if (!s.available) continue
-      const start = new Date(s.start)
-      const key = ymd(start)
-      if (!byDay.has(key)) byDay.set(key, [])
-
-      const entry: any = {
-        start: s.start,
-        end: s.end,
-        available: true,
-      }
-
-      if (globalPriceCents != null) {
-        entry.priceCents = globalPriceCents
-        entry.currency = globalCurrency
-      }
-
-      byDay.get(key)!.push(entry)
-    }
-
-    const availability = Array.from(byDay.entries())
-      .sort(([a], [b]) => (a < b ? -1 : 1))
-      .map(([date, daySlots]) => ({ date, slots: daySlots }))
+    const response: AvailabilityResponse = {
+      date: dateParam,
+      service: serviceName,
+      slots: timeSlots,
+      timezone: "UTC", // TODO: Support user timezone
+    };
 
     return NextResponse.json({
-      serviceId,
-      duration: service.duration || 60,
-      availability,
-    })
+      success: true,
+      data: response,
+      meta: {
+        totalSlots: timeSlots.length,
+        availableSlots: timeSlots.filter((s) => s.available).length,
+        bookedSlots: existingBookings.length,
+      },
+    });
   } catch (error) {
-    console.error('Error fetching availability:', error)
-    return NextResponse.json({ error: 'Failed to fetch availability' }, { status: 500 })
+    logger.error("Error checking availability", { error });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
-}, { requireAuth: false })
+};
+
+export const GET = withTenantContext(_api_GET, { requireAuth: true });

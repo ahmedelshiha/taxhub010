@@ -1,0 +1,13 @@
+
+
+# Run lint-staged on staged files
+pnpm lint-staged
+
+# Run TypeScript type check
+echo "Running TypeScript type check..."
+pnpm tsc --noEmit || {
+  echo "❌ TypeScript type check failed. Fix the errors before committing."
+  exit 1
+}
+
+echo "✅ Pre-commit checks passed!"

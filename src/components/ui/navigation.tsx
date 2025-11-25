@@ -8,6 +8,8 @@ import { useSession } from 'next-auth/react'
 import LogoutButton from '@/components/ui/LogoutButton'
 import { Menu, X, User, LogOut, Settings, Calendar, Bell } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
+import { localeConfig, type Locale } from '@/lib/i18n'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useClientNotifications } from '@/hooks/useClientNotifications'
+import { hasRole } from '@/lib/permissions'
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -66,12 +69,20 @@ function ClientNotificationsList() {
 
 import { useOrgSettings } from '@/components/providers/SettingsProvider'
 
-export function Navigation({ orgName = 'Accounting Firm', orgLogoUrl }: { orgName?: string; orgLogoUrl?: string }) {
+export function Navigation({
+  orgName = 'Accounting Firm',
+  orgLogoUrl,
+  currentLocale = 'en'
+}: {
+  orgName?: string
+  orgLogoUrl?: string
+  currentLocale?: Locale
+}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const { data: session, status } = useSession()
   const user = session?.user as any
-  const isAdminUser = ['ADMIN','TEAM_LEAD','TEAM_MEMBER'].includes((user?.role as string) || '')
+  const isAdminUser = hasRole((user?.role as string) || '', ['ADMIN','TEAM_LEAD','TEAM_MEMBER'])
 
   // prefer centralized settings when provider present
   const ctx = useOrgSettings()
@@ -127,6 +138,9 @@ export function Navigation({ orgName = 'Accounting Firm', orgLogoUrl }: { orgNam
 
           {/* Desktop Auth & CTA */}
           <div className="hidden md:flex md:items-center md:space-x-4">
+            {/* Language Toggle */}
+            <LanguageToggle currentLocale={currentLocale} />
+
             {status === 'loading' ? (
               <div className="h-8 w-20 bg-gray-200 animate-pulse rounded"></div>
             ) : session ? (
@@ -163,7 +177,7 @@ export function Navigation({ orgName = 'Accounting Firm', orgLogoUrl }: { orgNam
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/portal/settings" className="flex items-center">
+                          <Link href="/admin/profile?tab=preferences" className="flex items-center">
                             <Settings className="mr-2 h-4 w-4" />
                             Settings
                           </Link>
@@ -180,18 +194,18 @@ export function Navigation({ orgName = 'Accounting Firm', orgLogoUrl }: { orgNam
                     ) : (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link href="/portal" className="flex items-center">
+                          <Link href="/portal/dashboard" className="flex items-center">
                             <Calendar className="mr-2 h-4 w-4" />
-                            My Bookings
+                            My Dashboard
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/portal/settings" className="flex items-center">
+                          <Link href="/admin/profile?tab=preferences" className="flex items-center">
                             <Settings className="mr-2 h-4 w-4" />
                             Settings
                           </Link>
                         </DropdownMenuItem>
-                        {['ADMIN','TEAM_LEAD','TEAM_MEMBER'].includes((session?.user?.role as string) || '') && (
+                        {hasRole(((session?.user?.role as string) || ''), ['ADMIN', 'TEAM_LEAD', 'TEAM_MEMBER']) && (
                           <>
                             <DropdownMenuItem asChild>
                               <Link href="/admin" className="flex items-center">
@@ -223,8 +237,9 @@ export function Navigation({ orgName = 'Accounting Firm', orgLogoUrl }: { orgNam
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile language toggle and menu button */}
+          <div className="md:hidden flex items-center space-x-2">
+            <LanguageToggle currentLocale={currentLocale} size="icon" />
             <Button
               variant="ghost"
               size="sm"
@@ -279,7 +294,7 @@ export function Navigation({ orgName = 'Accounting Firm', orgLogoUrl }: { orgNam
                           Admin Panel
                         </Link>
                         <Link
-                          href="/portal/settings"
+                          href="/admin/profile?tab=preferences"
                           className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -290,20 +305,20 @@ export function Navigation({ orgName = 'Accounting Firm', orgLogoUrl }: { orgNam
                     ) : (
                       <>
                         <Link
-                          href="/portal"
+                          href="/portal/dashboard"
                           className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
                           onClick={() => setMobileMenuOpen(false)}
                         >
-                          My Bookings
+                          My Dashboard
                         </Link>
                         <Link
-                          href="/portal/settings"
+                          href="/admin/profile?tab=preferences"
                           className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Settings
                         </Link>
-                        {['ADMIN','TEAM_LEAD','TEAM_MEMBER'].includes((session?.user?.role as string) || '') && (
+                        {hasRole(((session?.user?.role as string) || ''), ['ADMIN', 'TEAM_LEAD', 'TEAM_MEMBER']) && (
                           <>
                             <Link
                               href="/admin"

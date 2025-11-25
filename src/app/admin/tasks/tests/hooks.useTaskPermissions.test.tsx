@@ -11,24 +11,24 @@ function renderWithHook(role: string) {
 
 describe('useTaskPermissions', () => {
   it('grants full perms to ADMIN', async () => {
-    const mod: any = await renderWithHook('ADMIN')
-    const Comp: React.FC = () => { const p = mod.useTaskPermissions(); return <div data-create={String(p.canCreate)} data-delete={String(p.canDelete)} /> }
+    const mod: Record<string, unknown> = await renderWithHook('ADMIN')
+    const Comp: React.FC = () => { const p = (mod.useTaskPermissions as () => Record<string, unknown>)(); return <div data-create={String((p as any).canCreate)} data-delete={String((p as any).canDelete)} /> }
     const { container } = render(<Comp />)
     expect(container.querySelector('[data-create="true"]')).toBeTruthy()
     expect(container.querySelector('[data-delete="true"]')).toBeTruthy()
   })
 
   it('grants limited perms to STAFF', async () => {
-    const mod: any = await renderWithHook('STAFF')
-    const Comp: React.FC = () => { const p = mod.useTaskPermissions(); return <div data-create={String(p.canCreate)} data-bulk={String(p.canBulk)} /> }
+    const mod: Record<string, unknown> = await renderWithHook('STAFF')
+    const Comp: React.FC = () => { const p = (mod.useTaskPermissions as () => Record<string, unknown>)(); return <div data-create={String((p as any).canCreate)} data-bulk={String((p as any).canBulk)} /> }
     const { container } = render(<Comp />)
     expect(container.querySelector('[data-create="true"]')).toBeTruthy()
     expect(container.querySelector('[data-bulk="false"]')).toBeTruthy()
   })
 
   it('grants comment-only to USER', async () => {
-    const mod: any = await renderWithHook('USER')
-    const Comp: React.FC = () => { const p = mod.useTaskPermissions(); return <div data-comment={String(p.canComment)} data-edit={String(p.canEdit)} /> }
+    const mod: Record<string, unknown> = await renderWithHook('USER')
+    const Comp: React.FC = () => { const p = (mod.useTaskPermissions as () => Record<string, unknown>)(); return <div data-comment={String((p as any).canComment)} data-edit={String((p as any).canEdit)} /> }
     const { container } = render(<Comp />)
     expect(container.querySelector('[data-comment="true"]')).toBeTruthy()
     expect(container.querySelector('[data-edit="false"]')).toBeTruthy()

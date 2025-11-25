@@ -10,6 +10,7 @@ export const PERMISSIONS = {
   TASKS_READ_ALL: 'tasks.read.all',
   TASKS_READ_ASSIGNED: 'tasks.read.assigned',
   TASKS_UPDATE: 'tasks.update',
+  TASKS_EDIT: 'tasks.edit',
   TASKS_DELETE: 'tasks.delete',
   TASKS_ASSIGN: 'tasks.assign',
 
@@ -26,6 +27,7 @@ export const PERMISSIONS = {
   SERVICES_VIEW: 'services.view',
   SERVICES_CREATE: 'services.create',
   SERVICES_EDIT: 'services.edit',
+  SERVICES_UPDATE: 'services.update',
   SERVICES_DELETE: 'services.delete',
   SERVICES_BULK_EDIT: 'services.bulk.edit',
   SERVICES_EXPORT: 'services.export',
@@ -56,6 +58,7 @@ export const PERMISSIONS = {
   INTEGRATION_HUB_EDIT: 'integration.settings.edit',
   INTEGRATION_HUB_TEST: 'integration.settings.test',
   INTEGRATION_HUB_SECRETS_WRITE: 'integration.settings.secrets.write',
+  INTEGRATIONS_MANAGE: 'integrations.manage',
 
   // Client Management settings
   CLIENT_SETTINGS_VIEW: 'client.settings.view',
@@ -94,15 +97,1193 @@ export const PERMISSIONS = {
   // System Administration settings
   SYSTEM_ADMIN_SETTINGS_VIEW: 'system-admin.settings.view',
   SYSTEM_ADMIN_SETTINGS_EDIT: 'system-admin.settings.edit',
+
+  // Language management
+  LANGUAGES_VIEW: 'languages.view',
+  LANGUAGES_MANAGE: 'languages.manage',
+
+  // Reports management
+  REPORTS_CREATE: 'reports.create',
+  REPORTS_READ: 'reports.read',
+  REPORTS_WRITE: 'reports.write',
+  REPORTS_DELETE: 'reports.delete',
+  REPORTS_GENERATE: 'reports.generate',
+
+  // Advanced exports
+  USERS_EXPORT: 'users.export',
+
+  // Entity Management (Portal)
+  ENTITIES_CREATE: 'entities.create',
+  ENTITIES_READ: 'entities.read',
+  ENTITIES_UPDATE: 'entities.update',
+  ENTITIES_DELETE: 'entities.delete',
+
+  // Approvals Management
+  APPROVALS_CREATE: 'approvals.create',
+  APPROVALS_READ: 'approvals.read',
+  APPROVALS_RESPOND: 'approvals.respond',
+  APPROVALS_DELETE: 'approvals.delete',
+
+  // Documents Management
+  DOCUMENTS_CREATE: 'documents.create',
+  DOCUMENTS_READ: 'documents.read',
+  DOCUMENTS_DELETE: 'documents.delete',
+  DOCUMENTS_DOWNLOAD: 'documents.download',
+  DOCUMENTS_UPLOAD: 'documents.upload',
+
+  // Invoices Management
+  INVOICES_CREATE: 'invoices.create',
+  INVOICES_READ: 'invoices.read',
+  INVOICES_UPDATE: 'invoices.update',
+  INVOICES_DELETE: 'invoices.delete',
+  INVOICES_SEND: 'invoices.send',
+  INVOICES_PAY: 'invoices.pay',
+
+  // Bookings Management
+  BOOKINGS_CREATE: 'bookings.create',
+  BOOKINGS_READ_OWN: 'bookings.read.own',
+  BOOKINGS_READ_ALL: 'bookings.read.all',
+  BOOKINGS_VIEW: 'bookings.view',
+  BOOKINGS_EDIT: 'bookings.edit',
+  BOOKINGS_CANCEL: 'bookings.cancel',
+  BOOKINGS_RESCHEDULE: 'bookings.reschedule',
+  BOOKINGS_DELETE: 'bookings.delete',
+
+  // Tasks Management (entity-level)
+  TASKS_UPDATE_OWN: 'tasks.update.own',
 } as const
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
+
+/**
+ * Permission Categories for organization and filtering
+ */
+export enum PermissionCategory {
+  CONTENT = 'Content Management',
+  ANALYTICS = 'Analytics & Reports',
+  USERS = 'User Management',
+  SYSTEM = 'System Settings',
+  BOOKINGS = 'Booking Management',
+  FINANCIAL = 'Financial Operations',
+  TEAM = 'Team Collaboration',
+  SECURITY = 'Security & Access',
+}
+
+/**
+ * Risk levels for permissions
+ */
+export enum RiskLevel {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+/**
+ * Metadata for each permission
+ */
+export interface PermissionMetadata {
+  key: Permission
+  label: string
+  description: string
+  category: PermissionCategory
+  risk: RiskLevel
+  dependencies?: Permission[]
+  conflicts?: Permission[]
+  icon?: string
+  tags?: string[]
+}
+
+/**
+ * Comprehensive metadata for all permissions
+ */
+export const PERMISSION_METADATA: Record<Permission, PermissionMetadata> = {
+  // Service Requests
+  [PERMISSIONS.SERVICE_REQUESTS_CREATE]: {
+    key: PERMISSIONS.SERVICE_REQUESTS_CREATE,
+    label: 'Create Service Requests',
+    description: 'Create new service request entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Plus',
+    tags: ['service-requests', 'create', 'content'],
+  },
+  [PERMISSIONS.SERVICE_REQUESTS_READ_ALL]: {
+    key: PERMISSIONS.SERVICE_REQUESTS_READ_ALL,
+    label: 'View All Service Requests',
+    description: 'View all service requests across the organization',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['service-requests', 'view', 'all', 'content'],
+  },
+  [PERMISSIONS.SERVICE_REQUESTS_READ_OWN]: {
+    key: PERMISSIONS.SERVICE_REQUESTS_READ_OWN,
+    label: 'View Own Service Requests',
+    description: 'View only service requests created by the user',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['service-requests', 'view', 'own', 'content'],
+  },
+  [PERMISSIONS.SERVICE_REQUESTS_UPDATE]: {
+    key: PERMISSIONS.SERVICE_REQUESTS_UPDATE,
+    label: 'Update Service Requests',
+    description: 'Edit existing service request entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.SERVICE_REQUESTS_READ_ALL],
+    icon: 'Edit',
+    tags: ['service-requests', 'edit', 'update', 'content'],
+  },
+  [PERMISSIONS.SERVICE_REQUESTS_DELETE]: {
+    key: PERMISSIONS.SERVICE_REQUESTS_DELETE,
+    label: 'Delete Service Requests',
+    description: 'Delete service request entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.SERVICE_REQUESTS_READ_ALL],
+    icon: 'Trash',
+    tags: ['service-requests', 'delete', 'content'],
+  },
+  [PERMISSIONS.SERVICE_REQUESTS_ASSIGN]: {
+    key: PERMISSIONS.SERVICE_REQUESTS_ASSIGN,
+    label: 'Assign Service Requests',
+    description: 'Assign service requests to team members',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.SERVICE_REQUESTS_READ_ALL, PERMISSIONS.TEAM_VIEW],
+    icon: 'Share',
+    tags: ['service-requests', 'assign', 'team', 'content'],
+  },
+
+  // Tasks
+  [PERMISSIONS.TASKS_CREATE]: {
+    key: PERMISSIONS.TASKS_CREATE,
+    label: 'Create Tasks',
+    description: 'Create new task entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'CheckSquare',
+    tags: ['tasks', 'create', 'content'],
+  },
+  [PERMISSIONS.TASKS_READ_ALL]: {
+    key: PERMISSIONS.TASKS_READ_ALL,
+    label: 'View All Tasks',
+    description: 'View all tasks across the organization',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['tasks', 'view', 'all', 'content'],
+  },
+  [PERMISSIONS.TASKS_READ_ASSIGNED]: {
+    key: PERMISSIONS.TASKS_READ_ASSIGNED,
+    label: 'View Assigned Tasks',
+    description: 'View only tasks assigned to the user',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['tasks', 'view', 'assigned', 'content'],
+  },
+  [PERMISSIONS.TASKS_UPDATE]: {
+    key: PERMISSIONS.TASKS_UPDATE,
+    label: 'Update Tasks',
+    description: 'Edit existing task entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.TASKS_CREATE],
+    icon: 'Edit',
+    tags: ['tasks', 'edit', 'update', 'content'],
+  },
+  [PERMISSIONS.TASKS_EDIT]: {
+    key: PERMISSIONS.TASKS_EDIT,
+    label: 'Edit Tasks',
+    description: 'Edit existing task entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.TASKS_CREATE],
+    icon: 'Edit',
+    tags: ['tasks', 'edit', 'content'],
+  },
+  [PERMISSIONS.TASKS_DELETE]: {
+    key: PERMISSIONS.TASKS_DELETE,
+    label: 'Delete Tasks',
+    description: 'Delete task entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.TASKS_READ_ALL],
+    icon: 'Trash',
+    tags: ['tasks', 'delete', 'content'],
+  },
+  [PERMISSIONS.TASKS_ASSIGN]: {
+    key: PERMISSIONS.TASKS_ASSIGN,
+    label: 'Assign Tasks',
+    description: 'Assign tasks to team members',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.TASKS_READ_ALL, PERMISSIONS.TEAM_VIEW],
+    icon: 'Share',
+    tags: ['tasks', 'assign', 'team', 'content'],
+  },
+
+  // Team Management
+  [PERMISSIONS.TEAM_MANAGE]: {
+    key: PERMISSIONS.TEAM_MANAGE,
+    label: 'Manage Team Members',
+    description: 'Add, remove, and manage team member information',
+    category: PermissionCategory.TEAM,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.TEAM_VIEW],
+    icon: 'Users',
+    tags: ['team', 'manage', 'collaboration'],
+  },
+  [PERMISSIONS.TEAM_VIEW]: {
+    key: PERMISSIONS.TEAM_VIEW,
+    label: 'View Team Members',
+    description: 'View team member information and organization',
+    category: PermissionCategory.TEAM,
+    risk: RiskLevel.LOW,
+    icon: 'Users',
+    tags: ['team', 'view', 'collaboration'],
+  },
+
+  // User Management
+  [PERMISSIONS.USERS_MANAGE]: {
+    key: PERMISSIONS.USERS_MANAGE,
+    label: 'Manage Users',
+    description: 'Manage user accounts, roles, and access',
+    category: PermissionCategory.USERS,
+    risk: RiskLevel.CRITICAL,
+    dependencies: [PERMISSIONS.USERS_VIEW],
+    icon: 'User',
+    tags: ['users', 'manage', 'rbac'],
+  },
+  [PERMISSIONS.USERS_VIEW]: {
+    key: PERMISSIONS.USERS_VIEW,
+    label: 'View Users',
+    description: 'View user information and account details',
+    category: PermissionCategory.USERS,
+    risk: RiskLevel.LOW,
+    icon: 'User',
+    tags: ['users', 'view', 'rbac'],
+  },
+  [PERMISSIONS.USERS_EXPORT]: {
+    key: PERMISSIONS.USERS_EXPORT,
+    label: 'Export Users',
+    description: 'Export user data to CSV, Excel, PDF, and other formats',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Download',
+    tags: ['users', 'export', 'reports', 'data'],
+  },
+
+  // Analytics & Reporting
+  [PERMISSIONS.ANALYTICS_VIEW]: {
+    key: PERMISSIONS.ANALYTICS_VIEW,
+    label: 'View Analytics',
+    description: 'Access analytics dashboards and view reports',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.LOW,
+    icon: 'BarChart3',
+    tags: ['analytics', 'reports', 'dashboard', 'view'],
+  },
+  [PERMISSIONS.ANALYTICS_EXPORT]: {
+    key: PERMISSIONS.ANALYTICS_EXPORT,
+    label: 'Export Analytics',
+    description: 'Export analytics data and generate reports',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.ANALYTICS_VIEW],
+    icon: 'Download',
+    tags: ['analytics', 'export', 'reports'],
+  },
+
+  // Services Management
+  [PERMISSIONS.SERVICES_VIEW]: {
+    key: PERMISSIONS.SERVICES_VIEW,
+    label: 'View Services',
+    description: 'View service catalog and details',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Package',
+    tags: ['services', 'view', 'catalog'],
+  },
+  [PERMISSIONS.SERVICES_CREATE]: {
+    key: PERMISSIONS.SERVICES_CREATE,
+    label: 'Create Services',
+    description: 'Create new service entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.SERVICES_VIEW],
+    icon: 'Plus',
+    tags: ['services', 'create', 'catalog'],
+  },
+  [PERMISSIONS.SERVICES_EDIT]: {
+    key: PERMISSIONS.SERVICES_EDIT,
+    label: 'Edit Services',
+    description: 'Edit existing service information',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.SERVICES_VIEW],
+    icon: 'Edit',
+    tags: ['services', 'edit', 'catalog'],
+  },
+  [PERMISSIONS.SERVICES_UPDATE]: {
+    key: PERMISSIONS.SERVICES_UPDATE,
+    label: 'Update Services',
+    description: 'Update existing service information',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.SERVICES_VIEW],
+    icon: 'Edit',
+    tags: ['services', 'update', 'catalog'],
+  },
+  [PERMISSIONS.SERVICES_DELETE]: {
+    key: PERMISSIONS.SERVICES_DELETE,
+    label: 'Delete Services',
+    description: 'Delete services from the catalog',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.SERVICES_VIEW],
+    icon: 'Trash',
+    tags: ['services', 'delete', 'catalog'],
+  },
+  [PERMISSIONS.SERVICES_BULK_EDIT]: {
+    key: PERMISSIONS.SERVICES_BULK_EDIT,
+    label: 'Bulk Edit Services',
+    description: 'Edit multiple services at once',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.SERVICES_EDIT],
+    icon: 'Zap',
+    tags: ['services', 'bulk', 'edit'],
+  },
+  [PERMISSIONS.SERVICES_EXPORT]: {
+    key: PERMISSIONS.SERVICES_EXPORT,
+    label: 'Export Services',
+    description: 'Export service data in various formats',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.SERVICES_VIEW],
+    icon: 'Download',
+    tags: ['services', 'export', 'data'],
+  },
+  [PERMISSIONS.SERVICES_ANALYTICS]: {
+    key: PERMISSIONS.SERVICES_ANALYTICS,
+    label: 'View Service Analytics',
+    description: 'View analytics for individual services',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.SERVICES_VIEW, PERMISSIONS.ANALYTICS_VIEW],
+    icon: 'BarChart3',
+    tags: ['services', 'analytics', 'reports'],
+  },
+  [PERMISSIONS.SERVICES_MANAGE_FEATURED]: {
+    key: PERMISSIONS.SERVICES_MANAGE_FEATURED,
+    label: 'Manage Featured Services',
+    description: 'Manage which services are featured in the catalog',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.SERVICES_VIEW, PERMISSIONS.SERVICES_EDIT],
+    icon: 'Star',
+    tags: ['services', 'featured', 'catalog'],
+  },
+
+  // Booking Settings
+  [PERMISSIONS.BOOKING_SETTINGS_VIEW]: {
+    key: PERMISSIONS.BOOKING_SETTINGS_VIEW,
+    label: 'View Booking Settings',
+    description: 'View booking configuration and availability',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.LOW,
+    icon: 'Settings',
+    tags: ['bookings', 'settings', 'view'],
+  },
+  [PERMISSIONS.BOOKING_SETTINGS_EDIT]: {
+    key: PERMISSIONS.BOOKING_SETTINGS_EDIT,
+    label: 'Edit Booking Settings',
+    description: 'Modify booking configurations and availability',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.BOOKING_SETTINGS_VIEW],
+    icon: 'Settings',
+    tags: ['bookings', 'settings', 'edit'],
+  },
+  [PERMISSIONS.BOOKING_SETTINGS_EXPORT]: {
+    key: PERMISSIONS.BOOKING_SETTINGS_EXPORT,
+    label: 'Export Booking Settings',
+    description: 'Export booking configuration data',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.BOOKING_SETTINGS_VIEW],
+    icon: 'Download',
+    tags: ['bookings', 'settings', 'export'],
+  },
+  [PERMISSIONS.BOOKING_SETTINGS_IMPORT]: {
+    key: PERMISSIONS.BOOKING_SETTINGS_IMPORT,
+    label: 'Import Booking Settings',
+    description: 'Import booking configuration from file',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.BOOKING_SETTINGS_EDIT],
+    icon: 'Upload',
+    tags: ['bookings', 'settings', 'import'],
+  },
+  [PERMISSIONS.BOOKING_SETTINGS_RESET]: {
+    key: PERMISSIONS.BOOKING_SETTINGS_RESET,
+    label: 'Reset Booking Settings',
+    description: 'Reset booking settings to defaults',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.CRITICAL,
+    dependencies: [PERMISSIONS.BOOKING_SETTINGS_EDIT],
+    icon: 'RotateCcw',
+    tags: ['bookings', 'settings', 'reset'],
+  },
+
+  // Organization Settings
+  [PERMISSIONS.ORG_SETTINGS_VIEW]: {
+    key: PERMISSIONS.ORG_SETTINGS_VIEW,
+    label: 'View Organization Settings',
+    description: 'View general organization configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Settings',
+    tags: ['org', 'settings', 'view'],
+  },
+  [PERMISSIONS.ORG_SETTINGS_EDIT]: {
+    key: PERMISSIONS.ORG_SETTINGS_EDIT,
+    label: 'Edit Organization Settings',
+    description: 'Modify organization configuration and branding',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.ORG_SETTINGS_VIEW],
+    icon: 'Settings',
+    tags: ['org', 'settings', 'edit'],
+  },
+  [PERMISSIONS.ORG_SETTINGS_EXPORT]: {
+    key: PERMISSIONS.ORG_SETTINGS_EXPORT,
+    label: 'Export Organization Settings',
+    description: 'Export organization configuration data',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.ORG_SETTINGS_VIEW],
+    icon: 'Download',
+    tags: ['org', 'settings', 'export'],
+  },
+  [PERMISSIONS.ORG_SETTINGS_IMPORT]: {
+    key: PERMISSIONS.ORG_SETTINGS_IMPORT,
+    label: 'Import Organization Settings',
+    description: 'Import organization configuration from file',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.ORG_SETTINGS_EDIT],
+    icon: 'Upload',
+    tags: ['org', 'settings', 'import'],
+  },
+  [PERMISSIONS.ORG_SETTINGS_RESET]: {
+    key: PERMISSIONS.ORG_SETTINGS_RESET,
+    label: 'Reset Organization Settings',
+    description: 'Reset organization settings to defaults',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.CRITICAL,
+    dependencies: [PERMISSIONS.ORG_SETTINGS_EDIT],
+    icon: 'RotateCcw',
+    tags: ['org', 'settings', 'reset'],
+  },
+
+  // Financial Settings
+  [PERMISSIONS.FINANCIAL_SETTINGS_VIEW]: {
+    key: PERMISSIONS.FINANCIAL_SETTINGS_VIEW,
+    label: 'View Financial Settings',
+    description: 'View financial configuration and payment settings',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.MEDIUM,
+    icon: 'DollarSign',
+    tags: ['financial', 'settings', 'view'],
+  },
+  [PERMISSIONS.FINANCIAL_SETTINGS_EDIT]: {
+    key: PERMISSIONS.FINANCIAL_SETTINGS_EDIT,
+    label: 'Edit Financial Settings',
+    description: 'Modify financial configuration and payment methods',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.CRITICAL,
+    dependencies: [PERMISSIONS.FINANCIAL_SETTINGS_VIEW],
+    icon: 'DollarSign',
+    tags: ['financial', 'settings', 'edit'],
+  },
+  [PERMISSIONS.FINANCIAL_SETTINGS_EXPORT]: {
+    key: PERMISSIONS.FINANCIAL_SETTINGS_EXPORT,
+    label: 'Export Financial Settings',
+    description: 'Export financial configuration and data',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.FINANCIAL_SETTINGS_VIEW],
+    icon: 'Download',
+    tags: ['financial', 'settings', 'export'],
+  },
+
+  // Integration Hub
+  [PERMISSIONS.INTEGRATION_HUB_VIEW]: {
+    key: PERMISSIONS.INTEGRATION_HUB_VIEW,
+    label: 'View Integration Settings',
+    description: 'View available integrations and status',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Link',
+    tags: ['integration', 'settings', 'view'],
+  },
+  [PERMISSIONS.INTEGRATION_HUB_EDIT]: {
+    key: PERMISSIONS.INTEGRATION_HUB_EDIT,
+    label: 'Edit Integration Settings',
+    description: 'Configure and manage integrations',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.INTEGRATION_HUB_VIEW],
+    icon: 'Link',
+    tags: ['integration', 'settings', 'edit'],
+  },
+  [PERMISSIONS.INTEGRATION_HUB_TEST]: {
+    key: PERMISSIONS.INTEGRATION_HUB_TEST,
+    label: 'Test Integrations',
+    description: 'Test integration connections and functionality',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.INTEGRATION_HUB_VIEW],
+    icon: 'Zap',
+    tags: ['integration', 'test'],
+  },
+  [PERMISSIONS.INTEGRATION_HUB_SECRETS_WRITE]: {
+    key: PERMISSIONS.INTEGRATION_HUB_SECRETS_WRITE,
+    label: 'Manage Integration Secrets',
+    description: 'Write and manage integration API keys and secrets',
+    category: PermissionCategory.SECURITY,
+    risk: RiskLevel.CRITICAL,
+    dependencies: [PERMISSIONS.INTEGRATION_HUB_EDIT],
+    icon: 'Lock',
+    tags: ['integration', 'secrets', 'security'],
+  },
+  [PERMISSIONS.INTEGRATIONS_MANAGE]: {
+    key: PERMISSIONS.INTEGRATIONS_MANAGE,
+    label: 'Manage Integrations',
+    description: 'Full management of filter bar integrations (Slack, Teams, Zapier, Webhooks)',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.INTEGRATION_HUB_VIEW],
+    icon: 'Plug',
+    tags: ['integration', 'manage', 'slack', 'teams', 'zapier', 'webhook'],
+  },
+
+  // Client Settings
+  [PERMISSIONS.CLIENT_SETTINGS_VIEW]: {
+    key: PERMISSIONS.CLIENT_SETTINGS_VIEW,
+    label: 'View Client Settings',
+    description: 'View client management configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Settings',
+    tags: ['client', 'settings', 'view'],
+  },
+  [PERMISSIONS.CLIENT_SETTINGS_EDIT]: {
+    key: PERMISSIONS.CLIENT_SETTINGS_EDIT,
+    label: 'Edit Client Settings',
+    description: 'Modify client management configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.CLIENT_SETTINGS_VIEW],
+    icon: 'Settings',
+    tags: ['client', 'settings', 'edit'],
+  },
+  [PERMISSIONS.CLIENT_SETTINGS_EXPORT]: {
+    key: PERMISSIONS.CLIENT_SETTINGS_EXPORT,
+    label: 'Export Client Settings',
+    description: 'Export client configuration data',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.CLIENT_SETTINGS_VIEW],
+    icon: 'Download',
+    tags: ['client', 'settings', 'export'],
+  },
+  [PERMISSIONS.CLIENT_SETTINGS_IMPORT]: {
+    key: PERMISSIONS.CLIENT_SETTINGS_IMPORT,
+    label: 'Import Client Settings',
+    description: 'Import client configuration from file',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.CLIENT_SETTINGS_EDIT],
+    icon: 'Upload',
+    tags: ['client', 'settings', 'import'],
+  },
+
+  // Team Settings
+  [PERMISSIONS.TEAM_SETTINGS_VIEW]: {
+    key: PERMISSIONS.TEAM_SETTINGS_VIEW,
+    label: 'View Team Settings',
+    description: 'View team management configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Settings',
+    tags: ['team', 'settings', 'view'],
+  },
+  [PERMISSIONS.TEAM_SETTINGS_EDIT]: {
+    key: PERMISSIONS.TEAM_SETTINGS_EDIT,
+    label: 'Edit Team Settings',
+    description: 'Modify team management configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.TEAM_SETTINGS_VIEW],
+    icon: 'Settings',
+    tags: ['team', 'settings', 'edit'],
+  },
+  [PERMISSIONS.TEAM_SETTINGS_EXPORT]: {
+    key: PERMISSIONS.TEAM_SETTINGS_EXPORT,
+    label: 'Export Team Settings',
+    description: 'Export team configuration data',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.TEAM_SETTINGS_VIEW],
+    icon: 'Download',
+    tags: ['team', 'settings', 'export'],
+  },
+  [PERMISSIONS.TEAM_SETTINGS_IMPORT]: {
+    key: PERMISSIONS.TEAM_SETTINGS_IMPORT,
+    label: 'Import Team Settings',
+    description: 'Import team configuration from file',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.TEAM_SETTINGS_EDIT],
+    icon: 'Upload',
+    tags: ['team', 'settings', 'import'],
+  },
+
+  // Task & Workflow Settings
+  [PERMISSIONS.TASK_WORKFLOW_SETTINGS_VIEW]: {
+    key: PERMISSIONS.TASK_WORKFLOW_SETTINGS_VIEW,
+    label: 'View Task & Workflow Settings',
+    description: 'View task and workflow configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Settings',
+    tags: ['task', 'workflow', 'settings', 'view'],
+  },
+  [PERMISSIONS.TASK_WORKFLOW_SETTINGS_EDIT]: {
+    key: PERMISSIONS.TASK_WORKFLOW_SETTINGS_EDIT,
+    label: 'Edit Task & Workflow Settings',
+    description: 'Modify task and workflow configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.TASK_WORKFLOW_SETTINGS_VIEW],
+    icon: 'Settings',
+    tags: ['task', 'workflow', 'settings', 'edit'],
+  },
+  [PERMISSIONS.TASK_WORKFLOW_SETTINGS_EXPORT]: {
+    key: PERMISSIONS.TASK_WORKFLOW_SETTINGS_EXPORT,
+    label: 'Export Task & Workflow Settings',
+    description: 'Export task and workflow configuration data',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.TASK_WORKFLOW_SETTINGS_VIEW],
+    icon: 'Download',
+    tags: ['task', 'workflow', 'settings', 'export'],
+  },
+  [PERMISSIONS.TASK_WORKFLOW_SETTINGS_IMPORT]: {
+    key: PERMISSIONS.TASK_WORKFLOW_SETTINGS_IMPORT,
+    label: 'Import Task & Workflow Settings',
+    description: 'Import task and workflow configuration from file',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.TASK_WORKFLOW_SETTINGS_EDIT],
+    icon: 'Upload',
+    tags: ['task', 'workflow', 'settings', 'import'],
+  },
+
+  // Analytics & Reporting Settings
+  [PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_VIEW]: {
+    key: PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_VIEW,
+    label: 'View Analytics & Reporting Settings',
+    description: 'View analytics and reporting configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Settings',
+    tags: ['analytics', 'reporting', 'settings', 'view'],
+  },
+  [PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_EDIT]: {
+    key: PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_EDIT,
+    label: 'Edit Analytics & Reporting Settings',
+    description: 'Modify analytics and reporting configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_VIEW],
+    icon: 'Settings',
+    tags: ['analytics', 'reporting', 'settings', 'edit'],
+  },
+  [PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_EXPORT]: {
+    key: PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_EXPORT,
+    label: 'Export Analytics & Reporting Settings',
+    description: 'Export analytics and reporting configuration data',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_VIEW],
+    icon: 'Download',
+    tags: ['analytics', 'reporting', 'settings', 'export'],
+  },
+  [PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_IMPORT]: {
+    key: PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_IMPORT,
+    label: 'Import Analytics & Reporting Settings',
+    description: 'Import analytics and reporting configuration from file',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.ANALYTICS_REPORTING_SETTINGS_EDIT],
+    icon: 'Upload',
+    tags: ['analytics', 'reporting', 'settings', 'import'],
+  },
+
+  // Communication Settings
+  [PERMISSIONS.COMMUNICATION_SETTINGS_VIEW]: {
+    key: PERMISSIONS.COMMUNICATION_SETTINGS_VIEW,
+    label: 'View Communication Settings',
+    description: 'View communication and notification configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Settings',
+    tags: ['communication', 'settings', 'view'],
+  },
+  [PERMISSIONS.COMMUNICATION_SETTINGS_EDIT]: {
+    key: PERMISSIONS.COMMUNICATION_SETTINGS_EDIT,
+    label: 'Edit Communication Settings',
+    description: 'Modify communication and notification configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.COMMUNICATION_SETTINGS_VIEW],
+    icon: 'Settings',
+    tags: ['communication', 'settings', 'edit'],
+  },
+  [PERMISSIONS.COMMUNICATION_SETTINGS_EXPORT]: {
+    key: PERMISSIONS.COMMUNICATION_SETTINGS_EXPORT,
+    label: 'Export Communication Settings',
+    description: 'Export communication configuration data',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.COMMUNICATION_SETTINGS_VIEW],
+    icon: 'Download',
+    tags: ['communication', 'settings', 'export'],
+  },
+  [PERMISSIONS.COMMUNICATION_SETTINGS_IMPORT]: {
+    key: PERMISSIONS.COMMUNICATION_SETTINGS_IMPORT,
+    label: 'Import Communication Settings',
+    description: 'Import communication configuration from file',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.COMMUNICATION_SETTINGS_EDIT],
+    icon: 'Upload',
+    tags: ['communication', 'settings', 'import'],
+  },
+
+  // Security & Compliance Settings
+  [PERMISSIONS.SECURITY_COMPLIANCE_SETTINGS_VIEW]: {
+    key: PERMISSIONS.SECURITY_COMPLIANCE_SETTINGS_VIEW,
+    label: 'View Security & Compliance Settings',
+    description: 'View security and compliance configuration',
+    category: PermissionCategory.SECURITY,
+    risk: RiskLevel.LOW,
+    icon: 'Shield',
+    tags: ['security', 'compliance', 'settings', 'view'],
+  },
+  [PERMISSIONS.SECURITY_COMPLIANCE_SETTINGS_EDIT]: {
+    key: PERMISSIONS.SECURITY_COMPLIANCE_SETTINGS_EDIT,
+    label: 'Edit Security & Compliance Settings',
+    description: 'Modify security and compliance configuration',
+    category: PermissionCategory.SECURITY,
+    risk: RiskLevel.CRITICAL,
+    dependencies: [PERMISSIONS.SECURITY_COMPLIANCE_SETTINGS_VIEW],
+    icon: 'Shield',
+    tags: ['security', 'compliance', 'settings', 'edit'],
+  },
+
+  // System Administration Settings
+  [PERMISSIONS.SYSTEM_ADMIN_SETTINGS_VIEW]: {
+    key: PERMISSIONS.SYSTEM_ADMIN_SETTINGS_VIEW,
+    label: 'View System Administration Settings',
+    description: 'View system administration configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Settings',
+    tags: ['system', 'admin', 'settings', 'view'],
+  },
+  [PERMISSIONS.SYSTEM_ADMIN_SETTINGS_EDIT]: {
+    key: PERMISSIONS.SYSTEM_ADMIN_SETTINGS_EDIT,
+    label: 'Edit System Administration Settings',
+    description: 'Modify system administration configuration',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.CRITICAL,
+    dependencies: [PERMISSIONS.SYSTEM_ADMIN_SETTINGS_VIEW],
+    icon: 'Settings',
+    tags: ['system', 'admin', 'settings', 'edit'],
+  },
+
+  // Language Management
+  [PERMISSIONS.LANGUAGES_VIEW]: {
+    key: PERMISSIONS.LANGUAGES_VIEW,
+    label: 'View Languages',
+    description: 'View available languages and localization settings',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.LOW,
+    icon: 'Globe',
+    tags: ['languages', 'localization', 'view'],
+  },
+  [PERMISSIONS.LANGUAGES_MANAGE]: {
+    key: PERMISSIONS.LANGUAGES_MANAGE,
+    label: 'Manage Languages',
+    description: 'Add, remove, and manage languages and localization',
+    category: PermissionCategory.SYSTEM,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.LANGUAGES_VIEW],
+    icon: 'Globe',
+    tags: ['languages', 'localization', 'manage'],
+  },
+
+  // Reports Management
+  [PERMISSIONS.REPORTS_CREATE]: {
+    key: PERMISSIONS.REPORTS_CREATE,
+    label: 'Create Reports',
+    description: 'Create new custom reports',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.LOW,
+    icon: 'PlusSquare',
+    tags: ['reports', 'create', 'analytics'],
+  },
+  [PERMISSIONS.REPORTS_READ]: {
+    key: PERMISSIONS.REPORTS_READ,
+    label: 'View Reports',
+    description: 'View existing reports and report templates',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['reports', 'view', 'analytics'],
+  },
+  [PERMISSIONS.REPORTS_WRITE]: {
+    key: PERMISSIONS.REPORTS_WRITE,
+    label: 'Edit Reports',
+    description: 'Edit and modify existing reports',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.REPORTS_READ],
+    icon: 'Edit',
+    tags: ['reports', 'edit', 'analytics'],
+  },
+  [PERMISSIONS.REPORTS_DELETE]: {
+    key: PERMISSIONS.REPORTS_DELETE,
+    label: 'Delete Reports',
+    description: 'Delete reports and report templates',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.REPORTS_READ],
+    icon: 'Trash',
+    tags: ['reports', 'delete', 'analytics'],
+  },
+  [PERMISSIONS.REPORTS_GENERATE]: {
+    key: PERMISSIONS.REPORTS_GENERATE,
+    label: 'Generate Reports',
+    description: 'Generate and export reports in various formats',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.REPORTS_READ],
+    icon: 'Download',
+    tags: ['reports', 'generate', 'export', 'analytics'],
+  },
+
+  // Entity Management (Portal)
+  [PERMISSIONS.ENTITIES_CREATE]: {
+    key: PERMISSIONS.ENTITIES_CREATE,
+    label: 'Create Entities',
+    description: 'Create new business entities and tax registrations',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    icon: 'Plus',
+    tags: ['entities', 'create', 'business'],
+  },
+  [PERMISSIONS.ENTITIES_READ]: {
+    key: PERMISSIONS.ENTITIES_READ,
+    label: 'View Entities',
+    description: 'View entity information and registration details',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['entities', 'view', 'business'],
+  },
+  [PERMISSIONS.ENTITIES_UPDATE]: {
+    key: PERMISSIONS.ENTITIES_UPDATE,
+    label: 'Edit Entities',
+    description: 'Update entity information and settings',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.ENTITIES_READ],
+    icon: 'Edit',
+    tags: ['entities', 'update', 'business'],
+  },
+  [PERMISSIONS.ENTITIES_DELETE]: {
+    key: PERMISSIONS.ENTITIES_DELETE,
+    label: 'Delete Entities',
+    description: 'Archive or delete business entities',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.ENTITIES_READ],
+    icon: 'Trash',
+    tags: ['entities', 'delete', 'business'],
+  },
+
+  // Approvals Management
+  [PERMISSIONS.APPROVALS_CREATE]: {
+    key: PERMISSIONS.APPROVALS_CREATE,
+    label: 'Create Approvals',
+    description: 'Create new approval requests',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    icon: 'CheckCircle',
+    tags: ['approvals', 'create'],
+  },
+  [PERMISSIONS.APPROVALS_READ]: {
+    key: PERMISSIONS.APPROVALS_READ,
+    label: 'View Approvals',
+    description: 'View approval requests and their status',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['approvals', 'view'],
+  },
+  [PERMISSIONS.APPROVALS_RESPOND]: {
+    key: PERMISSIONS.APPROVALS_RESPOND,
+    label: 'Respond to Approvals',
+    description: 'Approve or reject approval requests',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.APPROVALS_READ],
+    icon: 'CheckSquare',
+    tags: ['approvals', 'respond'],
+  },
+  [PERMISSIONS.APPROVALS_DELETE]: {
+    key: PERMISSIONS.APPROVALS_DELETE,
+    label: 'Delete Approvals',
+    description: 'Delete approval requests (admin only)',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.APPROVALS_READ],
+    icon: 'Trash',
+    tags: ['approvals', 'delete', 'admin'],
+  },
+
+  // Documents Management
+  [PERMISSIONS.DOCUMENTS_CREATE]: {
+    key: PERMISSIONS.DOCUMENTS_CREATE,
+    label: 'Create Documents',
+    description: 'Create new document entries',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Plus',
+    tags: ['documents', 'create'],
+  },
+  [PERMISSIONS.DOCUMENTS_READ]: {
+    key: PERMISSIONS.DOCUMENTS_READ,
+    label: 'View Documents',
+    description: 'View documents and their metadata',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['documents', 'view'],
+  },
+  [PERMISSIONS.DOCUMENTS_DELETE]: {
+    key: PERMISSIONS.DOCUMENTS_DELETE,
+    label: 'Delete Documents',
+    description: 'Delete document entries and files',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.DOCUMENTS_READ],
+    icon: 'Trash',
+    tags: ['documents', 'delete'],
+  },
+  [PERMISSIONS.DOCUMENTS_DOWNLOAD]: {
+    key: PERMISSIONS.DOCUMENTS_DOWNLOAD,
+    label: 'Download Documents',
+    description: 'Download document files',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.DOCUMENTS_READ],
+    icon: 'Download',
+    tags: ['documents', 'download'],
+  },
+  [PERMISSIONS.DOCUMENTS_UPLOAD]: {
+    key: PERMISSIONS.DOCUMENTS_UPLOAD,
+    label: 'Upload Documents',
+    description: 'Upload new document files',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Upload',
+    tags: ['documents', 'upload'],
+  },
+
+  // Invoices Management
+  [PERMISSIONS.INVOICES_CREATE]: {
+    key: PERMISSIONS.INVOICES_CREATE,
+    label: 'Create Invoices',
+    description: 'Create new invoices',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.MEDIUM,
+    icon: 'Plus',
+    tags: ['invoices', 'create', 'financial'],
+  },
+  [PERMISSIONS.INVOICES_READ]: {
+    key: PERMISSIONS.INVOICES_READ,
+    label: 'View Invoices',
+    description: 'View invoices and payment status',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['invoices', 'view', 'financial'],
+  },
+  [PERMISSIONS.INVOICES_UPDATE]: {
+    key: PERMISSIONS.INVOICES_UPDATE,
+    label: 'Edit Invoices',
+    description: 'Edit invoice details and settings',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.INVOICES_READ],
+    icon: 'Edit',
+    tags: ['invoices', 'update', 'financial'],
+  },
+  [PERMISSIONS.INVOICES_DELETE]: {
+    key: PERMISSIONS.INVOICES_DELETE,
+    label: 'Delete Invoices',
+    description: 'Delete invoices (if unpaid)',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.INVOICES_READ],
+    icon: 'Trash',
+    tags: ['invoices', 'delete', 'financial'],
+  },
+  [PERMISSIONS.INVOICES_SEND]: {
+    key: PERMISSIONS.INVOICES_SEND,
+    label: 'Send Invoices',
+    description: 'Send invoices to clients via email',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.INVOICES_READ],
+    icon: 'Send',
+    tags: ['invoices', 'send', 'financial'],
+  },
+  [PERMISSIONS.INVOICES_PAY]: {
+    key: PERMISSIONS.INVOICES_PAY,
+    label: 'Record Invoice Payments',
+    description: 'Record and process invoice payments',
+    category: PermissionCategory.FINANCIAL,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.INVOICES_READ],
+    icon: 'CreditCard',
+    tags: ['invoices', 'payments', 'financial'],
+  },
+
+  // Bookings Management
+  [PERMISSIONS.BOOKINGS_CREATE]: {
+    key: PERMISSIONS.BOOKINGS_CREATE,
+    label: 'Create Bookings',
+    description: 'Create new bookings for services',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.LOW,
+    icon: 'Plus',
+    tags: ['bookings', 'create'],
+  },
+  [PERMISSIONS.BOOKINGS_READ_OWN]: {
+    key: PERMISSIONS.BOOKINGS_READ_OWN,
+    label: 'View Own Bookings',
+    description: 'View bookings created by the user',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['bookings', 'view', 'own'],
+  },
+  [PERMISSIONS.BOOKINGS_READ_ALL]: {
+    key: PERMISSIONS.BOOKINGS_READ_ALL,
+    label: 'View All Bookings',
+    description: 'View all bookings across the organization',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['bookings', 'view', 'all'],
+  },
+  [PERMISSIONS.BOOKINGS_VIEW]: {
+    key: PERMISSIONS.BOOKINGS_VIEW,
+    label: 'View Booking',
+    description: 'View individual booking details',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['bookings', 'view'],
+  },
+  [PERMISSIONS.BOOKINGS_EDIT]: {
+    key: PERMISSIONS.BOOKINGS_EDIT,
+    label: 'Edit Bookings',
+    description: 'Modify booking details',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.BOOKINGS_READ_ALL],
+    icon: 'Edit',
+    tags: ['bookings', 'edit'],
+  },
+  [PERMISSIONS.BOOKINGS_CANCEL]: {
+    key: PERMISSIONS.BOOKINGS_CANCEL,
+    label: 'Cancel Bookings',
+    description: 'Cancel existing bookings',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.BOOKINGS_READ_ALL],
+    icon: 'X',
+    tags: ['bookings', 'cancel'],
+  },
+  [PERMISSIONS.BOOKINGS_RESCHEDULE]: {
+    key: PERMISSIONS.BOOKINGS_RESCHEDULE,
+    label: 'Reschedule Bookings',
+    description: 'Reschedule existing bookings to different times',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.BOOKINGS_READ_ALL],
+    icon: 'RefreshCw',
+    tags: ['bookings', 'reschedule'],
+  },
+  [PERMISSIONS.BOOKINGS_DELETE]: {
+    key: PERMISSIONS.BOOKINGS_DELETE,
+    label: 'Delete Bookings',
+    description: 'Permanently delete bookings',
+    category: PermissionCategory.BOOKINGS,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.BOOKINGS_READ_ALL],
+    icon: 'Trash',
+    tags: ['bookings', 'delete'],
+  },
+
+  // Tasks Management - Update Own
+  [PERMISSIONS.TASKS_UPDATE_OWN]: {
+    key: PERMISSIONS.TASKS_UPDATE_OWN,
+    label: 'Update Own Tasks',
+    description: 'Update status of tasks assigned to the user',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.TASKS_READ_ASSIGNED],
+    icon: 'CheckSquare',
+    tags: ['tasks', 'update', 'own'],
+  },
+}
 
 export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   CLIENT: [
     PERMISSIONS.SERVICE_REQUESTS_CREATE,
     PERMISSIONS.SERVICE_REQUESTS_READ_OWN,
     PERMISSIONS.TASKS_READ_ASSIGNED,
+    PERMISSIONS.APPROVALS_READ,
+    PERMISSIONS.APPROVALS_RESPOND,
+    PERMISSIONS.DOCUMENTS_READ,
+    PERMISSIONS.DOCUMENTS_DOWNLOAD,
+    PERMISSIONS.DOCUMENTS_UPLOAD,
+    PERMISSIONS.INVOICES_READ,
+    PERMISSIONS.INVOICES_PAY,
+    PERMISSIONS.BOOKINGS_VIEW,
   ],
   TEAM_MEMBER: [
     PERMISSIONS.SERVICE_REQUESTS_READ_ALL,
@@ -115,6 +1296,13 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.SERVICES_VIEW,
     PERMISSIONS.SERVICES_ANALYTICS,
     PERMISSIONS.SERVICES_EXPORT,
+    PERMISSIONS.APPROVALS_READ,
+    PERMISSIONS.APPROVALS_RESPOND,
+    PERMISSIONS.DOCUMENTS_READ,
+    PERMISSIONS.DOCUMENTS_DOWNLOAD,
+    PERMISSIONS.DOCUMENTS_UPLOAD,
+    PERMISSIONS.INVOICES_READ,
+    PERMISSIONS.BOOKINGS_VIEW,
     // Settings visibility (read-only)
     PERMISSIONS.BOOKING_SETTINGS_VIEW,
     PERMISSIONS.ORG_SETTINGS_VIEW,
@@ -134,6 +1322,18 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.SERVICES_VIEW,
     PERMISSIONS.SERVICES_ANALYTICS,
     PERMISSIONS.SERVICES_EXPORT,
+    PERMISSIONS.APPROVALS_CREATE,
+    PERMISSIONS.APPROVALS_READ,
+    PERMISSIONS.APPROVALS_RESPOND,
+    PERMISSIONS.DOCUMENTS_CREATE,
+    PERMISSIONS.DOCUMENTS_READ,
+    PERMISSIONS.DOCUMENTS_DOWNLOAD,
+    PERMISSIONS.DOCUMENTS_UPLOAD,
+    PERMISSIONS.INVOICES_CREATE,
+    PERMISSIONS.INVOICES_READ,
+    PERMISSIONS.INVOICES_UPDATE,
+    PERMISSIONS.INVOICES_SEND,
+    PERMISSIONS.BOOKINGS_VIEW,
     // Booking settings (no import/reset for TEAM_LEAD)
     PERMISSIONS.BOOKING_SETTINGS_VIEW,
     PERMISSIONS.BOOKING_SETTINGS_EDIT,
@@ -158,6 +1358,10 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
 
 export function hasPermission(userRole: string | undefined | null, permission: Permission): boolean {
   if (!userRole) return false
+  try {
+    const roleNormalized = String(userRole).toUpperCase()
+    if (roleNormalized === 'SUPER_ADMIN') return true
+  } catch {}
   const allowed = ROLE_PERMISSIONS[userRole]
   return Array.isArray(allowed) ? allowed.includes(permission) : false
 }
@@ -168,6 +1372,10 @@ export function checkPermissions(userRole: string | undefined | null, required: 
 
 export function getRolePermissions(userRole: string | undefined | null): Permission[] {
   if (!userRole) return []
+  try {
+    const roleNormalized = String(userRole).toUpperCase()
+    if (roleNormalized === 'SUPER_ADMIN') return ROLE_PERMISSIONS['SUPER_ADMIN'] ?? []
+  } catch {}
   return ROLE_PERMISSIONS[userRole] ?? []
 }
 
@@ -179,5 +1387,9 @@ export function getRolePermissions(userRole: string | undefined | null): Permiss
  */
 export function hasRole(userRole: string | undefined | null, allowedRoles: readonly string[]): boolean {
   if (!userRole || !allowedRoles) return false
+  try {
+    const roleNormalized = String(userRole).toUpperCase()
+    if (roleNormalized === 'SUPER_ADMIN') return true
+  } catch {}
   return allowedRoles.includes(userRole)
 }

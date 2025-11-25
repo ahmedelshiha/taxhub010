@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, X, Calendar, Users, AlertTriangle, FileText, Tag, Link2 } from 'lucide-react'
 import { apiFetch } from '@/lib/api'
+import { hasRole } from '@/lib/permissions'
 
 // Types matching the provided UI
 interface UserItem {
@@ -327,8 +328,8 @@ function useAssignees() {
         const data = await res.json().catch(() => ({}))
         const list = Array.isArray(data) ? data : (data?.teamMembers || [])
         let mapped: UserItem[] = list
-          .map((m: any) => ({ id: m.userId, name: m.name || m.email || 'Unknown', email: m.email || '', role: m.role || 'STAFF' }))
-          .filter((u: any) => !!u.id)
+          .map((m: Record<string, unknown>) => ({ id: String(m.userId || ''), name: String(m.name || m.email || 'Unknown'), email: String(m.email || ''), role: String(m.role || 'STAFF') }))
+          .filter((u: UserItem) => !!u.id)
 
         // Client-side fallback: if no team members are linked to users, derive from users endpoint
         if (!mapped.length) {
@@ -337,8 +338,8 @@ function useAssignees() {
             const usersJson = await resUsers.json().catch(() => ({}))
             const users = Array.isArray(usersJson) ? usersJson : (usersJson?.users || [])
             mapped = users
-              .filter((u: any) => ['ADMIN','STAFF'].includes(String(u.role || '').toUpperCase()))
-              .map((u: any) => ({ id: u.id, name: u.name || u.email || 'User', email: u.email || '', role: u.role || 'STAFF' }))
+              .filter((u: Record<string, unknown>) => hasRole(String(u.role || '').toUpperCase(), ['ADMIN', 'STAFF']))
+              .map((u: Record<string, unknown>) => ({ id: String(u.id || ''), name: String(u.name || u.email || 'User'), email: String(u.email || ''), role: String(u.role || 'STAFF') }))
           } catch { /* ignore */ }
         }
 
@@ -359,8 +360,8 @@ function useClients() {
         const res = await apiFetch('/api/admin/users', { signal: ac.signal })
         const data = await res.json().catch(() => ({}))
         const users = Array.isArray(data) ? data : (data?.users || [])
-        const clients = users.filter((u: any) => (u.role || '').toUpperCase() === 'CLIENT')
-        const mapped: ClientItem[] = clients.map((c: any) => ({
+        const clients = users.filter((u: Record<string, unknown>) => String(u.role || '').toUpperCase() === 'CLIENT')
+        const mapped: ClientItem[] = clients.map((c: Record<string, unknown>) => ({
           id: c.id,
           name: c.name || c.email || 'Unknown',
           tier: (() => { const n = Number(c.totalBookings || 0); if (n >= 20) return 'Enterprise'; if (n >= 1) return 'SMB'; return 'Individual' })(),
@@ -382,10 +383,10 @@ function useBookings() {
         const res = await apiFetch('/api/admin/bookings?limit=50&offset=0&sortBy=scheduledAt&sortOrder=desc', { signal: ac.signal })
         const data = await res.json().catch(() => ({}))
         const bookings = Array.isArray(data) ? data : (data?.bookings || [])
-        const mapped: BookingItem[] = bookings.map((b: any) => ({
-          id: b.id,
-          clientName: b.client?.name || b.clientName || 'Unknown',
-          service: b.service?.name || b.serviceName || 'Service',
+        const mapped: BookingItem[] = bookings.map((b: Record<string, unknown>) => ({
+          id: String(b.id ?? ''),
+          clientName: (b.client as any)?.name || (b.clientName as string) || 'Unknown',
+          service: (b.service as any)?.name || (b.serviceName as string) || 'Service',
           date: (b.scheduledAt ? String(b.scheduledAt) : new Date().toISOString()).slice(0,10),
         }))
         setItems(mapped)
@@ -404,7 +405,7 @@ function useTasksForDeps() {
       try {
         const res = await apiFetch('/api/admin/tasks?limit=200', { signal: ac.signal })
         const data = await res.json().catch(() => [])
-        const mapped = (Array.isArray(data) ? data : []).map((t: any) => ({ id: t.id, title: t.title || 'Untitled' }))
+        const mapped = (Array.isArray(data) ? data : []).map((t: Record<string, unknown>) => ({ id: String(t.id || ''), title: String(t.title || 'Untitled') }))
         setItems(mapped)
       } catch { /* ignore */ }
     })()
@@ -522,9 +523,14 @@ function NewTaskInner() {
   const onSave = async (task: CreateTaskData) => {
     const result = await createTask({
       title: task.title,
-      priority: (() => { const p = String(task.priority).toLowerCase(); if (p === 'low') return 'low'; if (p === 'high' || p === 'critical') return 'high'; return 'medium' })(),
-      dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : undefined,
+      priority: (() => { const p = String(task.priority).toLowerCase(); if (p === 'low') return 'low'; if (p === 'high' || p === 'critical') return 'high'; return 'medium' })() as any,
+      category: task.category ? (task.category.toLowerCase().replace(/\s+/g, '_') as any) : 'system',
+      dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : new Date().toISOString(),
+      estimatedHours: task.estimatedHours || 0,
       assigneeId: task.assigneeId || undefined,
+      tags: task.tags || [],
+      complianceRequired: task.complianceRequired || false,
+      complianceDeadline: task.complianceDeadline || undefined,
     })
     if (!result) throw new Error(providerError || 'Failed to create')
     try { router.push('/admin/tasks') } catch {}

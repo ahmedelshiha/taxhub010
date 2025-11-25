@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { authOptions, getSessionOrBypass } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import AdminOverview from '@/components/admin/dashboard/AdminOverview'
+import { hasRole } from '@/lib/permissions'
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard Overview',
@@ -12,14 +13,14 @@ export default async function AdminOverviewPage() {
   const session = await getSessionOrBypass()
   if (!session?.user) redirect('/login')
 
-  const role = (session.user as any)?.role as string | undefined
+  const role = (session.user as { role?: string })?.role as string | undefined
   if (role === 'CLIENT') redirect('/portal')
-  if (!['ADMIN', 'TEAM_LEAD'].includes(role || '')) redirect('/admin/analytics')
+  if (!hasRole(role || '', ['ADMIN', 'TEAM_LEAD', 'SUPER_ADMIN', 'STAFF'])) redirect('/admin/analytics')
 
   // Hydrate initial KPI data server-side for faster first paint (do not throw on failures)
-  let bookingsJson: any = null
-  let servicesJson: any = null
-  let usersJson: any = null
+  let bookingsJson: Record<string, unknown> | null = null
+  let servicesJson: Record<string, unknown> | null = null
+  let usersJson: Record<string, unknown> | null = null
   try {
     const [bookingsRes, servicesRes, usersRes] = await Promise.all([
       fetch('/api/admin/bookings/stats', { cache: 'no-store' }).catch(() => new Response(null, { status: 503 })),

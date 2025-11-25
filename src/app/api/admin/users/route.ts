@@ -1,75 +1,177 @@
-import { NextResponse } from 'next/server'
-import { withTenantContext } from '@/lib/api-wrapper'
+import { NextRequest, NextResponse } from 'next/server'
+import { withAdminAuth } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
-import prisma from '@/lib/prisma'
-import { queryTenantRaw } from '@/lib/db-raw'
 import { respond } from '@/lib/api-response'
-import { hasPermission, PERMISSIONS } from '@/lib/permissions'
-import { createHash } from 'crypto'
-import { applyRateLimit, getClientIp } from '@/lib/rate-limit'
-import { tenantFilter } from '@/lib/tenant'
+import prisma from '@/lib/prisma'
+import { logAudit } from '@/lib/audit'
+import { z } from 'zod'
 
-export const runtime = 'nodejs'
-
-export const GET = withTenantContext(async (request: Request) => {
-  const ctx = requireTenantContext()
-  const tenantId = ctx.tenantId ?? null
-  try {
-    const ip = getClientIp(request as unknown as Request)
-    const rl = await applyRateLimit(`admin-users-list:${ip}`, 60, 60_000)
-    if (rl && rl.allowed === false) {
-      try { const { logAudit } = await import('@/lib/audit'); await logAudit({ action: 'security.ratelimit.block', details: { tenantId, ip, key: `admin-users-list:${ip}`, route: new URL(request.url).pathname } }) } catch {}
-      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
-    }
-
-    const role = ctx.role ?? ''
-    if (!ctx.userId) return respond.unauthorized()
-    if (!hasPermission(role, PERMISSIONS.USERS_MANAGE)) return respond.forbidden('Forbidden')
-
-    let useFallback = false
-    try {
-      await queryTenantRaw`SELECT 1`
-    } catch (e: any) {
-      const code = String(e?.code || '')
-      if (code.startsWith('P10')) useFallback = true
-    }
-    if (useFallback) {
-      const fallback = [
-        { id: 'demo-admin', name: 'Admin User', email: 'admin@accountingfirm.com', role: 'ADMIN', createdAt: new Date().toISOString() },
-        { id: 'demo-staff', name: 'Staff Member', email: 'staff@accountingfirm.com', role: 'STAFF', createdAt: new Date().toISOString() },
-        { id: 'demo-client', name: 'John Smith', email: 'john@example.com', role: 'CLIENT', createdAt: new Date().toISOString() },
-      ]
-      return NextResponse.json({ users: fallback })
-    }
-
-    try {
-      const users = (await prisma.user.findMany({ where: tenantFilter(tenantId), orderBy: { createdAt: 'desc' }, select: { id: true, name: true, email: true, role: true, createdAt: true, _count: { select: { bookings: true } } } })) || []
-      const mapped = (Array.isArray(users) ? users : []).map(u => ({ id: u.id, name: u.name, email: u.email, role: u.role, createdAt: u.createdAt, totalBookings: (u as any)._count?.bookings ?? 0 }))
-      const etag = '"' + createHash('sha1').update(JSON.stringify({ t: mapped.length, ids: mapped.map(u=>u.id), up: mapped.map(u=>u.createdAt) })).digest('hex') + '"'
-      const ifNoneMatch = request.headers.get('if-none-match')
-      if (ifNoneMatch && ifNoneMatch === etag) {
-        return new NextResponse(null, { status: 304, headers: { ETag: etag } })
-      }
-      return NextResponse.json({ users: mapped }, { headers: { ETag: etag, 'Cache-Control': 'private, max-age=60' } })
-    } catch (e: any) {
-      const code = String(e?.code || '')
-      if (code.startsWith('P20') || /relation|table|column/i.test(String(e?.message || ''))) {
-        const fallback = [
-          { id: 'demo-admin', name: 'Admin User', email: 'admin@accountingfirm.com', role: 'ADMIN', createdAt: new Date().toISOString() },
-          { id: 'demo-staff', name: 'Staff Member', email: 'staff@accountingfirm.com', role: 'STAFF', createdAt: new Date().toISOString() },
-          { id: 'demo-client', name: 'John Smith', email: 'john@example.com', role: 'CLIENT', createdAt: new Date().toISOString() },
-        ]
-        return NextResponse.json({ users: fallback })
-      }
-      throw e
-    }
-  } catch (error) {
-    console.error('Error fetching users:', error)
-    const fallback = [
-      { id: 'demo-admin', name: 'Admin User', email: 'admin@accountingfirm.com', role: 'ADMIN', createdAt: new Date().toISOString() },
-      { id: 'demo-staff', name: 'Staff Member', email: 'staff@accountingfirm.com', role: 'STAFF', createdAt: new Date().toISOString() },
-      { id: 'demo-client', name: 'John Smith', email: 'john@example.com', role: 'CLIENT', createdAt: new Date().toISOString() },
-    ]
-    return NextResponse.json({ users: fallback })
-  }
+const UserListFilterSchema = z.object({
+  role: z.string().optional(),
+  department: z.string().optional(),
+  search: z.string().optional(),
+  active: z.coerce.boolean().optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(25),
+  offset: z.coerce.number().int().min(0).default(0),
 })
+
+const UserCreateSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(255),
+  role: z.enum(['ADMIN', 'TEAM_MEMBER', 'CLIENT']).default('TEAM_MEMBER'),
+  department: z.string().max(100).optional(),
+  position: z.string().max(100).optional(),
+})
+
+/**
+ * GET /api/admin/users
+ * List all users with filtering and pagination
+ */
+export const GET = withAdminAuth(
+  async (request) => {
+    try {
+      const ctx = requireTenantContext()
+      const { tenantId } = ctx
+
+      const { searchParams } = new URL(request.url)
+      const filters = UserListFilterSchema.parse(Object.fromEntries(searchParams))
+
+      // Build query
+      const where: any = { tenantId: tenantId as string }
+
+      if (filters.role) {
+        where.role = filters.role
+      }
+
+      if (filters.department) {
+        where.department = filters.department
+      }
+
+      if (filters.active !== undefined) {
+        where.isActive = filters.active
+      }
+
+      if (filters.search) {
+        where.OR = [
+          { email: { contains: filters.search, mode: 'insensitive' } },
+          { name: { contains: filters.search, mode: 'insensitive' } },
+          { department: { contains: filters.search, mode: 'insensitive' } },
+        ]
+      }
+
+      // Get total count
+      const total = await prisma.user.count({ where })
+
+      // Get paginated results
+      const data = await prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          image: true,
+          role: true,
+          department: true,
+          position: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+          emailVerified: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip: filters.offset,
+        take: filters.limit,
+      })
+
+      return respond.ok({
+        data,
+        meta: {
+          total,
+          limit: filters.limit,
+          offset: filters.offset,
+          hasMore: filters.offset + filters.limit < total,
+        },
+      })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return respond.badRequest('Invalid filters', error.errors)
+      }
+      console.error('User list error:', error)
+      return respond.serverError()
+    }
+  }
+)
+
+/**
+ * POST /api/admin/users
+ * Create a new user
+ */
+export const POST = withAdminAuth(
+  async (request) => {
+    try {
+      const ctx = requireTenantContext()
+      const { tenantId, userId } = ctx
+
+      const body = await request.json()
+      const input = UserCreateSchema.parse(body)
+
+      // Check if user with email already exists in tenant
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          email: input.email,
+          tenantId: tenantId as string,
+        },
+      })
+
+      if (existingUser) {
+        return respond.badRequest('User with this email already exists in this organization')
+      }
+
+      // Create new user
+      const newUser = await prisma.user.create({
+        data: {
+          email: input.email,
+          name: input.name,
+          role: input.role,
+          department: input.department,
+          position: input.position,
+          tenantId: tenantId as string,
+          isActive: true,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          department: true,
+          position: true,
+          isActive: true,
+          createdAt: true,
+        },
+      })
+
+      // Log audit event
+      await logAudit({
+        tenantId,
+        userId,
+        action: 'USER_CREATED',
+        entity: 'User',
+        entityId: newUser.id,
+        changes: input,
+      })
+
+      return respond.created({
+        data: newUser,
+      })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return respond.badRequest('Invalid user data', error.errors)
+      }
+      console.error('User creation error:', error)
+      return respond.serverError()
+    }
+  },
+  { requireAuth: true }
+)

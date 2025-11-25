@@ -1,11 +1,10 @@
 'use client'
 
-'use client'
-
 import { useEffect, useState } from 'react'
 import { apiFetch } from '@/lib/api'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { BookingCreateModal, BookingRescheduleModal, BookingCancelModal } from '@/components/portal/modals'
 import { Calendar, Clock, DollarSign, FileText, Plus, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,17 +14,7 @@ import { toast } from 'sonner'
 import { getApiErrorMessage } from '@/lib/api-error'
 import { useTranslations } from '@/lib/i18n'
 
-interface Booking {
-  id: string
-  scheduledAt: string
-  status: string
-  service: {
-    name: string
-    price?: number
-  }
-  duration: number
-  notes?: string
-}
+import { Booking } from '@/types/shared/entities/booking'
 
 const statusColors = {
   PENDING: 'bg-yellow-100 text-yellow-800',
@@ -81,8 +70,17 @@ export default function PortalPage() {
   const minuteLabel = (n: number) => (n === 1 ? t('time.minute') : t('time.minutes'))
   const statusLabel = (s: string) => t(`status.${s.toLowerCase()}`)
 
-  const [filter, setFilter] = useState<'all'|'upcoming'|'past'>('upcoming')
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('upcoming')
+
+  // Modal states
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false)
+  const [cancelModalOpen, setCancelModalOpen] = useState(false)
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
+
+  const handleRefreshBookings = () => {
+    window.location.reload()
+  }
 
   const upcomingBookings = bookings.filter(booking =>
     new Date(booking.scheduledAt) > new Date() &&
@@ -94,49 +92,28 @@ export default function PortalPage() {
     ['COMPLETED', 'CANCELLED'].includes(booking.status)
   )
 
-
-  const handleCancel = async (id: string) => {
-    if (!confirm(t('portal.confirmCancel'))) return
-    setDeletingId(id)
-    try {
-      const res = await apiFetch(`/api/bookings/${encodeURIComponent(id)}`, { method: 'DELETE' })
-      if (res.ok) {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'CANCELLED' } : b))
-        toast.success(t('portal.toast.cancelled'))
-      } else {
-        const errBody = await res.json().catch(() => ({}))
-        toast.error(getApiErrorMessage(errBody, t('portal.toast.cancelFailed')))
-      }
-    } catch (e) {
-      console.error('Cancel error', e)
-      toast.error(t('portal.toast.cancelFailed'))
-    } finally {
-      setDeletingId(null)
-    }
-  }
-
   const exportCSV = () => {
     if (!bookings.length) return
     const rows = bookings.map(b => ({
       id: b.id,
-      service: b.service.name,
+      service: b.service?.name || 'Unknown Service',
       date: new Date(b.scheduledAt).toLocaleDateString(),
       time: new Date(b.scheduledAt).toLocaleTimeString(),
       status: b.status
     }))
     const header = Object.keys(rows[0]).join(',')
-    const csv = [header, ...rows.map(r => Object.values(r).map(v => `"${String(v).replace(/"/g,'""')}"`).join(','))].join('\n')
+    const csv = [header, ...rows.map(r => Object.values(r).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `bookings-${new Date().toISOString().slice(0,10)}.csv`
+    a.download = `bookings-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8" >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -156,10 +133,12 @@ export default function PortalPage() {
               <Plus className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full" aria-label={t('portal.scheduleConsultation')}>
-                <Link href="/booking">
-                  {t('portal.scheduleConsultation')}
-                </Link>
+              <Button
+                onClick={() => setCreateModalOpen(true)}
+                className="w-full"
+                aria-label={t('portal.scheduleConsultation')}
+              >
+                {t('portal.scheduleConsultation')}
               </Button>
             </CardContent>
           </Card>
@@ -214,7 +193,7 @@ export default function PortalPage() {
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg">{booking.service.name}</CardTitle>
+                        <CardTitle className="text-lg">{booking.service?.name || 'Unknown Service'}</CardTitle>
                         <CardDescription>
                           {formatDate(booking.scheduledAt)} {t('time.at')} {formatTime(booking.scheduledAt)}
                         </CardDescription>
@@ -231,7 +210,7 @@ export default function PortalPage() {
                           <Clock className="h-4 w-4 mr-1" />
                           {booking.duration} {minuteLabel(booking.duration)}
                         </div>
-                        {booking.service.price && (
+                        {booking.service?.price && (
                           <div className="flex items-center">
                             <DollarSign className="h-4 w-4 mr-1" />
                             {formatCurrencyFromDecimal(booking.service.price)}
@@ -239,16 +218,31 @@ export default function PortalPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" asChild aria-label={t('portal.viewDetails')}>
-                          <Link href={`/portal/bookings/${booking.id}`}>
-                            <Eye className="h-4 w-4 mr-1" />
-                            {t('portal.viewDetails')}
-                          </Link>
-                        </Button>
-                        {['PENDING','CONFIRMED'].includes(booking.status) && (
-                          <Button variant="destructive" size="sm" onClick={() => handleCancel(booking.id)} disabled={deletingId === booking.id} aria-label={t('portal.cancel')}>
-                            {deletingId === booking.id ? t('portal.cancelling') : t('portal.cancel')}
-                          </Button>
+                        {['PENDING', 'CONFIRMED'].includes(booking.status) && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedBooking(booking)
+                                setRescheduleModalOpen(true)
+                              }}
+                              aria-label="Reschedule"
+                            >
+                              Reschedule
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedBooking(booking)
+                                setCancelModalOpen(true)
+                              }}
+                              aria-label="Cancel"
+                            >
+                              Cancel
+                            </Button>
+                          </>
                         )}
                       </div>
                     </div>
@@ -271,10 +265,11 @@ export default function PortalPage() {
                 <p className="text-gray-600 mb-4">
                   {t('portal.noUpcomingDescription')}
                 </p>
-                <Button asChild aria-label={t('portal.bookAppointment')}>
-                  <Link href="/booking">
-                    {t('portal.bookAppointment')}
-                  </Link>
+                <Button
+                  onClick={() => setCreateModalOpen(true)}
+                  aria-label={t('portal.bookAppointment')}
+                >
+                  {t('portal.bookAppointment')}
                 </Button>
               </CardContent>
             </Card>
@@ -292,7 +287,7 @@ export default function PortalPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div>
-                          <h3 className="font-medium text-gray-900">{booking.service.name}</h3>
+                          <h3 className="font-medium text-gray-900">{booking.service?.name || 'Unknown Service'}</h3>
                           <p className="text-sm text-gray-600">
                             {formatDate(booking.scheduledAt)} {t('time.at')} {formatTime(booking.scheduledAt)}
                           </p>
@@ -324,7 +319,33 @@ export default function PortalPage() {
             </div>
           </div>
         )}
+        {/* Modals */}
+        <BookingCreateModal
+          open={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          onSuccess={handleRefreshBookings}
+        />
+
+        <BookingRescheduleModal
+          open={rescheduleModalOpen}
+          onClose={() => {
+            setRescheduleModalOpen(false)
+            setSelectedBooking(null)
+          }}
+          booking={selectedBooking}
+          onSuccess={handleRefreshBookings}
+        />
+
+        <BookingCancelModal
+          open={cancelModalOpen}
+          onClose={() => {
+            setCancelModalOpen(false)
+            setSelectedBooking(null)
+          }}
+          booking={selectedBooking}
+          onSuccess={handleRefreshBookings}
+        />
       </div>
-    </div>
+    </div >
   )
 }
