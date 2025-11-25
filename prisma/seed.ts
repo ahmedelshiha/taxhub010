@@ -2270,6 +2270,229 @@ Effective cash flow management requires ongoing attention and planning. Regular 
 
   console.log('✅ Organization settings created')
 
+  // Advanced Features: Workflows
+  const workflowTemplates = [
+    {
+      id: 'wf_tmpl_1',
+      tenantId: defaultTenant.id,
+      name: 'Client Onboarding Workflow',
+      description: 'Standard workflow for new client onboarding',
+      createdBy: admin.id,
+      category: 'ONBOARDING' as const,
+      isActive: true,
+      steps: [
+        { stepNumber: 1, name: 'Collect KYC Documents', duration: 1 },
+        { stepNumber: 2, name: 'Set Up Client Profile', duration: 1 },
+        { stepNumber: 3, name: 'Configure Billing', duration: 1 },
+        { stepNumber: 4, name: 'Schedule Kickoff Call', duration: 0.5 },
+      ] as any,
+    },
+    {
+      id: 'wf_tmpl_2',
+      tenantId: defaultTenant.id,
+      name: 'Tax Return Preparation Workflow',
+      description: 'Workflow for preparing tax returns',
+      createdBy: admin.id,
+      category: 'TAX_COMPLIANCE' as const,
+      isActive: true,
+      steps: [
+        { stepNumber: 1, name: 'Request Documents from Client', duration: 2 },
+        { stepNumber: 2, name: 'Review and Organize Documents', duration: 2 },
+        { stepNumber: 3, name: 'Prepare Draft Return', duration: 4 },
+        { stepNumber: 4, name: 'Client Review and Approval', duration: 2 },
+        { stepNumber: 5, name: 'File Return', duration: 1 },
+      ] as any,
+    },
+  ]
+
+  for (const tmpl of workflowTemplates) {
+    await prisma.workflowTemplate.upsert({
+      where: { id: tmpl.id },
+      update: { ...tmpl, id: undefined },
+      create: tmpl,
+    })
+  }
+
+  console.log('✅ Workflow templates created')
+
+  // User Workflows
+  const userWorkflows = [
+    {
+      id: 'uw_1',
+      tenantId: defaultTenant.id,
+      workflowTemplateId: 'wf_tmpl_1',
+      userId: client1.id,
+      triggeredBy: admin.id,
+      status: 'IN_PROGRESS' as const,
+      startedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2),
+      completedAt: null,
+      metadata: { clientName: client1.name } as any,
+    },
+    {
+      id: 'uw_2',
+      tenantId: defaultTenant.id,
+      workflowTemplateId: 'wf_tmpl_2',
+      userId: client2.id,
+      triggeredBy: admin.id,
+      status: 'PENDING' as const,
+      startedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 1),
+      completedAt: null,
+      metadata: { clientName: client2.name, taxYear: 2024 } as any,
+    },
+  ]
+
+  for (const uw of userWorkflows) {
+    await prisma.userWorkflow.upsert({
+      where: { id: uw.id },
+      update: { ...uw, id: undefined },
+      create: uw,
+    })
+  }
+
+  console.log('✅ User workflows created')
+
+  // Reports
+  const reports = [
+    {
+      id: 'report_1',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Monthly Revenue Report',
+      description: 'Summary of monthly revenue by service',
+      type: 'REVENUE' as const,
+      frequency: 'MONTHLY' as const,
+      status: 'ACTIVE' as const,
+      config: { metrics: ['total_revenue', 'revenue_by_service', 'top_clients'] } as any,
+    },
+    {
+      id: 'report_2',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Team Performance Report',
+      description: 'Team member performance metrics and utilization',
+      type: 'PERFORMANCE' as const,
+      frequency: 'WEEKLY' as const,
+      status: 'ACTIVE' as const,
+      config: { metrics: ['utilization_rate', 'completion_rate', 'client_satisfaction'] } as any,
+    },
+    {
+      id: 'report_3',
+      tenantId: defaultTenant.id,
+      createdBy: lead.id,
+      name: 'Tax Compliance Status',
+      description: 'Status of all tax filings and compliance deadlines',
+      type: 'COMPLIANCE' as const,
+      frequency: 'MONTHLY' as const,
+      status: 'ACTIVE' as const,
+      config: { metrics: ['filing_status', 'upcoming_deadlines', 'overdue_items'] } as any,
+    },
+    {
+      id: 'report_4',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Client Engagement Report',
+      description: 'Client activity and engagement metrics',
+      type: 'CLIENT' as const,
+      frequency: 'MONTHLY' as const,
+      status: 'ACTIVE' as const,
+      config: { metrics: ['active_clients', 'service_usage', 'support_tickets'] } as any,
+    },
+  ]
+
+  for (const report of reports) {
+    await prisma.report.upsert({
+      where: { id: report.id },
+      update: { ...report, id: undefined },
+      create: report,
+    })
+  }
+
+  console.log('✅ Reports created')
+
+  // Entities (business entities like LLC, Corp, etc.)
+  const entities = [
+    {
+      id: 'entity_1',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Primary Accounting Firm LLC',
+      type: 'LLC' as const,
+      status: 'ACTIVE' as const,
+      registrationNumber: 'LLC-2020-001234',
+      industry: 'Accounting & Finance',
+      foundedDate: new Date('2020-03-15'),
+      registrationDate: new Date('2020-03-20'),
+      jurisdiction: 'Delaware',
+      businessAddress: '123 Business Ave, Suite 100, New York, NY 10001',
+      websiteUrl: 'https://www.accountingfirm.com',
+      metadata: { employees: 15, revenue: 2500000 } as any,
+    },
+    {
+      id: 'entity_2',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Client Service Division',
+      type: 'DIVISION' as const,
+      status: 'ACTIVE' as const,
+      registrationNumber: 'DIV-2021-005678',
+      industry: 'Professional Services',
+      parentEntityId: 'entity_1',
+      businessAddress: '123 Business Ave, Suite 200, New York, NY 10001',
+      metadata: { focus: 'client services', team_size: 8 } as any,
+    },
+    {
+      id: 'entity_3',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Tech Startup Client Inc',
+      type: 'C_CORP' as const,
+      status: 'ACTIVE' as const,
+      registrationNumber: 'CORP-2023-009012',
+      industry: 'Software Development',
+      foundedDate: new Date('2023-01-10'),
+      registrationDate: new Date('2023-01-15'),
+      jurisdiction: 'California',
+      businessAddress: '456 Tech Drive, San Francisco, CA 94103',
+      taxId: '12-3456789',
+      metadata: { stage: 'Series A', investors: ['VC Fund 1', 'VC Fund 2'] } as any,
+    },
+  ]
+
+  for (const entity of entities) {
+    await prisma.entity.upsert({
+      where: { id: entity.id },
+      update: { ...entity, id: undefined },
+      create: entity,
+    })
+  }
+
+  console.log('✅ Entities created')
+
+  // Create associations between users and entities
+  try {
+    await prisma.userOnEntity.upsert({
+      where: { unique_user_entity: { userId: admin.id, entityId: 'entity_1' } },
+      update: { role: 'OWNER' },
+      create: { userId: admin.id, entityId: 'entity_1', role: 'OWNER' },
+    })
+
+    await prisma.userOnEntity.upsert({
+      where: { unique_user_entity: { userId: client1.id, entityId: 'entity_3' } },
+      update: { role: 'OWNER' },
+      create: { userId: client1.id, entityId: 'entity_3', role: 'OWNER' },
+    })
+
+    await prisma.userOnEntity.upsert({
+      where: { unique_user_entity: { userId: staff.id, entityId: 'entity_1' } },
+      update: { role: 'MEMBER' },
+      create: { userId: staff.id, entityId: 'entity_1', role: 'MEMBER' },
+    })
+
+    console.log('✅ User-entity associations created')
+  } catch (e) {
+    console.warn('Skipping user-entity associations due to error:', (e as any)?.message)
+  }
+
   // Seed communication settings
   await prisma.communicationSettings.upsert({
     where: { tenantId: defaultTenant.id },
