@@ -52,7 +52,8 @@ export default function NotificationBell({
         revalidateOnFocus: true,
     })
 
-    const notifications = data?.data || []
+    const rawNotifications = data?.data
+    const notifications = Array.isArray(rawNotifications) ? rawNotifications : []
     const unreadCount = data?.meta?.unreadCount || 0
 
     // Mark notification as read when clicked

@@ -66,7 +66,8 @@ export default function GlobalSearchModal({ open, onOpenChange }: GlobalSearchMo
                 const res = await fetch(`/api/portal/search?q=${encodeURIComponent(query)}`)
                 const data = await res.json()
                 if (data.success) {
-                    setResults(data.data.results || [])
+                    const rawResults = data.data.results
+                    setResults(Array.isArray(rawResults) ? rawResults : [])
                 }
             } catch (error) {
                 console.error('Search error:', error)

@@ -38,7 +38,7 @@ export default function PortalFooter() {
                         <span>Support</span>
                     </Link>
                     <Link
-                        href="/docs"
+                        href="/portal/help"
                         className="flex items-center gap-1 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
                     >
                         <FileText className="h-4 w-4" />
