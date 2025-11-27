@@ -112,7 +112,7 @@ export default function PortalDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <>
       {/* Modals */}
       <SetupWizard
         open={setupWizardOpen}
@@ -203,7 +203,7 @@ export default function PortalDashboardPage() {
           </Suspense>
         </Tabs>
       </div>
-    </div>
+    </>
   );
 }
 
