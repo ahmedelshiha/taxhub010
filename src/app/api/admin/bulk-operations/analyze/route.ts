@@ -12,7 +12,7 @@ export const POST = withAdminAuth(async (req: NextRequest) => {
       impact,
       timestamp: new Date().toISOString()
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to analyze bulk operation:', error)
     return NextResponse.json(
       { error: 'Failed to analyze bulk operation' },

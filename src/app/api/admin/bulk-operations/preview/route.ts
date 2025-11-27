@@ -47,7 +47,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     )
 
     return NextResponse.json(dryRunResult)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('POST /api/admin/bulk-operations/preview error:', error)
     return NextResponse.json(
       {

@@ -22,7 +22,7 @@ export const GET = withTenantContext(async (_req: NextRequest) => {
     }
 
     return NextResponse.json(data)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching counts:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

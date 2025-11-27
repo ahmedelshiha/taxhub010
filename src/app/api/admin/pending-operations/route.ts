@@ -72,7 +72,7 @@ export const GET = withTenantContext(async (request: Request) => {
       },
       timestamp: new Date().toISOString()
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching pending operations:', error)
     return respond.serverError('Failed to fetch pending operations')
   }
@@ -157,7 +157,7 @@ async function generatePendingOperations(
       operations,
       total: recentUsers.length
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('Error generating pending operations:', error)
     // Return empty list if there's an error
     return {
@@ -264,7 +264,7 @@ export const POST = withTenantContext(async (request: Request) => {
     }
 
     return respond.badRequest('Invalid action')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling operation action:', error)
     return respond.serverError('Failed to handle operation')
   }

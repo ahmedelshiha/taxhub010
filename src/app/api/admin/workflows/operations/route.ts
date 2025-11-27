@@ -31,7 +31,7 @@ export const POST = withAdminAuth(async (req: NextRequest) => {
       result,
       timestamp: new Date().toISOString()
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to process workflow operation:', error)
     return NextResponse.json(
       { error: 'Failed to process workflow operation' },

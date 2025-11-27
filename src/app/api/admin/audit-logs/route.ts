@@ -95,7 +95,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     response.headers.set('X-RateLimit-Reset', String(Math.ceil(resetTime / 1000)))
 
     return response
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching audit logs:', error)
     return NextResponse.json(
       { error: 'Failed to fetch audit logs' },

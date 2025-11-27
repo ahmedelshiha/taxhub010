@@ -60,7 +60,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       limit,
       offset
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch reports:', error)
     return NextResponse.json({ error: 'Failed to fetch reports' }, { status: 500 })
   }
@@ -128,7 +128,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     })
 
     return NextResponse.json({ success: true, report, message: 'Report created successfully' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to create report:', error)
     return NextResponse.json({ error: 'Failed to create report' }, { status: 500 })
   }

@@ -12,7 +12,7 @@ export const GET = withAdminAuth(async (req: NextRequest) => {
       data: templates,
       total: templates.length
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch workflow templates:', error)
     return NextResponse.json(
       { error: 'Failed to fetch workflow templates' },

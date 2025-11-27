@@ -63,7 +63,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
         }, {} as Record<string, number>)
       }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching user stats:', error)
     return NextResponse.json({ error: 'Failed to fetch user statistics' }, { status: 500 })
   }

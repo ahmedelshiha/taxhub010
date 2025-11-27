@@ -74,7 +74,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
         }
       }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Analytics error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },

@@ -80,7 +80,7 @@ export const GET = withTenantContext(async (request) => {
       },
       keys,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[translations/missing] Error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch missing translations' },

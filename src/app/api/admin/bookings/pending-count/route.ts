@@ -21,7 +21,7 @@ export const GET = withTenantContext(async () => {
     const count = await prisma.booking.count({ where })
 
     return NextResponse.json({ success: true, count })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching pending bookings count:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

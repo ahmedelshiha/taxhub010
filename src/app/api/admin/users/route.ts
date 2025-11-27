@@ -94,7 +94,7 @@ export const GET = withAdminAuth(
           hasMore: filters.offset + filters.limit < total,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid filters', error.errors)
       }
@@ -165,7 +165,7 @@ export const POST = withAdminAuth(
       return respond.created({
         data: newUser,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid user data', error.errors)
       }

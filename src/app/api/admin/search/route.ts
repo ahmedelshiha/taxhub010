@@ -25,7 +25,7 @@ export const GET = withAdminAuth(async (req: NextRequest) => {
       suggestions,
       totalResults: results.length
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Search error:', error)
     return NextResponse.json(
       { error: 'Failed to perform search' },

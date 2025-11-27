@@ -34,7 +34,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     // Get all settings
     const settings = await AdminSettingsService.getSettings(tenantId)
     return NextResponse.json(settings)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching settings:', error)
     return NextResponse.json(
       { error: 'Failed to fetch settings' },
@@ -61,7 +61,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     const settings = await AdminSettingsService.updateSettings(tenantId, body)
 
     return NextResponse.json(settings)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving settings:', error)
     return NextResponse.json(
       { error: 'Failed to save settings' },

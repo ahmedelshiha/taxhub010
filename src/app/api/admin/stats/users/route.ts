@@ -207,7 +207,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     return NextResponse.json(response, {
       headers: { 'Cache-Control': 'private, max-age=120' }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching user statistics:', error)
     const emptyResponse: UserStatsResponse = {
       total: 0,

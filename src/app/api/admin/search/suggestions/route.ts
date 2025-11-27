@@ -13,7 +13,7 @@ export const GET = withAdminAuth(async (req: NextRequest) => {
     const suggestions = await advancedSearchService.getSuggestions(query, limit)
 
     return NextResponse.json({ suggestions })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Suggestions error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch suggestions' },

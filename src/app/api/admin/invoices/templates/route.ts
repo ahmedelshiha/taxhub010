@@ -37,7 +37,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     return NextResponse.json({ templates }, {
       headers: { 'Cache-Control': 'private, max-age=300' }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching invoice templates:', error)
     return NextResponse.json({ templates: [] }, { status: 500 })
   }

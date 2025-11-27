@@ -129,7 +129,7 @@ export const POST = withTenantContext(async (req: NextRequest, ctx: any) => {
         responseTime,
         timestamp: new Date().toISOString(),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       const responseTime = Date.now() - startTime
 
@@ -147,7 +147,7 @@ export const POST = withTenantContext(async (req: NextRequest, ctx: any) => {
         { status: 200 }
       )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     Sentry.captureException(error)
     return NextResponse.json(
       { error: 'Failed to run integration test' },

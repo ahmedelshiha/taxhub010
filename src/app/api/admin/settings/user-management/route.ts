@@ -59,7 +59,7 @@ async function handleGET(request: AuthenticatedRequest) {
     }
 
     return NextResponse.json(responseData)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching user management settings:', error)
     return NextResponse.json(
       { error: 'Failed to fetch settings' },
@@ -239,7 +239,7 @@ async function handlePUT(request: AuthenticatedRequest) {
     }
 
     return NextResponse.json(responseData)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating user management settings:', error)
     return NextResponse.json(
       { error: 'Failed to update settings' },

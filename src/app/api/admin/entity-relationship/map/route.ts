@@ -20,7 +20,7 @@ export const GET = withAdminAuth(async (req: NextRequest) => {
         }
       }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to build relationship map:', error)
     return NextResponse.json(
       { error: 'Failed to build relationship map' },

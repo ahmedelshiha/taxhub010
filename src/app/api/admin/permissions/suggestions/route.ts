@@ -84,7 +84,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<Suggestion
       success: true,
       suggestions,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[permissions/suggestions] Error:', error)
     return NextResponse.json(
       {

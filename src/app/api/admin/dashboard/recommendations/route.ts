@@ -35,7 +35,7 @@ export const GET = withTenantContext(async (req: NextRequest) => {
         }
       }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch recommendations:', error)
     return NextResponse.json(
       { error: 'Failed to fetch recommendations' },

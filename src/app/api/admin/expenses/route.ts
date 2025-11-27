@@ -117,7 +117,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     const total = await prisma.expense.count({ where })
 
     return NextResponse.json({ expenses, total, page, limit })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching expenses:', error)
     return NextResponse.json({ error: 'Failed to fetch expenses' }, { status: 500 })
   }
@@ -169,7 +169,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     })
 
     return NextResponse.json({ message: 'Expense created', expense }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating expense:', error)
     return NextResponse.json({ error: 'Failed to create expense' }, { status: 500 })
   }
@@ -202,7 +202,7 @@ export const DELETE = withTenantContext(async (request: NextRequest) => {
 
     const result = await prisma.expense.deleteMany({ where })
     return NextResponse.json({ message: `Deleted ${result.count} expenses`, deleted: result.count })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error deleting expenses:', error)
     return NextResponse.json({ error: 'Failed to delete expenses' }, { status: 500 })
   }

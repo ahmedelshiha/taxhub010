@@ -74,7 +74,7 @@ export const GET = withTenantContext(async (req: NextRequest, ctx: any) => {
     }
 
     return NextResponse.json({ success: true, data: integrations })
-  } catch (error) {
+  } catch (error: unknown) {
     Sentry.captureException(error)
     return NextResponse.json(
       { error: 'Failed to fetch integrations' },
@@ -117,7 +117,7 @@ export const POST = withTenantContext(async (req: NextRequest, ctx: any) => {
           body: JSON.stringify({ text: 'Test' }),
         })
         validations.slack = { valid: response.ok }
-      } catch (error) {
+      } catch (error: unknown) {
         validations.slack = { valid: false, error: 'Failed to connect' }
       }
     }
@@ -134,7 +134,7 @@ export const POST = withTenantContext(async (req: NextRequest, ctx: any) => {
           }),
         })
         validations.teams = { valid: response.ok }
-      } catch (error) {
+      } catch (error: unknown) {
         validations.teams = { valid: false, error: 'Failed to connect' }
       }
     }
@@ -147,7 +147,7 @@ export const POST = withTenantContext(async (req: NextRequest, ctx: any) => {
           body: JSON.stringify({ event: 'test' }),
         })
         validations.zapier = { valid: response.ok }
-      } catch (error) {
+      } catch (error: unknown) {
         validations.zapier = { valid: false, error: 'Failed to connect' }
       }
     }
@@ -160,7 +160,7 @@ export const POST = withTenantContext(async (req: NextRequest, ctx: any) => {
           body: JSON.stringify({ event: 'test' }),
         })
         validations.webhook = { valid: response.ok }
-      } catch (error) {
+      } catch (error: unknown) {
         validations.webhook = { valid: false, error: 'Failed to connect' }
       }
     }
@@ -170,7 +170,7 @@ export const POST = withTenantContext(async (req: NextRequest, ctx: any) => {
       message: 'Integrations configured',
       validations,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     Sentry.captureException(error)
     return NextResponse.json(
       { error: 'Failed to configure integrations' },

@@ -27,7 +27,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     })
 
     return NextResponse.json(result)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GET /api/admin/bulk-operations error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch bulk operations' },
@@ -73,7 +73,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     )
 
     return NextResponse.json(operation, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('POST /api/admin/bulk-operations error:', error)
     return NextResponse.json(
       { error: 'Failed to create bulk operation' },

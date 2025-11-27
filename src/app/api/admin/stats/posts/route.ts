@@ -133,7 +133,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       topTags,
       range: ranged
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching post statistics:', error)
     return NextResponse.json({ error: 'Failed to fetch post statistics' }, { status: 500 })
   }
