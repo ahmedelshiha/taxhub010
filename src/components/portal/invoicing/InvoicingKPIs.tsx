@@ -1,10 +1,3 @@
-/**
- * InvoicingKPIs Component
- * 
- * KPI cards displaying invoice metrics
- * ~80 lines, uses Oracle Fusion KPICard/Grid
- */
-
 'use client'
 
 import { KPICard, KPIGrid } from '@/components/ui-oracle'
@@ -26,7 +19,6 @@ export function InvoicingKPIs({ invoices }: InvoicingKPIsProps) {
     const totalAmount = calculateTotalAmount(invoices)
     const paidAmount = calculatePaidAmount(invoices)
     const pendingAmount = calculatePendingAmount(invoices)
-
     const totalCount = invoices.length
     const paidCount = countByStatus(invoices, 'paid')
     const pendingCount = countByStatus(invoices, 'pending_overdue')
@@ -40,7 +32,6 @@ export function InvoicingKPIs({ invoices }: InvoicingKPIsProps) {
                 icon={DollarSign}
                 variant="info"
             />
-
             <KPICard
                 label="Paid"
                 value={formatCurrency(paidAmount)}
@@ -48,7 +39,6 @@ export function InvoicingKPIs({ invoices }: InvoicingKPIsProps) {
                 icon={CheckCircle}
                 variant="success"
             />
-
             <KPICard
                 label="Pending"
                 value={formatCurrency(pendingAmount)}

@@ -1,10 +1,3 @@
-/**
- * InvoiceAmountCell Component
- * 
- * Displays formatted currency amount
- * ~40 lines
- */
-
 import { formatCurrency } from '@/lib/invoicing'
 
 export interface InvoiceAmountCellProps {

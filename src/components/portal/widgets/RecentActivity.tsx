@@ -1,111 +1,66 @@
-/**
- * Recent Activity Widget
- * 
- * Reusable component showing recent user activity
- * ~90 lines, production-ready
- */
-
 'use client'
 
-import {
-    ContentSection,
-    EmptyState,
-    LoadingSkeleton,
-    StatusBadge,
-} from '@/components/ui-oracle'
-import { Clock, FileText, DollarSign, CheckSquare } from 'lucide-react'
+import { ContentSection, EmptyState, LoadingSkeleton, StatusBadge } from '@/components/ui-oracle'
+import { Clock, FileText, CheckCircle, AlertCircle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
 export interface ActivityItem {
     id: string
-    type: 'document' | 'invoice' | 'task' | 'booking'
+    type: 'invoice' | 'document' | 'compliance' | 'system'
     title: string
     description: string
-    timestamp: Date
-    status?: 'success' | 'warning' | 'info' | 'pending'
+    timestamp: string
+    status?: string
 }
 
-export interface RecentActivityProps {
-    activities?: ActivityItem[]
+export interface RecentActivityWidgetProps {
+    activities: ActivityItem[]
     loading?: boolean
     maxItems?: number
 }
 
-const activityIcons = {
-    document: FileText,
-    invoice: DollarSign,
-    task: CheckSquare,
-    booking: Clock,
-}
+export function RecentActivityWidget({ activities, loading, maxItems = 5 }: RecentActivityWidgetProps) {
+    if (loading) return <LoadingSkeleton variant="list" count={3} />
 
-export function RecentActivityWidget({
-    activities = [],
-    loading = false,
-    maxItems = 5,
-}: RecentActivityProps) {
-    if (loading) {
-        return (
-            <ContentSection title="Recent Activity">
-                <LoadingSkeleton variant="list" count={3} />
-            </ContentSection>
-        )
-    }
-
-    const displayActivities = activities.slice(0, maxItems)
-
-    if (displayActivities.length === 0) {
+    if (activities.length === 0) {
         return (
             <ContentSection title="Recent Activity">
                 <EmptyState
                     icon={Clock}
                     title="No recent activity"
                     description="Your recent actions will appear here"
-                    variant="compact"
                 />
             </ContentSection>
         )
     }
 
+    const displayActivities = activities.slice(0, maxItems)
+
     return (
         <ContentSection title="Recent Activity">
-            <div className="space-y-3">
-                {displayActivities.map((activity) => {
-                    const Icon = activityIcons[activity.type]
-
-                    return (
-                        <div
-                            key={activity.id}
-                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                        >
-                            <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-800">
-                                <Icon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2">
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {activity.title}
-                                        </p>
-                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                                            {activity.description}
-                                        </p>
-                                    </div>
-
-                                    {activity.status && (
-                                        <StatusBadge variant={activity.status} size="sm">
-                                            {activity.status}
-                                        </StatusBadge>
-                                    )}
-                                </div>
-
-                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+            <div className="space-y-4">
+                {displayActivities.map((activity) => (
+                    <div key={activity.id} className="flex gap-4 items-start pb-4 border-b border-gray-100 dark:border-gray-800 last:border-0 last:pb-0">
+                        <div className="mt-1">
+                            {activity.type === 'invoice' && <FileText className="h-5 w-5 text-blue-500" />}
+                            {activity.type === 'compliance' && <AlertCircle className="h-5 w-5 text-orange-500" />}
+                            {activity.type === 'document' && <FileText className="h-5 w-5 text-purple-500" />}
+                            {activity.type === 'system' && <CheckCircle className="h-5 w-5 text-green-500" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{activity.title}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{activity.description}</p>
+                            <div className="flex items-center gap-2 mt-2">
+                                <span className="text-xs text-gray-400">
                                     {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
-                                </p>
+                                </span>
+                                {activity.status && (
+                                    <StatusBadge variant="neutral" size="sm">{activity.status}</StatusBadge>
+                                )}
                             </div>
                         </div>
-                    )
-                })}
+                    </div>
+                ))}
             </div>
         </ContentSection>
     )

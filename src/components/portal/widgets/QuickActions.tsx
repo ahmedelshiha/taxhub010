@@ -1,80 +1,45 @@
-/**
- * Quick Actions Widget
- * 
- * Reusable component with common action buttons
- * ~70 lines, production-ready
- */
-
 'use client'
 
 import { ContentSection } from '@/components/ui-oracle'
 import { Button } from '@/components/ui/button'
-import { Plus, Upload, FileText, DollarSign, Calendar, CheckSquare } from 'lucide-react'
+import { Upload, FileText, CreditCard, HelpCircle, Plus, type LucideIcon } from 'lucide-react'
 
 export interface QuickAction {
     id: string
     label: string
-    icon: React.ComponentType<{ className?: string }>
+    icon: LucideIcon
     onClick: () => void
-    variant?: 'default' | 'outline'
+    variant?: 'default' | 'outline' | 'secondary' | 'ghost'
 }
 
-export interface QuickActionsProps {
+export interface QuickActionsWidgetProps {
     actions?: QuickAction[]
-    title?: string
-    description?: string
 }
 
-const defaultActions: QuickAction[] = [
-    {
-        id: 'upload-document',
-        label: 'Upload Document',
-        icon: Upload,
-        onClick: () => console.log('Upload document'),
-    },
-    {
-        id: 'create-invoice',
-        label: 'Create Invoice',
-        icon: DollarSign,
-        onClick: () => console.log('Create invoice'),
-    },
-    {
-        id: 'book-meeting',
-        label: 'Book Meeting',
-        icon: Calendar,
-        onClick: () => console.log('Book meeting'),
-    },
-    {
-        id: 'add-task',
-        label: 'Add Task',
-        icon: CheckSquare,
-        onClick: () => console.log('Add task'),
-    },
-]
+export function QuickActionsWidget({ actions }: QuickActionsWidgetProps) {
+    const defaultActions: QuickAction[] = [
+        { id: 'upload', label: 'Upload Document', icon: Upload, onClick: () => { }, variant: 'outline' },
+        { id: 'invoice', label: 'Create Invoice', icon: Plus, onClick: () => { }, variant: 'default' },
+        { id: 'pay', label: 'Make Payment', icon: CreditCard, onClick: () => { }, variant: 'outline' },
+        { id: 'help', label: 'Get Help', icon: HelpCircle, onClick: () => { }, variant: 'ghost' },
+    ]
 
-export function QuickActionsWidget({
-    actions = defaultActions,
-    title = 'Quick Actions',
-    description = 'Frequently used actions for faster workflow',
-}: QuickActionsProps) {
+    const displayActions = actions || defaultActions
+
     return (
-        <ContentSection title={title} description={description}>
+        <ContentSection title="Quick Actions">
             <div className="grid grid-cols-2 gap-3">
-                {actions.map((action) => {
-                    const Icon = action.icon
-
-                    return (
-                        <Button
-                            key={action.id}
-                            variant={action.variant || 'outline'}
-                            onClick={action.onClick}
-                            className="h-auto py-4 flex-col gap-2"
-                        >
-                            <Icon className="h-5 w-5" />
-                            <span className="text-sm">{action.label}</span>
-                        </Button>
-                    )
-                })}
+                {displayActions.map((action) => (
+                    <Button
+                        key={action.id}
+                        variant={action.variant as any || 'outline'}
+                        className="h-auto py-4 flex flex-col gap-2 items-center justify-center text-center"
+                        onClick={action.onClick}
+                    >
+                        <action.icon className="h-5 w-5" />
+                        <span className="text-xs font-medium">{action.label}</span>
+                    </Button>
+                ))}
             </div>
         </ContentSection>
     )

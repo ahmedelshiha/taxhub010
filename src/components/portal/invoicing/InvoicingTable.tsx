@@ -1,23 +1,8 @@
-/**
- * InvoicingTable Component
- * 
- * Main table container for invoice list
- * ~120 lines, uses table cells + Oracle Fusion components
- */
-
 'use client'
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ContentSection, EmptyState, LoadingSkeleton, StatusMessage } from '@/components/ui-oracle'
-import { FileText, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { FileText } from 'lucide-react'
 import { InvoiceNumberCell } from './table/InvoiceNumberCell'
 import { InvoiceDateCell } from './table/InvoiceDateCell'
 import { InvoiceAmountCell } from './table/InvoiceAmountCell'
@@ -35,14 +20,7 @@ export interface InvoicingTableProps {
   onCreateClick: () => void
 }
 
-export function InvoicingTable({
-  invoices,
-  loading,
-  error,
-  onDownload,
-  onPay,
-  onCreateClick,
-}: InvoicingTableProps) {
+export function InvoicingTable({ invoices, loading, error, onDownload, onPay, onCreateClick }: InvoicingTableProps) {
   if (error) {
     return (
       <StatusMessage variant="error" title="Failed to load invoices">
@@ -62,10 +40,7 @@ export function InvoicingTable({
           icon={FileText}
           title="No invoices found"
           description="Create your first invoice to get started"
-          action={{
-            label: 'Create Invoice',
-            onClick: onCreateClick,
-          }}
+          action={{ label: 'Create Invoice', onClick: onCreateClick }}
         />
       </ContentSection>
     )
@@ -88,29 +63,13 @@ export function InvoicingTable({
             {invoices.map((invoice) => (
               <TableRow key={invoice.id}>
                 <TableCell>
-                  <InvoiceNumberCell
-                    invoiceNumber={invoice.invoiceNumber}
-                    description={invoice.description}
-                  />
+                  <InvoiceNumberCell invoiceNumber={invoice.invoiceNumber} description={invoice.description} />
                 </TableCell>
-                <TableCell>
-                  <InvoiceDateCell date={invoice.date} />
-                </TableCell>
-                <TableCell>
-                  <InvoiceAmountCell
-                    amount={invoice.amount}
-                    currency={invoice.currency}
-                  />
-                </TableCell>
-                <TableCell>
-                  <InvoiceStatusCell status={invoice.status} />
-                </TableCell>
+                <TableCell><InvoiceDateCell date={invoice.date} /></TableCell>
+                <TableCell><InvoiceAmountCell amount={invoice.amount} currency={invoice.currency} /></TableCell>
+                <TableCell><InvoiceStatusCell status={invoice.status} /></TableCell>
                 <TableCell className="text-right">
-                  <InvoiceActionsCell
-                    invoice={invoice}
-                    onDownload={onDownload}
-                    onPay={onPay}
-                  />
+                  <InvoiceActionsCell invoice={invoice} onDownload={onDownload} onPay={onPay} />
                 </TableCell>
               </TableRow>
             ))}

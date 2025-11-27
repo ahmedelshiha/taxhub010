@@ -1,10 +1,3 @@
-/**
- * InvoiceNumberCell Component
- * 
- * Displays invoice number with icon and optional description
- * ~50 lines
- */
-
 import { FileText } from 'lucide-react'
 
 export interface InvoiceNumberCellProps {

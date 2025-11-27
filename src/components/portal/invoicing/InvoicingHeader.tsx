@@ -1,10 +1,3 @@
-/**
- * InvoicingHeader Component
- * 
- * Page header with back button, title, and create action
- * ~60 lines, uses Oracle Fusion ActionHeader
- */
-
 'use client'
 
 import { ActionHeader } from '@/components/ui-oracle'
@@ -31,7 +24,6 @@ export function InvoicingHeader({ onCreateClick }: InvoicingHeaderProps) {
                 <Link href="/portal">
                     <Button variant="ghost" size="icon">
                         <ArrowLeft className="h-5 w-5" />
-                        <span className="sr-only">Back to Portal</span>
                     </Button>
                 </Link>
             }

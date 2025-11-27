@@ -1,10 +1,3 @@
-/**
- * InvoiceActionsCell Component
- * 
- * Action buttons for invoice row (download, pay)
- * ~70 lines
- */
-
 import { Button } from '@/components/ui/button'
 import { Download, CreditCard } from 'lucide-react'
 import { hasPDF, isPayable, type Invoice } from '@/lib/invoicing'
@@ -15,14 +8,9 @@ export interface InvoiceActionsCellProps {
     onPay: (id: string) => void
 }
 
-export function InvoiceActionsCell({
-    invoice,
-    onDownload,
-    onPay,
-}: InvoiceActionsCellProps) {
+export function InvoiceActionsCell({ invoice, onDownload, onPay }: InvoiceActionsCellProps) {
     return (
         <div className="flex items-center justify-end gap-2">
-            {/* Download Button */}
             {hasPDF(invoice) && (
                 <Button
                     variant="ghost"
@@ -34,8 +22,6 @@ export function InvoiceActionsCell({
                     <span className="sr-only">Download</span>
                 </Button>
             )}
-
-            {/* Pay Button */}
             {isPayable(invoice) && (
                 <Button
                     variant="outline"
