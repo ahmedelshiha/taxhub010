@@ -47,10 +47,10 @@ export default function ActivityTab() {
     // Transform API data to widget format
     const activityItems: ActivityItem[] = activities.map((activity: any) => ({
         id: activity.id,
-        type: activity.type || 'system',
+        type: (activity.type || 'system') as 'invoice' | 'document' | 'compliance' | 'system',
         title: activity.title,
         description: activity.description,
-        timestamp: new Date(activity.timestamp),
+        timestamp: activity.timestamp,
         status: activity.metadata?.status,
     }))
 

@@ -23,11 +23,14 @@ export function useServiceRequests(options: UseServiceRequestsOptions = {}) {
     limit = 10,
     q = '',
     status = 'ALL',
-    bookingType = 'ALL',
+    bookingType: bookingTypeInput = 'ALL',
     dateFrom,
     dateTo,
     type = 'all',
   } = options
+
+  // Ensure bookingType is a valid type
+  const bookingType = (bookingTypeInput as any) || 'ALL'
 
   // Use existing shared useBookings hook with portal scope
   const { items, pagination, isLoading, refresh } = useBookings({

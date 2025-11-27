@@ -19,7 +19,7 @@ import {
 } from '@/components/ui-oracle'
 import { QuickActionsWidget } from '@/components/portal/widgets'
 import { usePortalFinancial } from '@/hooks/usePortalQuery'
-import { DollarSign, Receipt, AlertCircle, TrendingUp, CreditCard, Plus } from 'lucide-react'
+import { DollarSign, Receipt, AlertCircle, TrendingUp, CreditCard, Plus, FileText, Download, Upload } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -73,29 +73,23 @@ export default function FinancialTab() {
 
     const quickActions = [
         {
-            id: 'invoices',
-            label: 'Manage Invoices',
-            icon: Receipt,
-            onClick: () => router.push('/portal/invoicing'),
-        },
-        {
-            id: 'expenses',
-            label: 'Track Expenses',
-            icon: CreditCard,
-            onClick: () => router.push('/portal/expenses'),
-        },
-        {
-            id: 'reports',
+            id: 'view-reports',
             label: 'View Reports',
-            icon: TrendingUp,
+            icon: FileText,
             onClick: () => router.push('/portal/analytics'),
         },
         {
-            id: 'new-invoice',
-            label: 'New Invoice',
-            icon: Plus,
-            onClick: () => router.push('/portal/invoicing/new'),
-            variant: 'default' as const,
+            id: 'download-summary',
+            label: 'Download Summary',
+            icon: Download,
+            onClick: () => { },
+        },
+        {
+            id: 'export-data',
+            label: 'Export Data',
+            icon: Upload,
+            onClick: () => { },
+            variant: 'outline' as const,
         },
     ]
 
@@ -120,7 +114,7 @@ export default function FinancialTab() {
                 <KPICard
                     label="Overdue"
                     value={stats.overdueInvoices}
-                    comparisonText="Needs follow-up"
+                    comparisonText="Needs followup"
                     icon={AlertCircle}
                     variant="danger"
                 />
@@ -185,7 +179,7 @@ export default function FinancialTab() {
             </ContentSection>
 
             {/* Quick Actions */}
-            <QuickActionsWidget actions={quickActions} title="Financial Actions" />
+            <QuickActionsWidget actions={quickActions} />
         </div>
     )
 }

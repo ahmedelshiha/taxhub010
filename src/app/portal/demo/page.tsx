@@ -12,7 +12,7 @@ import { DollarSign, Users, FileText, Activity, Plus, Filter, X } from 'lucide-r
 
 export default function DemoPage() {
     const [isDetailOpen, setIsDetailOpen] = useState(false)
-    const [activeFilters, setActiveFilters] = useState(['Status: Active', 'Type: Invoice'])
+    const [activeFilters, setActiveFilters] = useState<string[]>(['Status: Active', 'Type: Invoice'])
     const [isLoading, setIsLoading] = useState(false)
 
     return (
@@ -62,13 +62,13 @@ export default function DemoPage() {
                     <ContentSection>
                         <div className="space-y-4">
                             <SearchBox onSearch={() => { }} placeholder="Search components..." />
-                            <FilterBar
-                                filters={activeFilters}
-                                onRemoveFilter={(f) => setActiveFilters(activeFilters.filter(x => x !== f))}
-                                onClearAll={() => setActiveFilters([])}
-                            >
-                                <Button variant="outline" size="sm"><Filter className="h-4 w-4 mr-2" /> Add Filter</Button>
-                            </FilterBar>
+                            <div className="flex flex-wrap gap-2">
+                                {activeFilters.map((filter, idx) => (
+                                    <span key={idx} className="px-2 py-1 bg-gray-100 rounded text-sm">
+                                        {filter}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
                     </ContentSection>
                 </section>
@@ -82,7 +82,7 @@ export default function DemoPage() {
                             <StatusBadge variant="danger">Danger</StatusBadge>
                             <StatusBadge variant="info">Info</StatusBadge>
                             <StatusBadge variant="neutral">Neutral</StatusBadge>
-                            <StatusBadge variant="brand">Brand</StatusBadge>
+                            <StatusBadge variant="info">Info Blue</StatusBadge>
                         </div>
                     </ContentSection>
 
@@ -100,7 +100,7 @@ export default function DemoPage() {
                 <section>
                     <Button onClick={() => setIsDetailOpen(true)}>Open Detail Panel</Button>
                     <DetailPanel
-                        isOpen={isDetailOpen}
+                        open={isDetailOpen}
                         onClose={() => setIsDetailOpen(false)}
                         title="Component Details"
                     >

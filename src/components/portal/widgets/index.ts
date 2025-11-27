@@ -1,2 +1,2 @@
-export { RecentActivityWidget } from './RecentActivity'
+export { RecentActivityWidget, type ActivityItem } from './RecentActivity'
 export { QuickActionsWidget } from './QuickActions'

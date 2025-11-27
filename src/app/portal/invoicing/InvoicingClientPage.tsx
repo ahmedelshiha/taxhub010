@@ -32,7 +32,7 @@ export default function InvoicingPage() {
         <InvoicingTable
           invoices={filteredInvoices}
           loading={isLoading}
-          error={error}
+          error={error as any}
           onDownload={downloadInvoice}
           onPay={payInvoice}
           onCreateClick={() => setCreateModalOpen(true)}
