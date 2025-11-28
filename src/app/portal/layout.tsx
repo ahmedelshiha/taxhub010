@@ -15,6 +15,8 @@ import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { QueryProvider } from '@/providers/QueryProvider'
 
+export const dynamic = 'force-dynamic'
+
 export default async function PortalAppLayout({
     children,
 }: {
