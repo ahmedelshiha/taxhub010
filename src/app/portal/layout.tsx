@@ -36,7 +36,7 @@ function LayoutErrorFallback({ error }: { error?: string }) {
                                 Portal Temporarily Unavailable
                             </h2>
                             <p className="text-gray-600 dark:text-gray-400">
-                                We're experiencing technical difficulties. Please try again in a moment.
+                                We&apos;re experiencing technical difficulties. Please try again in a moment.
                             </p>
                             {error && (
                                 <p className="text-xs text-gray-500 mt-4 font-mono">{error}</p>
