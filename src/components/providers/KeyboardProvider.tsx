@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useCallback, useState, useMemo } from "react"
+import { createContext, useContext, useEffect, useCallback, useState } from "react"
 
 type KeyCombo = string // e.g., "Meta+k", "Shift+?", "Escape"
 
@@ -81,14 +81,8 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
         return () => window.removeEventListener("keydown", handleKeyDown)
     }, [shortcuts])
 
-    const contextValue = useMemo(() => ({
-        registerShortcut,
-        unregisterShortcut,
-        shortcuts
-    }), [registerShortcut, unregisterShortcut, shortcuts])
-
     return (
-        <KeyboardContext.Provider value={contextValue}>
+        <KeyboardContext.Provider value={{ registerShortcut, unregisterShortcut, shortcuts }}>
             {children}
         </KeyboardContext.Provider>
     )
