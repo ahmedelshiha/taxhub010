@@ -10,8 +10,8 @@ export const useSidebarState = () => useAdminLayoutStore(state => state.sidebar)
 
 export const useSidebarActions = () => ({
   toggleSidebar: useAdminLayoutStore(state => state.toggleSidebar),
-  setCollapsed: useAdminLayoutStore(state => state.setCollapsed),
-  setWidth: useAdminLayoutStore(state => state.setWidth),
+  setCollapsed: useAdminLayoutStore(state => state.setSidebarCollapsed),
+  setWidth: useAdminLayoutStore(state => state.setSidebarWidth),
   setMobileOpen: useAdminLayoutStore(state => state.setMobileOpen),
   toggleGroup: useAdminLayoutStore(state => state.toggleGroup),
   setExpandedGroups: useAdminLayoutStore(state => state.setExpandedGroups),

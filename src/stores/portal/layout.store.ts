@@ -1,90 +1,30 @@
 /**
  * Portal Layout Store
  * Centralized state management for portal dashboard layout
- * Mirrors admin layout store pattern for consistency
+ * Refactored to use slice pattern for better modularity
  */
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createLayoutSlice, LayoutSlice } from '@/stores/slices/layout.slice'
+import { createPreferencesSlice, PreferencesSlice } from '@/stores/slices/preferences.slice'
+import { createAuthSlice, AuthSlice } from '@/stores/slices/auth.slice'
 
-interface PortalLayoutState {
-    // Sidebar state
-    sidebarCollapsed: boolean
-    sidebarWidth: number
-    expandedGroups: string[]
+// Combined store type
+export type PortalLayoutStore = LayoutSlice & PreferencesSlice & AuthSlice
 
-    // Dashboard state
-    activeTab: string
-    widgetPreferences: Record<string, { visible: boolean; order: number }>
-
-    // Entity selection
-    selectedEntityId: string | null
-
-    // Actions
-    actions: {
-        setSidebarCollapsed: (collapsed: boolean) => void
-        setSidebarWidth: (width: number) => void
-        toggleGroup: (groupName: string) => void
-        setActiveTab: (tab: string) => void
-        setSelectedEntity: (entityId: string | null) => void
-        updateWidgetPreference: (widgetId: string, preference: { visible?: boolean; order?: number }) => void
-        resetWidgetPreferences: () => void
-    }
-}
-
-export const usePortalLayoutStore = create<PortalLayoutState>()(
+// Create the combined store
+export const usePortalLayoutStore = create<PortalLayoutStore>()(
     persist(
-        (set) => ({
-            // Initial state
-            sidebarCollapsed: false,
-            sidebarWidth: 256,
-            expandedGroups: [],
-            activeTab: 'overview',
-            widgetPreferences: {},
-            selectedEntityId: null,
-
-            // Actions
-            actions: {
-                setSidebarCollapsed: (collapsed) =>
-                    set({ sidebarCollapsed: collapsed }),
-
-                setSidebarWidth: (width) =>
-                    set({ sidebarWidth: width }),
-
-                toggleGroup: (groupName) =>
-                    set((state) => ({
-                        expandedGroups: state.expandedGroups.includes(groupName)
-                            ? state.expandedGroups.filter((g) => g !== groupName)
-                            : [...state.expandedGroups, groupName],
-                    })),
-
-                setActiveTab: (tab) =>
-                    set({ activeTab: tab }),
-
-                setSelectedEntity: (entityId) =>
-                    set({ selectedEntityId: entityId }),
-
-                updateWidgetPreference: (widgetId, preference) =>
-                    set((state) => ({
-                        widgetPreferences: {
-                            ...state.widgetPreferences,
-                            [widgetId]: {
-                                ...(state.widgetPreferences[widgetId] || { visible: true, order: 0 }),
-                                ...preference,
-                            },
-                        },
-                    })),
-
-                resetWidgetPreferences: () =>
-                    set({ widgetPreferences: {} }),
-            },
+        (...a) => ({
+            ...createLayoutSlice(...a),
+            ...createPreferencesSlice(...a),
+            ...createAuthSlice(...a),
         }),
         {
             name: 'portal-layout-storage',
             partialize: (state) => ({
-                sidebarCollapsed: state.sidebarCollapsed,
-                sidebarWidth: state.sidebarWidth,
-                expandedGroups: state.expandedGroups,
+                sidebar: state.sidebar,
                 activeTab: state.activeTab,
                 widgetPreferences: state.widgetPreferences,
                 // Don't persist selectedEntityId - should be session-specific
@@ -93,17 +33,17 @@ export const usePortalLayoutStore = create<PortalLayoutState>()(
     )
 )
 
-// Sidebar selectors
+// ===== Sidebar Selectors =====
 export const usePortalSidebarCollapsed = () =>
-    usePortalLayoutStore((state) => state.sidebarCollapsed)
+    usePortalLayoutStore((state) => state.sidebar.collapsed)
 
 export const usePortalSidebarWidth = () =>
-    usePortalLayoutStore((state) => state.sidebarWidth)
+    usePortalLayoutStore((state) => state.sidebar.width)
 
 export const usePortalExpandedGroups = () =>
-    usePortalLayoutStore((state) => state.expandedGroups)
+    usePortalLayoutStore((state) => state.sidebar.expandedGroups)
 
-// Dashboard selectors
+// ===== Dashboard Selectors =====
 export const usePortalActiveTab = () =>
     usePortalLayoutStore((state) => state.activeTab)
 
@@ -113,6 +53,42 @@ export const usePortalSelectedEntity = () =>
 export const usePortalWidgetPreferences = () =>
     usePortalLayoutStore((state) => state.widgetPreferences)
 
-// Actions selector
+// ===== Actions Selectors =====
+// Backward compatible combined actions (includes all actions)
 export const usePortalLayoutActions = () =>
-    usePortalLayoutStore((state) => state.actions)
+    usePortalLayoutStore((state) => ({
+        // Layout actions
+        setSidebarCollapsed: state.setSidebarCollapsed,
+        setSidebarWidth: state.setSidebarWidth,
+        setMobileOpen: state.setMobileOpen,
+        toggleGroup: state.toggleGroup,
+        toggleSidebar: state.toggleSidebar,
+        // Preferences actions
+        setActiveTab: state.setActiveTab,
+        updateWidgetPreference: state.updateWidgetPreference,
+        resetWidgetPreferences: state.resetWidgetPreferences,
+        // Auth actions
+        setSelectedEntity: state.setSelectedEntity,
+    }))
+
+// Granular action selectors for better performance
+export const usePortalSidebarActions = () =>
+    usePortalLayoutStore((state) => ({
+        setSidebarCollapsed: state.setSidebarCollapsed,
+        setSidebarWidth: state.setSidebarWidth,
+        setMobileOpen: state.setMobileOpen,
+        toggleGroup: state.toggleGroup,
+        toggleSidebar: state.toggleSidebar,
+    }))
+
+export const usePortalPreferencesActions = () =>
+    usePortalLayoutStore((state) => ({
+        setActiveTab: state.setActiveTab,
+        updateWidgetPreference: state.updateWidgetPreference,
+        resetWidgetPreferences: state.resetWidgetPreferences,
+    }))
+
+export const usePortalAuthActions = () =>
+    usePortalLayoutStore((state) => ({
+        setSelectedEntity: state.setSelectedEntity,
+    }))
