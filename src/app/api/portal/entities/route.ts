@@ -1,11 +1,12 @@
 /**
  * Portal Entities API
- * Returns list of entities accessible to the current user
+ * Thin controller using service layer
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionOrBypass } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { entitiesService } from '@/services/portal/entities.service'
+import { ServiceError } from '@/services/shared/base.service'
 
 export async function GET(request: NextRequest) {
     try {
@@ -17,29 +18,10 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        const userId = (session.user as any).id
         const tenantId = (session.user as any).tenantId
 
-        // Fetch entities for this tenant
-        const entities = await prisma.entity.findMany({
-            where: {
-                tenantId,
-                // Only show active entities
-                OR: [
-                    { status: 'ACTIVE' },
-                    { status: 'VERIFIED' },
-                ],
-            },
-            select: {
-                id: true,
-                name: true,
-                status: true,
-                country: true,
-            },
-            orderBy: {
-                name: 'asc',
-            },
-        })
+        // Delegate to service layer
+        const entities = await entitiesService.listActiveEntities(tenantId)
 
         return NextResponse.json({
             success: true,
@@ -49,6 +31,12 @@ export async function GET(request: NextRequest) {
             },
         })
     } catch (error: unknown) {
+        if (error instanceof ServiceError) {
+            return NextResponse.json(
+                { success: false, error: error.message },
+                { status: error.statusCode }
+            )
+        }
         console.error('Portal entities API error:', error)
         return NextResponse.json(
             {
