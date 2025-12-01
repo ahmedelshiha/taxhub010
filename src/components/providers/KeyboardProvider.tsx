@@ -22,6 +22,7 @@ const KeyboardContext = createContext<KeyboardContextType | null>(null)
 
 export function KeyboardProvider({ children }: { children: React.ReactNode }) {
     const [shortcuts, setShortcuts] = useState<Shortcut[]>([])
+    const shortcutsRef = useRef<Shortcut[]>([])
 
     const registerShortcut = useCallback((shortcut: Shortcut) => {
         setShortcuts((prev) => {
@@ -35,6 +36,12 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
         setShortcuts((prev) => prev.filter((s) => s.id !== id))
     }, [])
 
+    // Keep ref in sync with state for use in event handler
+    useEffect(() => {
+        shortcutsRef.current = shortcuts
+    }, [shortcuts])
+
+    // Single event listener that uses ref instead of state dependency
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             // Ignore if input/textarea is focused (unless it's a global shortcut like Cmd+K)
@@ -59,12 +66,9 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
 
             const combo = parts.join("+")
 
-            // Find matching shortcut
-            const match = shortcuts.find((s) => {
+            // Find matching shortcut from ref (avoids recreating listener when shortcuts change)
+            const match = shortcutsRef.current.find((s) => {
                 if (s.disabled) return false
-
-                // Simple exact match for now
-                // Could be enhanced to support "Ctrl+k" matching "Meta+k" explicitly if needed
                 return s.combo.toLowerCase() === combo.toLowerCase()
             })
 
@@ -79,7 +83,7 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
 
         window.addEventListener("keydown", handleKeyDown)
         return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [shortcuts])
+    }, []) // Empty dependency array: listener only attached once
 
     return (
         <KeyboardContext.Provider value={{ registerShortcut, unregisterShortcut, shortcuts }}>
