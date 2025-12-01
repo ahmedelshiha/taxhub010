@@ -1683,6 +1683,8 @@ Effective cash flow management requires ongoing attention and planning. Regular 
         periodEndDate: new Date('2024-12-31'),
         status: 'DRAFT',
         data: JSON.stringify({ form: '1040', estimatedRefund: 2500.00 }),
+        calculations: JSON.stringify({ grossIncome: 75000, deductions: 12000, taxableIncome: 63000 }),
+        taxAmount: 2500.00,
         submittedAt: null,
       },
       {
@@ -1695,6 +1697,8 @@ Effective cash flow management requires ongoing attention and planning. Regular 
         periodEndDate: new Date('2024-09-30'),
         status: 'SUBMITTED',
         data: JSON.stringify({ form: '1040-ES', estimatedTax: 5000.00 }),
+        calculations: JSON.stringify({ estimatedIncome: 80000, estimatedTax: 5000 }),
+        taxAmount: 5000.00,
         submittedAt: new Date('2024-09-10'),
       },
       {
@@ -1707,6 +1711,8 @@ Effective cash flow management requires ongoing attention and planning. Regular 
         periodEndDate: new Date('2024-12-31'),
         status: 'ACCEPTED',
         data: JSON.stringify({ form: 'State Return', taxYear: 2024 }),
+        calculations: JSON.stringify({ stateIncome: 75000, stateTax: 3750 }),
+        taxAmount: 3750.00,
         submittedAt: new Date('2025-01-20'),
       },
     ]
