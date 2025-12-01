@@ -180,7 +180,7 @@ const _api_GET = async (request: NextRequest) => {
         bookedSlots: existingBookings.length,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error checking availability", { error });
     return NextResponse.json(
       { error: "Internal server error" },

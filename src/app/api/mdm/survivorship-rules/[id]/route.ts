@@ -64,7 +64,7 @@ async function handleGET(
       success: true,
       data: rule,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error fetching survivorship rule', { error });
     return NextResponse.json(
       { error: 'Failed to fetch survivorship rule' },
@@ -127,7 +127,7 @@ async function handlePUT(
       success: true,
       data: updated,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.flatten() },
@@ -188,7 +188,7 @@ async function handleDELETE(
       success: true,
       message: 'Survivorship rule deleted',
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error deleting survivorship rule', { error });
     return NextResponse.json(
       { error: 'Failed to delete survivorship rule' },

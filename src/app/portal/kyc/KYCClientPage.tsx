@@ -137,7 +137,7 @@ export default function KYCCenterPage() {
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3">
-            <Link href="/portal/dashboard">
+            <Link href="/portal">
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
@@ -175,15 +175,15 @@ export default function KYCCenterPage() {
                     overallPercentage === 100
                       ? "default"
                       : overallPercentage > 50
-                      ? "secondary"
-                      : "outline"
+                        ? "secondary"
+                        : "outline"
                   }
                 >
                   {overallPercentage === 100
                     ? "Complete"
                     : overallPercentage > 50
-                    ? "In Progress"
-                    : "Not Started"}
+                      ? "In Progress"
+                      : "Not Started"}
                 </Badge>
               </div>
             </div>
@@ -205,13 +205,12 @@ export default function KYCCenterPage() {
             {steps.map((step, idx) => (
               <Card
                 key={step.id}
-                className={`cursor-pointer hover:shadow-md transition-shadow ${
-                  step.status === "completed"
+                className={`cursor-pointer hover:shadow-md transition-shadow ${step.status === "completed"
                     ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
                     : step.status === "in_progress"
-                    ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
-                    : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                }`}
+                      ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                      : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                  }`}
                 onClick={() => router.push(`/portal/kyc/${step.id}?entityId=${entityId}`)}
               >
                 <CardContent className="pt-6">

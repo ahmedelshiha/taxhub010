@@ -33,7 +33,7 @@ export const PATCH = withTenantContext(async (
             data: { success: true, unreadCount },
             meta: { notificationId },
         })
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Error marking notification as read:', error)
         return respond.serverError()
     }

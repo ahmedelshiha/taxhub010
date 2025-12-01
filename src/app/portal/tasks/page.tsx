@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useTasksData } from '@/hooks/shared/useTasks'
 import { Task, TaskStatus, TaskPriority } from '@/types/shared/entities/task'
 import { TaskQuickCreateModal, TaskDetailModal, TaskEditModal } from '@/components/portal/modals'
+import ModalErrorBoundary from '@/components/error-boundary/ModalErrorBoundary'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -385,31 +386,37 @@ export default function PortalTasksPage() {
       )}
 
       {/* Modals */}
-      <TaskQuickCreateModal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onSuccess={handleTaskUpdate}
-      />
+      <ModalErrorBoundary modalName="Task Quick Create">
+        <TaskQuickCreateModal
+          open={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          onSuccess={handleTaskUpdate}
+        />
+      </ModalErrorBoundary>
 
-      <TaskDetailModal
-        open={detailModalOpen}
-        onClose={() => {
-          setDetailModalOpen(false)
-          setSelectedTask(null)
-        }}
-        task={selectedTask}
-        onUpdate={handleTaskUpdate}
-      />
+      <ModalErrorBoundary modalName="Task Details">
+        <TaskDetailModal
+          open={detailModalOpen}
+          onClose={() => {
+            setDetailModalOpen(false)
+            setSelectedTask(null)
+          }}
+          task={selectedTask}
+          onUpdate={handleTaskUpdate}
+        />
+      </ModalErrorBoundary>
 
-      <TaskEditModal
-        open={editModalOpen}
-        onClose={() => {
-          setEditModalOpen(false)
-          setSelectedTask(null)
-        }}
-        task={selectedTask}
-        onSuccess={handleTaskUpdate}
-      />
+      <ModalErrorBoundary modalName="Task Edit">
+        <TaskEditModal
+          open={editModalOpen}
+          onClose={() => {
+            setEditModalOpen(false)
+            setSelectedTask(null)
+          }}
+          task={selectedTask}
+          onSuccess={handleTaskUpdate}
+        />
+      </ModalErrorBoundary>
     </div>
   )
 }

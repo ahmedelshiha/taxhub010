@@ -19,7 +19,7 @@ const UserUpdateSchema = z.object({
  * Get user details
  */
 export const GET = withAdminAuth(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId } = ctx
@@ -54,7 +54,7 @@ export const GET = withAdminAuth(
       return respond.ok({
         data: userDetail,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Get user detail error:', error)
       return respond.serverError()
     }
@@ -67,7 +67,7 @@ export const GET = withAdminAuth(
  * Update user details
  */
 export const PUT = withAdminAuth(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId } = ctx
@@ -113,7 +113,7 @@ export const PUT = withAdminAuth(
       return respond.ok({
         data: updated,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid user data', error.errors)
       }
@@ -129,7 +129,7 @@ export const PUT = withAdminAuth(
  * Deactivate/delete user
  */
 export const DELETE = withAdminAuth(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId } = ctx
@@ -174,7 +174,7 @@ export const DELETE = withAdminAuth(
       return respond.ok({
         data: deleted,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Delete user error:', error)
       return respond.serverError()
     }

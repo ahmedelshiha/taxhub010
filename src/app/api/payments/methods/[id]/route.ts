@@ -11,10 +11,10 @@ const UpdatePaymentMethodSchema = z.object({
 })
 
 export const PATCH = withTenantContext(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId } = requireTenantContext()
-      const { id } = params
+      const { id } = await params
       const body = await request.json()
       const validated = UpdatePaymentMethodSchema.parse(body)
 
@@ -44,10 +44,10 @@ export const PATCH = withTenantContext(
       await logAuditSafe({
         action: 'payment_methods:update',
         details: { paymentMethodId: id, updates: Object.keys(validated) },
-      }).catch(() => {})
+      }).catch(() => { })
 
       return NextResponse.json(updated, { status: 200 })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json({ error: 'Invalid request body', details: error.issues }, { status: 400 })
       }
@@ -59,10 +59,10 @@ export const PATCH = withTenantContext(
 );
 
 export const DELETE = withTenantContext(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId } = requireTenantContext()
-      const { id } = params
+      const { id } = await params
 
       const paymentMethod = await prisma.userPaymentMethod.findFirst({
         where: { id, userId: userId!, tenantId: tenantId! },
@@ -80,10 +80,10 @@ export const DELETE = withTenantContext(
       await logAuditSafe({
         action: 'payment_methods:delete',
         details: { paymentMethodId: id },
-      }).catch(() => {})
+      }).catch(() => { })
 
       return NextResponse.json({ success: true }, { status: 200 })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Payment method delete API error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

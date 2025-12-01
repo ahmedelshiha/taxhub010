@@ -6,7 +6,7 @@ const _api_GET = async () => {
   try {
     await prisma.$queryRaw`SELECT 1`
     return respond.ok({ status: 'ok' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('DB health check failed:', error)
     return respond.serverError('Database health check failed')
   }

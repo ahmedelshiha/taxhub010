@@ -19,7 +19,7 @@ export const GET = withTenantContext(async () => {
     })
 
     return NextResponse.json({ status: 'ok' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Email health check failed:', error)
     return NextResponse.json({ status: 'error' }, { status: 500 })
   }

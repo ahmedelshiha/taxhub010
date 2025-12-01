@@ -18,7 +18,7 @@ export const GET = withTenantContext(async () => {
         'Cache-Control': 'public, max-age=86400, immutable'
       }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch timezones:', error)
     return NextResponse.json(
       { error: 'Failed to fetch timezones' },

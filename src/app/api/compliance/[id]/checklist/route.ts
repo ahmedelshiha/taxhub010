@@ -79,7 +79,7 @@ const _api_GET = async (
       success: true,
       data: mockChecklist,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching compliance checklist", { error });
     return NextResponse.json(
       { error: "Internal server error" },

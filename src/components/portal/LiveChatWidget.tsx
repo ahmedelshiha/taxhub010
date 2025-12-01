@@ -71,6 +71,8 @@ export default function LiveChatWidget() {
 
   // Flush pending queue on reconnect
   useEffect(() => {
+    if (typeof window === 'undefined') return
+
     const onOnline = async () => {
       try {
         const raw = localStorage.getItem('af_pending_chat')

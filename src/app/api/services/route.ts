@@ -109,7 +109,7 @@ const getCachedServices = withCache<any>(
  * - Unauthenticated: see public active services
  */
 export const GET = withTenantContext(
-  async (request: NextRequest, { params }: any) => {
+  async (request: NextRequest, { params }: { params: unknown }) => {
     try {
       // Rate limiting
       const ip = getClientIp(request as any)
@@ -148,7 +148,7 @@ export const GET = withTenantContext(
       }
 
       return respond.ok(result as any)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch services', { error })
       if (error instanceof Error && error.message.includes('Zod')) {
         return respond.badRequest('Invalid query parameters')
@@ -164,7 +164,7 @@ export const GET = withTenantContext(
  * Create a new service (Admin only)
  */
 export const POST = withTenantContext(
-  async (request: NextRequest, { params }: any) => {
+  async (request: NextRequest, { params }: { params: unknown }) => {
     try {
       const ctx = requireTenantContext()
 
@@ -196,7 +196,7 @@ export const POST = withTenantContext(
       })
 
       return respond.created(service)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create service', { error })
 
       if (error instanceof Error) {

@@ -13,7 +13,7 @@ export default function EntitySetupStatusPage() {
   const params = useParams();
   const router = useRouter();
   const entityId = params.entityId as string;
-  
+
   const [entityName, setEntityName] = useState<string>("Your business");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export default function EntitySetupStatusPage() {
     const fetchEntity = async () => {
       try {
         const response = await fetch(`/api/entities/${entityId}`);
-        
+
         if (response.ok) {
           const data = await response.json();
           setEntityName(data.data?.name || "Your business");
@@ -70,13 +70,13 @@ export default function EntitySetupStatusPage() {
               if (status === "verified") {
                 // Redirect to dashboard after a short delay
                 setTimeout(() => {
-                  router.push("/portal/dashboard");
+                  router.push("/portal");
                 }, 2000);
               }
             }}
             onContinue={() => {
               // Navigate to dashboard
-              router.push("/portal/dashboard");
+              router.push("/portal");
             }}
             onManualReview={() => {
               // Open messaging/support

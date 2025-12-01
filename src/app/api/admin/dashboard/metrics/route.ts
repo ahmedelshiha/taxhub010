@@ -21,7 +21,7 @@ export const GET = withAdminAuth(async (req: NextRequest) => {
         }
       }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch dashboard metrics:', error)
     return NextResponse.json(
       { error: 'Failed to fetch metrics' },

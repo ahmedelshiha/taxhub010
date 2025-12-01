@@ -72,7 +72,7 @@ export const GET = withTenantContext(async (request: NextRequest, props: { param
     }
 
     return respond.ok(share)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[PresetShare GET] Error:', error)
     return respond.serverError('Failed to fetch share')
   }
@@ -176,7 +176,7 @@ export const PATCH = withTenantContext(async (request: NextRequest, props: { par
     })
 
     return respond.ok(updated)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[PresetShare PATCH] Error:', error)
     return respond.serverError('Failed to update share')
   }
@@ -255,7 +255,7 @@ export const DELETE = withTenantContext(async (request: NextRequest, props: { pa
       message: 'Share revoked successfully',
       id: shareId
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[PresetShare DELETE] Error:', error)
     return respond.serverError('Failed to revoke share')
   }

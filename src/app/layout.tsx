@@ -9,6 +9,7 @@ import { getEffectiveOrgSettingsFromHeaders } from '@/lib/org-settings'
 import { SettingsProvider } from '@/components/providers/SettingsProvider'
 import { locales, type Locale, localeConfig } from '@/lib/i18n'
 import '@/styles/dark-mode.css'
+import '@/styles/portal-animations.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -68,7 +69,7 @@ export default async function RootLayout({
     contactEmail = eff.contactEmail ?? null
     contactPhone = eff.contactPhone ?? null
     legalLinks = eff.legalLinks ?? null
-  } catch {}
+  } catch { }
 
   // Load user's preferred locale if authenticated
   let userLocale: Locale = orgLocale
@@ -115,17 +116,17 @@ export default async function RootLayout({
         </a>
         <TranslationProvider initialLocale={userLocale as any} initialTranslations={serverTranslations}>
           <SettingsProvider initialSettings={{ name: orgName, logoUrl: orgLogoUrl ?? null, contactEmail: contactEmail ?? null, contactPhone: contactPhone ?? null, legalLinks: legalLinks ?? null, defaultLocale: orgLocale }}>
-              <ClientLayout
-                session={session}
-                orgName={orgName}
-                orgLogoUrl={orgLogoUrl || undefined}
-                contactEmail={contactEmail || undefined}
-                contactPhone={contactPhone || undefined}
-                legalLinks={legalLinks || undefined}
-                locale={userLocale}
-              >
-                {children}
-              </ClientLayout>
+            <ClientLayout
+              session={session}
+              orgName={orgName}
+              orgLogoUrl={orgLogoUrl || undefined}
+              contactEmail={contactEmail || undefined}
+              contactPhone={contactPhone || undefined}
+              legalLinks={legalLinks || undefined}
+              locale={userLocale}
+            >
+              {children}
+            </ClientLayout>
           </SettingsProvider>
         </TranslationProvider>
 

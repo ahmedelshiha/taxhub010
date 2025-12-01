@@ -49,7 +49,7 @@ export async function GET(): Promise<Response> {
         responseTime: prismaDuration,
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     const prismaDuration = Date.now() - prismaStart
     health.checks.prisma = {
       status: 'unhealthy',
@@ -74,7 +74,7 @@ export async function GET(): Promise<Response> {
       message: 'Database connection successful',
       responseTime: dbDuration,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     const dbDuration = Date.now() - dbStart
     health.checks.database = {
       status: 'unhealthy',
@@ -123,7 +123,7 @@ export async function GET(): Promise<Response> {
     }
 
     health.details.environmentVars = hasRequiredEnv
-  } catch (error) {
+  } catch (error: unknown) {
     health.checks.environment = {
       status: 'degraded',
       message: `Failed to check environment: ${error instanceof Error ? error.message : String(error)}`,

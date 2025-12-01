@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
               controller.enqueue(
                 `data: ${JSON.stringify({ type: eventName, data, timestamp: new Date().toISOString() })}\n\n`
               )
-            } catch (error) {
+            } catch (error: unknown) {
               console.error('[realtime] Error sending event:', error)
             }
           }
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
           controller.enqueue(
             `data: ${JSON.stringify({ type: 'heartbeat', timestamp: new Date().toISOString() })}\n\n`
           )
-        } catch (error) {
+        } catch (error: unknown) {
           clearInterval(heartbeatInterval)
         }
       }, 30000) // 30 seconds
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
         })
         try {
           controller.close()
-        } catch (error) {
+        } catch (error: unknown) {
           // Already closed
         }
       }

@@ -55,7 +55,7 @@ const _api_GET = async (request: NextRequest) => {
     }
 
     return NextResponse.json(rows)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Neon GET /api/neon/posts error:', error)
     return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 })
   }

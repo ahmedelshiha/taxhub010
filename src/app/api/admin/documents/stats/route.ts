@@ -161,7 +161,7 @@ export const GET = withAdminAuth(async (request, context) => {
         },
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Document stats error:', error)
     return respond.serverError()
   }

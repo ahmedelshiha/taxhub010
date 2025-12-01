@@ -17,7 +17,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       success: true,
       message: 'All other sessions have been revoked',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error revoking other sessions', { error })
     return NextResponse.json(
       { error: 'Internal server error' },

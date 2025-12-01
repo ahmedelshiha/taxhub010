@@ -103,7 +103,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       message: 'Contact form submitted successfully',
       id: submission ? submission.id : null
     }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error submitting contact form:', error)
     return NextResponse.json(
       { error: 'Failed to submit contact form' },
@@ -141,7 +141,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     })
 
     return NextResponse.json(submissions)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching contact submissions:', error)
     return NextResponse.json(
       { error: 'Failed to fetch contact submissions' },

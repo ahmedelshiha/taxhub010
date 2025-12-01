@@ -37,7 +37,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
         executionCount: s._count.executions
       }))
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch export schedules:', error)
     return NextResponse.json({ error: 'Failed to fetch export schedules' }, { status: 500 })
   }
@@ -110,7 +110,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     })
 
     return NextResponse.json({ success: true, schedule, message: 'Export schedule created successfully' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to create export schedule:', error)
     return NextResponse.json({ error: 'Failed to create export schedule' }, { status: 500 })
   }
@@ -142,7 +142,7 @@ export const PATCH = withTenantContext(async (request: NextRequest) => {
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to update export schedules:', error)
     return NextResponse.json({ error: 'Failed to update export schedules' }, { status: 500 })
   }
@@ -173,7 +173,7 @@ export const DELETE = withTenantContext(async (request: NextRequest) => {
     const deleted = await prisma.exportSchedule.deleteMany({ where: { id: { in: ids } } })
 
     return NextResponse.json({ success: true, deletedCount: deleted.count, message: `${deleted.count} schedule(s) deleted` })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to delete export schedules:', error)
     return NextResponse.json({ error: 'Failed to delete export schedules' }, { status: 500 })
   }

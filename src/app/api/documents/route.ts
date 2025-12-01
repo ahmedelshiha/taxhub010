@@ -202,7 +202,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
         hasMore: filters.offset + filters.limit < total,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return respond.badRequest('Invalid query parameters', error.errors)
     }
@@ -341,7 +341,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
         uploadedBy: document.uploader,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Document upload error:', error)
     return respond.serverError()
   }

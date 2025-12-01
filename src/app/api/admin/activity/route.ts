@@ -61,7 +61,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     ])
 
     return NextResponse.json({ data: logs, pagination: { page, limit: take, total, totalPages: Math.max(1, Math.ceil(total / take)) } })
-  } catch (error) {
+  } catch (error: unknown) {
     try { const { captureError } = await import('@/lib/observability'); await captureError(error, { tags: { route: 'admin/activity' } }) } catch {}
     console.error('Activity API error:', error)
     return NextResponse.json({ error: 'Failed to load activity' }, { status: 500 })

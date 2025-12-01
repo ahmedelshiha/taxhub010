@@ -10,7 +10,7 @@ import { z } from 'zod'
  * Assign a task to a user (admin only)
  */
 export const POST = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId, userId } = ctx
@@ -75,7 +75,7 @@ export const POST = withTenantContext(
         data: updated,
         message: `Task assigned to ${assignee.name || assignee.email}`,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid assignment data', error.errors)
       }

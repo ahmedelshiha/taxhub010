@@ -63,7 +63,7 @@ export const POST = withTenantContext(
         signatureRequestId: signatureRequest?.id || `sig-req-${Date.now()}`,
         status: 'pending',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Request signature error:', error)
       return respond.serverError()
     }
@@ -113,7 +113,7 @@ export const PUT = withTenantContext(
         signatureId: signature?.id || `sig-${Date.now()}`,
         status: 'completed',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Sign document error:', error)
       return respond.serverError()
     }
@@ -152,7 +152,7 @@ export const GET = withTenantContext(
         signatureRequests: signatureRequests || [],
         signatures: signatures || [],
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Get signatures error:', error)
       return respond.serverError()
     }

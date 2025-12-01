@@ -11,7 +11,7 @@ import { z } from 'zod'
  * Perform bulk operations on multiple tasks (admin only)
  */
 export const POST = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: unknown }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId } = ctx
@@ -79,7 +79,7 @@ export const POST = withTenantContext(
         },
         message: `Updated ${result.count} task(s)`,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid bulk update data', error.errors)
       }

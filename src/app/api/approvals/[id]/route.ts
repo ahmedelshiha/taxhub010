@@ -53,7 +53,7 @@ export const GET = withTenantContext(async (
     return respond.ok({
       data: { ...approval, history },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching approval:', error)
     return respond.serverError()
   }
@@ -125,7 +125,7 @@ export const POST = withTenantContext(async (
       })
       return respond.ok({ data: result })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return respond.badRequest(error.errors.map(e => e.message).join(', '))
     }

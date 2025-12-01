@@ -5,6 +5,7 @@ import { apiFetch } from '@/lib/api'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { BookingCreateModal, BookingRescheduleModal, BookingCancelModal } from '@/components/portal/modals'
+import ModalErrorBoundary from '@/components/error-boundary/ModalErrorBoundary'
 import { Calendar, Clock, DollarSign, FileText, Plus, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -320,31 +321,37 @@ export default function PortalPage() {
           </div>
         )}
         {/* Modals */}
-        <BookingCreateModal
-          open={createModalOpen}
-          onClose={() => setCreateModalOpen(false)}
-          onSuccess={handleRefreshBookings}
-        />
+        <ModalErrorBoundary modalName="Booking Create">
+          <BookingCreateModal
+            open={createModalOpen}
+            onClose={() => setCreateModalOpen(false)}
+            onSuccess={handleRefreshBookings}
+          />
+        </ModalErrorBoundary>
 
-        <BookingRescheduleModal
-          open={rescheduleModalOpen}
-          onClose={() => {
-            setRescheduleModalOpen(false)
-            setSelectedBooking(null)
-          }}
-          booking={selectedBooking}
-          onSuccess={handleRefreshBookings}
-        />
+        <ModalErrorBoundary modalName="Booking Reschedule">
+          <BookingRescheduleModal
+            open={rescheduleModalOpen}
+            onClose={() => {
+              setRescheduleModalOpen(false)
+              setSelectedBooking(null)
+            }}
+            booking={selectedBooking}
+            onSuccess={handleRefreshBookings}
+          />
+        </ModalErrorBoundary>
 
-        <BookingCancelModal
-          open={cancelModalOpen}
-          onClose={() => {
-            setCancelModalOpen(false)
-            setSelectedBooking(null)
-          }}
-          booking={selectedBooking}
-          onSuccess={handleRefreshBookings}
-        />
+        <ModalErrorBoundary modalName="Booking Cancel">
+          <BookingCancelModal
+            open={cancelModalOpen}
+            onClose={() => {
+              setCancelModalOpen(false)
+              setSelectedBooking(null)
+            }}
+            booking={selectedBooking}
+            onSuccess={handleRefreshBookings}
+          />
+        </ModalErrorBoundary>
       </div>
     </div >
   )

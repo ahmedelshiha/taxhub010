@@ -66,7 +66,7 @@ const _api_GET = async (request: NextRequest): Promise<NextResponse> => {
     }
 
     return NextResponse.json(data, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[menu-customization:GET] Error:', error)
     const errorMessage = error instanceof Error ? error.message : 'Failed to fetch menu customization'
     return NextResponse.json(
@@ -107,7 +107,7 @@ const _api_POST = async (request: NextRequest): Promise<NextResponse> => {
     let body: MenuCustomizationData
     try {
       body = await request.json()
-    } catch (error) {
+    } catch (error: unknown) {
       return NextResponse.json(
         { error: 'Invalid request format', message: 'Request body must be valid JSON' },
         { status: 400 }
@@ -156,7 +156,7 @@ const _api_POST = async (request: NextRequest): Promise<NextResponse> => {
     }
 
     return NextResponse.json(data, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[menu-customization:POST] Error:', error)
     const errorMessage = error instanceof Error ? error.message : 'Failed to save menu customization'
     return NextResponse.json(
@@ -202,7 +202,7 @@ const _api_DELETE = async (request: NextRequest): Promise<NextResponse> => {
     // Return default configuration
     const defaultConfig = getDefaultMenuCustomization()
     return NextResponse.json(defaultConfig, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[menu-customization:DELETE] Error:', error)
     const errorMessage = error instanceof Error ? error.message : 'Failed to reset menu customization'
     return NextResponse.json(

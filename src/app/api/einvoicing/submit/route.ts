@@ -140,7 +140,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
 
         submitResult = await eta.submit(etaInvoice)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return NextResponse.json(
         {
           error: 'E-invoicing submission failed',
@@ -180,7 +180,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       },
       { status: submitResult.success ? 200 : 400 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: result,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Cron job failed", { error });
     return NextResponse.json(
       { error: "Internal server error" },

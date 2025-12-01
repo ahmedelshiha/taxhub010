@@ -8,7 +8,7 @@ export interface TeamsIntegrationConfig {
 }
 
 export interface TeamsMessage {
-  [key: string]: any
+  [key: string]: unknown
   summary?: string
   themeColor?: string
   sections?: TeamsSection[]
@@ -20,14 +20,14 @@ export interface TeamsSection {
   activitySubtitle?: string
   activityImage?: string
   text?: string
-  facts?: {name: string; value: string}[]
+  facts?: { name: string; value: string }[]
   markdown?: boolean
 }
 
 export interface TeamsAction {
-  [key: string]: any
+  [key: string]: unknown
   name: string
-  targets?: {os: string; uri: string}[]
+  targets?: { os: string; uri: string }[]
   inputs?: {
     id: string
     type: string
@@ -67,7 +67,7 @@ export class TeamsIntegrationService {
   /**
    * Share a filter preset via Teams
    */
-  async sharePresetToTeams(payload: TeamsPresetSharePayload): Promise<{success: boolean; messageId?: string; error?: string}> {
+  async sharePresetToTeams(payload: TeamsPresetSharePayload): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const message = this.buildPresetShareMessage(payload)
       const response = await fetch(this.webhookUrl, {
@@ -91,7 +91,7 @@ export class TeamsIntegrationService {
   /**
    * Send scheduled report to Teams channel
    */
-  async sendScheduledReportToTeams(payload: TeamsReportPayload): Promise<{success: boolean; messageId?: string; error?: string}> {
+  async sendScheduledReportToTeams(payload: TeamsReportPayload): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       const message = this.buildScheduledReportMessage(payload)
       const response = await fetch(this.webhookUrl, {
@@ -119,7 +119,7 @@ export class TeamsIntegrationService {
     title: string,
     message: string,
     details: Record<string, any>
-  ): Promise<{success: boolean; error?: string}> {
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const teamsMessage: TeamsMessage = {
         '@type': 'MessageCard',
@@ -164,7 +164,7 @@ export class TeamsIntegrationService {
     title: string,
     content: string,
     actionUrl?: string
-  ): Promise<{success: boolean; error?: string}> {
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const teamsMessage: TeamsMessage = {
         '@type': 'MessageCard',
@@ -179,17 +179,17 @@ export class TeamsIntegrationService {
         ],
         potentialAction: actionUrl
           ? [
-              {
-                '@type': 'OpenUri',
-                name: 'View in Dashboard',
-                targets: [
-                  {
-                    os: 'default',
-                    uri: actionUrl,
-                  },
-                ],
-              },
-            ]
+            {
+              '@type': 'OpenUri',
+              name: 'View in Dashboard',
+              targets: [
+                {
+                  os: 'default',
+                  uri: actionUrl,
+                },
+              ],
+            },
+          ]
           : [],
       }
 
@@ -213,7 +213,7 @@ export class TeamsIntegrationService {
   /**
    * Test Teams webhook connectivity
    */
-  async testWebhook(): Promise<{success: boolean; error?: string}> {
+  async testWebhook(): Promise<{ success: boolean; error?: string }> {
     try {
       const teamsMessage: TeamsMessage = {
         '@type': 'MessageCard',
@@ -285,17 +285,17 @@ export class TeamsIntegrationService {
       ],
       potentialAction: payload.shareUrl
         ? [
-            {
-              '@type': 'OpenUri',
-              name: 'View in Dashboard',
-              targets: [
-                {
-                  os: 'default',
-                  uri: payload.shareUrl,
-                },
-              ],
-            },
-          ]
+          {
+            '@type': 'OpenUri',
+            name: 'View in Dashboard',
+            targets: [
+              {
+                os: 'default',
+                uri: payload.shareUrl,
+              },
+            ],
+          },
+        ]
         : [],
     }
   }
@@ -339,7 +339,7 @@ export class TeamsIntegrationService {
   /**
    * Validate Teams webhook URL
    */
-  validateWebhookUrl(url: string): {valid: boolean; error?: string} {
+  validateWebhookUrl(url: string): { valid: boolean; error?: string } {
     try {
       const parsed = new URL(url)
       if (!parsed.hostname.includes('webhook.office.com')) {

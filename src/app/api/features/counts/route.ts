@@ -128,7 +128,7 @@ const _api_GET = async (request: NextRequest) => {
       success: true,
       data: counts,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching feature counts", { error });
     return NextResponse.json(
       { error: "Internal server error" },

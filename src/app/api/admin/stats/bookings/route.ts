@@ -124,7 +124,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       revenue: { total: totalRevenue, thisMonth: thisMonthRevenue, lastMonth: lastMonthRevenue, growth: Math.round(revenueGrowth * 100) / 100 },
       range: ranged
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching booking statistics:', error)
     if (isDbSchemaError(error)) {
       return NextResponse.json({

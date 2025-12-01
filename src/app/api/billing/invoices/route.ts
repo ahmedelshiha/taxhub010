@@ -55,7 +55,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       success: true,
       invoices: formattedInvoices,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
 
@@ -117,7 +117,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.issues },

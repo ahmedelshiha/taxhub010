@@ -109,7 +109,7 @@ const _api_GET = async (
         "Content-Disposition": `attachment; filename="tax-filing-${id}.ics"`,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error exporting compliance filing to ICS", { error });
     return NextResponse.json(
       { error: "Internal server error" },

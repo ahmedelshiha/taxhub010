@@ -51,7 +51,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     }
 
     return respond.ok({ data: preferences })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching notification preferences:', error)
     return respond.serverError()
   }
@@ -92,7 +92,7 @@ export const PUT = withTenantContext(async (request: NextRequest) => {
       data: updated,
       meta: { message: 'Preferences updated successfully' },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return respond.badRequest(error.errors.map(e => e.message).join(', '))
     }

@@ -122,7 +122,7 @@ export const GET = withTenantContext(async (
         count: formatted.length,
         filters,
       },
-    }).catch(() => {})
+    }).catch(() => { })
 
     return NextResponse.json(
       {
@@ -142,7 +142,7 @@ export const GET = withTenantContext(async (
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

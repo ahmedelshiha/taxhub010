@@ -25,7 +25,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       feedbackId: `feedback_${Date.now()}`,
       message: 'Thank you for your feedback!',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Feedback API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

@@ -40,7 +40,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       success: true,
       data: defaultPreferences,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error fetching user preferences', { error })
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -68,7 +68,7 @@ export const PUT = withTenantContext(async (request: NextRequest) => {
       success: true,
       data: preferences,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.issues },

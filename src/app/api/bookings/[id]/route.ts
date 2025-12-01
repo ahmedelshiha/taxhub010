@@ -82,7 +82,7 @@ export const GET = withTenantContext(
       const filteredBooking = filterBookingFields(booking, ctx.role || '', ctx.userId || '')
 
       return respond.ok(filteredBooking)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch booking detail', { error })
       return respond.serverError('Failed to fetch booking')
     }
@@ -190,7 +190,7 @@ export const PUT = withTenantContext(
       const filteredBooking = filterBookingFields(updated, ctx.role || '', ctx.userId || '')
 
       return respond.ok(filteredBooking)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update booking', { error })
 
       if (error instanceof Error) {
@@ -276,7 +276,7 @@ export const DELETE = withTenantContext(
       })
 
       return respond.ok({ success: true, message: 'Booking cancelled successfully', data: cancelled })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to cancel booking', { error })
       return respond.serverError('Failed to cancel booking')
     }

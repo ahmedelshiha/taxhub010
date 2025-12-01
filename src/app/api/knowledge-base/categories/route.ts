@@ -63,7 +63,7 @@ export const GET = withTenantContext(
           articleCount: cat._count.articles,
         })),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Knowledge Base categories list API error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
@@ -113,7 +113,7 @@ export const POST = withTenantContext(
       }).catch(() => {})
 
       return NextResponse.json(category, { status: 201 })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           { error: 'Invalid request body', details: error.issues },

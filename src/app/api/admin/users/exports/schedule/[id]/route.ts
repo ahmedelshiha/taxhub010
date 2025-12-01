@@ -29,7 +29,7 @@ export const GET = withTenantContext(async (request: NextRequest, { params }: { 
     }
 
     return NextResponse.json({ success: true, schedule: { ...schedule, totalExecutions: schedule._count.executions } })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch export schedule:', error)
     return NextResponse.json({ error: 'Failed to fetch export schedule' }, { status: 500 })
   }
@@ -88,7 +88,7 @@ export const PATCH = withTenantContext(async (request: NextRequest, { params }: 
     })
 
     return NextResponse.json({ success: true, schedule: updatedSchedule, message: 'Export schedule updated successfully' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to update export schedule:', error)
     return NextResponse.json({ error: 'Failed to update export schedule' }, { status: 500 })
   }
@@ -116,7 +116,7 @@ export const DELETE = withTenantContext(async (request: NextRequest, { params }:
     }
 
     return NextResponse.json({ success: true, message: 'Export schedule deleted successfully' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to delete export schedule:', error)
     return NextResponse.json({ error: 'Failed to delete export schedule' }, { status: 500 })
   }

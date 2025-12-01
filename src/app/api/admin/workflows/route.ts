@@ -26,7 +26,7 @@ export const GET = withAdminAuth(async (req: NextRequest) => {
       data: workflows,
       pagination: { total, limit, offset }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch workflows:', error)
     return NextResponse.json(
       { error: 'Failed to fetch workflows' },
@@ -59,7 +59,7 @@ export const POST = withAdminAuth(async (req: NextRequest) => {
     })
 
     return NextResponse.json(workflow, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to create workflow:', error)
     return NextResponse.json(
       { error: 'Failed to create workflow' },

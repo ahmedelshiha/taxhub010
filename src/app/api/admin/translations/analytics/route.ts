@@ -74,7 +74,7 @@ export const GET = withTenantContext(async (request) => {
       summary,
       chartData,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[translations/analytics] Error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch translation analytics' },

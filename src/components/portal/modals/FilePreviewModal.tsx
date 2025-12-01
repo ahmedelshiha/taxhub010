@@ -67,7 +67,7 @@ export function FilePreviewModal({
 
     // Keyboard navigation
     useEffect(() => {
-        if (!open) return;
+        if (!open || typeof window === 'undefined') return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
             switch (e.key) {

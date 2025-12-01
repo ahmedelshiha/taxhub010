@@ -97,7 +97,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
 
     const mockFlag = !!(result && typeof result === 'object' && 'mock' in (result as Record<string, unknown>) && (result as Record<string, unknown>).mock)
     return NextResponse.json({ message: `Test email sent successfully to ${email}`, type, result: mockFlag ? 'Email logged to console (no SendGrid configured)' : 'Email sent via SendGrid' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Test email error:', error)
     return NextResponse.json({ error: 'Failed to send test email', details: (error as Error).message }, { status: 500 })
   }
@@ -123,7 +123,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       sendgrid_configured: !!process.env.SENDGRID_API_KEY,
       from_email: process.env.FROM_EMAIL || 'noreply@accountingfirm.com'
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Email test info error:', error)
     return NextResponse.json({ error: 'Failed to get email test info' }, { status: 500 })
   }

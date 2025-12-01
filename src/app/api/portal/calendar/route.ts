@@ -151,7 +151,7 @@ const _api_GET = async (request: NextRequest) => {
                 compliance: 0,
             },
         });
-    } catch (error) {
+    } catch (error: unknown) {
         logger.error("Error fetching calendar events", { error });
         return NextResponse.json(
             { error: "Internal server error" },

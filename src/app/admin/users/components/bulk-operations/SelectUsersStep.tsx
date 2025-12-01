@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 interface UserFilter {
   searchTerm?: string
   roles?: string[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
 interface SelectUsersStepProps {

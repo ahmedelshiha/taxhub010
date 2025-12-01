@@ -74,7 +74,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       success: true,
       data: complianceItems,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Compliance API error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },

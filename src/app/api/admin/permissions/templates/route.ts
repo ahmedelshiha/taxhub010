@@ -65,7 +65,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       success: true,
       templates: parsedTemplates,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[permissions/templates] GET Error:', error)
     return NextResponse.json(
       { error: 'Internal server error', success: false },
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[permissions/templates] POST Error:', error)
     return NextResponse.json(
       { error: 'Internal server error', success: false },
@@ -226,7 +226,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
           : JSON.parse(typeof template.permissions === 'string' ? template.permissions : '[]'),
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[permissions/templates] PUT Error:', error)
     return NextResponse.json(
       { error: 'Internal server error', success: false },
@@ -275,7 +275,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
       success: true,
       message: 'Template deleted successfully',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[permissions/templates] DELETE Error:', error)
     return NextResponse.json(
       { error: 'Internal server error', success: false },

@@ -40,7 +40,7 @@ const _api_GET = async (
       success: true,
       data: history,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error && error.message.includes("Unauthorized")) {
       return NextResponse.json(
         { error: "Not found or unauthorized" },

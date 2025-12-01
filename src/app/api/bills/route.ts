@@ -76,7 +76,7 @@ const _api_GET = async (request: NextRequest) => {
         offset: filters.offset,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.issues },
@@ -151,7 +151,7 @@ const _api_POST = async (request: NextRequest) => {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.issues },

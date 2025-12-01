@@ -29,7 +29,7 @@ export const GET = withTenantContext(async (
     }
 
     return NextResponse.json(operation)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`GET /api/admin/bulk-operations/${params.id} error:`, error)
     return NextResponse.json(
       { error: 'Failed to fetch operation' },
@@ -128,7 +128,7 @@ export const PATCH = withTenantContext(async (
     }
 
     return NextResponse.json(result)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`PATCH /api/admin/bulk-operations/${params.id} error:`, error)
     return NextResponse.json(
       { error: (error as Error).message || 'Operation failed' },
@@ -175,7 +175,7 @@ export const DELETE = withTenantContext(async (
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`DELETE /api/admin/bulk-operations/${params.id} error:`, error)
     return NextResponse.json(
       { error: 'Failed to delete operation' },

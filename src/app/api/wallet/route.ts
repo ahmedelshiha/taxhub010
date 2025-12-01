@@ -57,7 +57,7 @@ export const GET = withTenantContext(
         balance: 2500.0,
         currency: 'USD',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Wallet API error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

@@ -115,7 +115,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
           ],
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Intake response save error:', error)
       return NextResponse.json(
         { error: 'Failed to save intake responses' },

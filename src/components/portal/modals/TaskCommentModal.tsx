@@ -96,7 +96,7 @@ export function TaskCommentModal({
 
     // Load draft from localStorage
     useEffect(() => {
-        if (open && task) {
+        if (open && task && typeof window !== 'undefined') {
             const draftKey = getDraftKey(task.id);
             const draft = localStorage.getItem(draftKey);
             if (draft) {
@@ -107,7 +107,7 @@ export function TaskCommentModal({
 
     // Save draft to localStorage
     useEffect(() => {
-        if (task && content) {
+        if (task && content && typeof window !== 'undefined') {
             const draftKey = getDraftKey(task.id);
             localStorage.setItem(draftKey, content);
         }
@@ -115,7 +115,7 @@ export function TaskCommentModal({
 
     // Clear draft on modal close
     const handleClose = () => {
-        if (task) {
+        if (task && typeof window !== 'undefined') {
             const draftKey = getDraftKey(task.id);
             localStorage.removeItem(draftKey);
         }
@@ -164,6 +164,8 @@ export function TaskCommentModal({
 
     // Keyboard shortcuts
     useEffect(() => {
+        if (typeof window === 'undefined') return;
+
         const handleKeyDown = (e: KeyboardEvent) => {
             // Ctrl+Enter or Cmd+Enter to submit
             if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {

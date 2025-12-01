@@ -21,6 +21,7 @@ import { Search, FileText, Calendar, DollarSign, CheckSquare, Clock, ArrowRight,
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut'
 
 interface SearchResult {
     id: string
@@ -66,7 +67,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
 
     // Load recent searches from localStorage
     useEffect(() => {
-        if (open) {
+        if (open && typeof window !== 'undefined') {
             const stored = localStorage.getItem(RECENT_SEARCHES_KEY)
             if (stored) {
                 try {
@@ -90,7 +91,9 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
         ].slice(0, MAX_RECENT_SEARCHES)
 
         setRecentSearches(updated)
-        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated))
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated))
+        }
     }, [recentSearches])
 
     // Debounced search
@@ -141,27 +144,36 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
     }, [results])
 
     // Keyboard navigation
-    useEffect(() => {
-        if (!open) return
+    useKeyboardShortcut({
+        id: 'global-search-nav-down',
+        combo: 'ArrowDown',
+        description: 'Navigate down',
+        action: () => setSelectedIndex(prev => Math.min(prev + 1, results.length - 1)),
+        disabled: !open || results.length === 0,
+        deps: [results.length]
+    })
 
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowDown') {
-                e.preventDefault()
-                setSelectedIndex(prev => Math.min(prev + 1, results.length - 1))
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault()
-                setSelectedIndex(prev => Math.max(prev - 1, 0))
-            } else if (e.key === 'Enter') {
-                e.preventDefault()
-                if (results[selectedIndex]) {
-                    handleSelect(results[selectedIndex])
-                }
+    useKeyboardShortcut({
+        id: 'global-search-nav-up',
+        combo: 'ArrowUp',
+        description: 'Navigate up',
+        action: () => setSelectedIndex(prev => Math.max(prev - 1, 0)),
+        disabled: !open || results.length === 0,
+        deps: [results.length]
+    })
+
+    useKeyboardShortcut({
+        id: 'global-search-select',
+        combo: 'Enter',
+        description: 'Select result',
+        action: () => {
+            if (results[selectedIndex]) {
+                handleSelect(results[selectedIndex])
             }
-        }
-
-        window.addEventListener('keydown', handleKeyDown)
-        return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [open, results, selectedIndex])
+        },
+        disabled: !open || results.length === 0,
+        deps: [results, selectedIndex]
+    })
 
     const handleSelect = (result: SearchResult) => {
         saveRecentSearch(query)
@@ -180,7 +192,9 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
 
     const clearRecentSearches = () => {
         setRecentSearches([])
-        localStorage.removeItem(RECENT_SEARCHES_KEY)
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(RECENT_SEARCHES_KEY)
+        }
     }
 
     // Group results by type

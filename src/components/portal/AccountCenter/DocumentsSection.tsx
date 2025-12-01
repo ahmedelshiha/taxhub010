@@ -74,7 +74,7 @@ export function DocumentsSection() {
     }
   }
 
-  const filteredDocs = activeTab === 'starred' ? documents.filter((d) => d.isStarred) : documents
+  const filteredDocs = activeTab === 'starred' ? (documents || []).filter((d) => d.isStarred) : (documents || [])
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
@@ -104,23 +104,21 @@ export function DocumentsSection() {
           <div className="flex gap-2 border-b">
             <button
               onClick={() => setActiveTab('recent')}
-              className={`px-4 py-2 font-medium text-sm border-b-2 transition ${
-                activeTab === 'recent'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 dark:text-gray-400'
-              }`}
+              className={`px-4 py-2 font-medium text-sm border-b-2 transition ${activeTab === 'recent'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 dark:text-gray-400'
+                }`}
             >
-              Recent ({documents.length})
+              Recent ({(documents || []).length})
             </button>
             <button
               onClick={() => setActiveTab('starred')}
-              className={`px-4 py-2 font-medium text-sm border-b-2 transition ${
-                activeTab === 'starred'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 dark:text-gray-400'
-              }`}
+              className={`px-4 py-2 font-medium text-sm border-b-2 transition ${activeTab === 'starred'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 dark:text-gray-400'
+                }`}
             >
-              Starred ({documents.filter((d) => d.isStarred).length})
+              Starred ({(documents || []).filter((d) => d.isStarred).length})
             </button>
           </div>
 

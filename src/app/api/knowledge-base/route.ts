@@ -132,7 +132,7 @@ export const GET = withTenantContext(
         },
         { status: 200 }
       )
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           {
@@ -225,7 +225,7 @@ export const POST = withTenantContext(
       }).catch(() => {})
 
       return NextResponse.json(article, { status: 201 })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           {

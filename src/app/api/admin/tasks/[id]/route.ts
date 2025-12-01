@@ -12,7 +12,7 @@ import { z } from 'zod'
  * Get task details with comments (admin only)
  */
 export const GET = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId, userId, role, tenantRole } = ctx
@@ -75,7 +75,7 @@ export const GET = withTenantContext(
       }
 
       return respond.ok({ data: task })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Admin task detail error:', error)
       return respond.serverError()
     }
@@ -88,7 +88,7 @@ export const GET = withTenantContext(
  * Update a task (admin only)
  */
 export const PUT = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId, userId, role, tenantRole } = ctx
@@ -172,7 +172,7 @@ export const PUT = withTenantContext(
       }
 
       return respond.ok({ data: updated })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid task data', error.errors)
       }
@@ -188,7 +188,7 @@ export const PUT = withTenantContext(
  * Delete a task (admin only)
  */
 export const DELETE = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId, userId, role, tenantRole } = ctx
@@ -230,7 +230,7 @@ export const DELETE = withTenantContext(
       })
 
       return respond.ok({ success: true, message: 'Task deleted successfully' })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Admin task deletion error:', error)
       return respond.serverError()
     }

@@ -1,0 +1,468 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#site-main-content"
+  - status [ref=e3]: Navigated to Professional Accounting Services | Accounting Firm
+  - generic [ref=e4]: Sidebar expanded
+  - generic [ref=e5]:
+    - banner [ref=e6]:
+      - navigation "Top" [ref=e7]:
+        - generic [ref=e8]:
+          - link "Accounting Firm home" [ref=e10] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e12]: AF
+            - generic [ref=e13]: Accounting Firm
+          - generic [ref=e14]:
+            - link "Home" [ref=e15] [cursor=pointer]:
+              - /url: /
+            - link "About" [ref=e16] [cursor=pointer]:
+              - /url: /about
+            - link "Services" [ref=e17] [cursor=pointer]:
+              - /url: /services
+            - link "Blog" [ref=e18] [cursor=pointer]:
+              - /url: /blog
+            - link "Contact" [ref=e19] [cursor=pointer]:
+              - /url: /contact
+          - generic [ref=e20]:
+            - 'button "Change language: currently English" [ref=e21]':
+              - img
+              - generic [ref=e22]: 🇺🇸
+            - link "Sign In" [ref=e24] [cursor=pointer]:
+              - /url: /login
+    - main [ref=e25]:
+      - generic [ref=e26]:
+        - link "Skip to main content" [ref=e27] [cursor=pointer]:
+          - /url: "#portal-main-content"
+        - navigation "Portal sidebar" [ref=e28]:
+          - generic [ref=e30]:
+            - img [ref=e31]
+            - generic [ref=e35]: TaxHub
+          - navigation [ref=e36]:
+            - generic [ref=e37]:
+              - heading "Overview" [level=3] [ref=e38]
+              - list [ref=e39]:
+                - listitem [ref=e40]:
+                  - link "Dashboard" [ref=e41] [cursor=pointer]:
+                    - /url: /portal
+                    - img [ref=e42]
+                    - generic [ref=e45]: Dashboard
+                - listitem [ref=e46]:
+                  - link "Analytics" [ref=e47] [cursor=pointer]:
+                    - /url: /portal/analytics
+                    - img [ref=e48]
+                    - generic [ref=e50]: Analytics
+            - generic [ref=e51]:
+              - heading "Compliance" [level=3] [ref=e52]
+              - list [ref=e53]:
+                - listitem [ref=e54]:
+                  - link "KYC Center" [ref=e55] [cursor=pointer]:
+                    - /url: /portal/kyc
+                    - img [ref=e56]
+                    - generic [ref=e61]: KYC Center
+                - listitem [ref=e62]:
+                  - link "Documents" [ref=e63] [cursor=pointer]:
+                    - /url: /portal/documents
+                    - img [ref=e64]
+                    - generic [ref=e67]: Documents
+                - listitem [ref=e68]:
+                  - link "Compliance" [ref=e69] [cursor=pointer]:
+                    - /url: /portal/compliance
+                    - img [ref=e70]
+                    - generic [ref=e73]: Compliance
+            - generic [ref=e74]:
+              - heading "Financials" [level=3] [ref=e75]
+              - list [ref=e76]:
+                - listitem [ref=e77]:
+                  - link "Invoicing" [ref=e78] [cursor=pointer]:
+                    - /url: /portal/invoicing
+                    - img [ref=e79]
+                    - generic [ref=e81]: Invoicing
+                - listitem [ref=e82]:
+                  - link "Bills" [ref=e83] [cursor=pointer]:
+                    - /url: /portal/bills
+                    - img [ref=e84]
+                    - generic [ref=e87]: Bills
+                - listitem [ref=e88]:
+                  - link "Expenses" [ref=e89] [cursor=pointer]:
+                    - /url: /portal/expenses
+                    - img [ref=e90]
+                    - generic [ref=e92]: Expenses
+            - generic [ref=e93]:
+              - heading "Operations" [level=3] [ref=e94]
+              - list [ref=e95]:
+                - listitem [ref=e96]:
+                  - link "Tasks" [ref=e97] [cursor=pointer]:
+                    - /url: /portal/tasks
+                    - img [ref=e98]
+                    - generic [ref=e101]: Tasks
+                - listitem [ref=e102]:
+                  - link "Bookings" [ref=e103] [cursor=pointer]:
+                    - /url: /portal/bookings
+                    - img [ref=e104]
+                    - generic [ref=e106]: Bookings
+                - listitem [ref=e107]:
+                  - link "Service Requests" [ref=e108] [cursor=pointer]:
+                    - /url: /portal/service-requests
+                    - img [ref=e109]
+                    - generic [ref=e112]: Service Requests
+            - generic [ref=e113]:
+              - heading "Support" [level=3] [ref=e114]
+              - list [ref=e115]:
+                - listitem [ref=e116]:
+                  - link "Messages" [ref=e117] [cursor=pointer]:
+                    - /url: /portal/messages
+                    - img [ref=e118]
+                    - generic [ref=e121]: Messages
+                - listitem [ref=e122]:
+                  - link "Help Center" [ref=e123] [cursor=pointer]:
+                    - /url: /portal/help
+                    - img [ref=e124]
+                    - generic [ref=e127]: Help Center
+                - listitem [ref=e128]:
+                  - link "Settings" [ref=e129] [cursor=pointer]:
+                    - /url: /portal/settings
+                    - img [ref=e130]
+                    - generic [ref=e133]: Settings
+          - generic [ref=e135]:
+            - generic [ref=e137]: U
+            - generic [ref=e138]:
+              - paragraph [ref=e139]: User
+              - paragraph [ref=e140]: user@example.com
+        - generic [ref=e141]:
+          - generic [ref=e143]:
+            - generic [ref=e145]:
+              - img [ref=e146]
+              - textbox "Search entities, filings, documents..." [ref=e149]
+              - generic:
+                - generic: ⌘
+                - text: K
+            - generic [ref=e150]:
+              - button "Loading..." [disabled]:
+                - img
+                - generic: Loading...
+              - generic [ref=e152]:
+                - button "Upload" [ref=e153]:
+                  - img
+                  - text: Upload
+                - button "Book" [ref=e154]:
+                  - img
+                  - text: Book
+              - button "Notifications" [ref=e156]:
+                - img
+          - main "Portal content" [ref=e157]:
+            - generic [ref=e158]:
+              - generic [ref=e161]:
+                - generic [ref=e162]:
+                  - heading "Good evening, there" [level=1] [ref=e163]
+                  - paragraph [ref=e164]: Wednesday, November 26
+                - generic [ref=e165]:
+                  - generic [ref=e166]:
+                    - img [ref=e167]
+                    - textbox "Search (Cmd+K)" [ref=e170]
+                  - button "Notifications" [ref=e172]:
+                    - img
+              - main [ref=e173]:
+                - generic [ref=e174]:
+                  - button "New Task" [ref=e175]:
+                    - img
+                    - text: New Task
+                  - button "New Booking" [ref=e176]:
+                    - img
+                    - text: New Booking
+                  - button "Upload File" [ref=e177]:
+                    - img
+                    - text: Upload File
+                - generic [ref=e178]:
+                  - generic [ref=e179]:
+                    - heading "Features" [level=2] [ref=e180]
+                    - paragraph [ref=e181]: All caught up! Explore available features.
+                  - generic [ref=e221]:
+                    - img [ref=e222]
+                    - generic [ref=e224]:
+                      - paragraph [ref=e225]: Need help?
+                      - paragraph [ref=e226]: Check out our help center or contact our support team for assistance.
+                      - generic [ref=e227]:
+                        - button "Help Center" [ref=e228]
+                        - button "Contact Support" [ref=e229]
+                - generic [ref=e230]:
+                  - generic [ref=e231]:
+                    - generic [ref=e232]:
+                      - generic [ref=e233]:
+                        - generic [ref=e234]:
+                          - img [ref=e236]
+                          - generic [ref=e239]: Pending Tasks
+                        - link "View All" [ref=e241] [cursor=pointer]:
+                          - /url: /portal/tasks
+                          - text: View All
+                          - img
+                      - img [ref=e244]
+                    - generic [ref=e246]:
+                      - generic [ref=e248]:
+                        - img [ref=e250]
+                        - generic [ref=e252]: Recent Activity
+                      - img [ref=e255]
+                  - generic [ref=e257]:
+                    - generic [ref=e258]:
+                      - generic [ref=e259]:
+                        - generic [ref=e260]:
+                          - img [ref=e262]
+                          - generic [ref=e264]: Upcoming Bookings
+                        - link "View All" [ref=e266] [cursor=pointer]:
+                          - /url: /portal/bookings
+                          - text: View All
+                          - img
+                      - img [ref=e269]
+                    - generic [ref=e271]:
+                      - generic [ref=e272]:
+                        - generic [ref=e273]:
+                          - img [ref=e275]
+                          - generic [ref=e278]: Compliance Tracker
+                        - link "View All" [ref=e280] [cursor=pointer]:
+                          - /url: /portal/compliance
+                          - text: View All
+                          - img
+                      - img [ref=e283]
+                    - generic [ref=e285]:
+                      - generic [ref=e286]:
+                        - generic [ref=e287]:
+                          - img [ref=e289]
+                          - generic [ref=e291]: Financial Overview
+                        - link "View Reports" [ref=e293] [cursor=pointer]:
+                          - /url: /portal/reports
+                          - text: View Reports
+                          - img
+                      - img [ref=e296]
+                  - generic [ref=e298]:
+                    - generic [ref=e299]:
+                      - generic [ref=e300]:
+                        - generic [ref=e301]:
+                          - img [ref=e303]
+                          - generic [ref=e306]: Notifications
+                        - link "View All" [ref=e308] [cursor=pointer]:
+                          - /url: /portal/notifications
+                          - text: View All
+                          - img
+                      - img [ref=e311]
+                    - generic [ref=e313]:
+                      - generic [ref=e314]:
+                        - generic [ref=e315]: Calendar
+                        - button [ref=e316]:
+                          - img
+                      - generic [ref=e320]:
+                        - navigation [ref=e321]:
+                          - button "Go to the Previous Month" [ref=e322]:
+                            - img [ref=e323]
+                          - button "Go to the Next Month" [ref=e325]:
+                            - img [ref=e326]
+                        - generic [ref=e328]:
+                          - status [ref=e330]: November 2025
+                          - grid "November 2025" [ref=e331]:
+                            - rowgroup [ref=e332]:
+                              - row [ref=e333]:
+                                - columnheader [ref=e334]: Su
+                                - columnheader [ref=e335]: Mo
+                                - columnheader [ref=e336]: Tu
+                                - columnheader [ref=e337]: We
+                                - columnheader [ref=e338]: Th
+                                - columnheader [ref=e339]: Fr
+                                - columnheader [ref=e340]: Sa
+                            - rowgroup [ref=e341]:
+                              - row "Sunday, October 26th, 2025 Monday, October 27th, 2025 Tuesday, October 28th, 2025 Wednesday, October 29th, 2025 Thursday, October 30th, 2025 Friday, October 31st, 2025 Saturday, November 1st, 2025" [ref=e342]:
+                                - gridcell "Sunday, October 26th, 2025" [ref=e343]:
+                                  - button "Sunday, October 26th, 2025" [ref=e344]: "26"
+                                - gridcell "Monday, October 27th, 2025" [ref=e345]:
+                                  - button "Monday, October 27th, 2025" [ref=e346]: "27"
+                                - gridcell "Tuesday, October 28th, 2025" [ref=e347]:
+                                  - button "Tuesday, October 28th, 2025" [ref=e348]: "28"
+                                - gridcell "Wednesday, October 29th, 2025" [ref=e349]:
+                                  - button "Wednesday, October 29th, 2025" [ref=e350]: "29"
+                                - gridcell "Thursday, October 30th, 2025" [ref=e351]:
+                                  - button "Thursday, October 30th, 2025" [ref=e352]: "30"
+                                - gridcell "Friday, October 31st, 2025" [ref=e353]:
+                                  - button "Friday, October 31st, 2025" [ref=e354]: "31"
+                                - gridcell "Saturday, November 1st, 2025" [ref=e355]:
+                                  - button "Saturday, November 1st, 2025" [ref=e356]: "1"
+                              - row "Sunday, November 2nd, 2025 Monday, November 3rd, 2025 Tuesday, November 4th, 2025 Wednesday, November 5th, 2025 Thursday, November 6th, 2025 Friday, November 7th, 2025 Saturday, November 8th, 2025" [ref=e357]:
+                                - gridcell "Sunday, November 2nd, 2025" [ref=e358]:
+                                  - button "Sunday, November 2nd, 2025" [ref=e359]: "2"
+                                - gridcell "Monday, November 3rd, 2025" [ref=e360]:
+                                  - button "Monday, November 3rd, 2025" [ref=e361]: "3"
+                                - gridcell "Tuesday, November 4th, 2025" [ref=e362]:
+                                  - button "Tuesday, November 4th, 2025" [ref=e363]: "4"
+                                - gridcell "Wednesday, November 5th, 2025" [ref=e364]:
+                                  - button "Wednesday, November 5th, 2025" [ref=e365]: "5"
+                                - gridcell "Thursday, November 6th, 2025" [ref=e366]:
+                                  - button "Thursday, November 6th, 2025" [ref=e367]: "6"
+                                - gridcell "Friday, November 7th, 2025" [ref=e368]:
+                                  - button "Friday, November 7th, 2025" [ref=e369]: "7"
+                                - gridcell "Saturday, November 8th, 2025" [ref=e370]:
+                                  - button "Saturday, November 8th, 2025" [ref=e371]: "8"
+                              - row "Sunday, November 9th, 2025 Monday, November 10th, 2025 Tuesday, November 11th, 2025 Wednesday, November 12th, 2025 Thursday, November 13th, 2025 Friday, November 14th, 2025 Saturday, November 15th, 2025" [ref=e372]:
+                                - gridcell "Sunday, November 9th, 2025" [ref=e373]:
+                                  - button "Sunday, November 9th, 2025" [ref=e374]: "9"
+                                - gridcell "Monday, November 10th, 2025" [ref=e375]:
+                                  - button "Monday, November 10th, 2025" [ref=e376]: "10"
+                                - gridcell "Tuesday, November 11th, 2025" [ref=e377]:
+                                  - button "Tuesday, November 11th, 2025" [ref=e378]: "11"
+                                - gridcell "Wednesday, November 12th, 2025" [ref=e379]:
+                                  - button "Wednesday, November 12th, 2025" [ref=e380]: "12"
+                                - gridcell "Thursday, November 13th, 2025" [ref=e381]:
+                                  - button "Thursday, November 13th, 2025" [ref=e382]: "13"
+                                - gridcell "Friday, November 14th, 2025" [ref=e383]:
+                                  - button "Friday, November 14th, 2025" [ref=e384]: "14"
+                                - gridcell "Saturday, November 15th, 2025" [ref=e385]:
+                                  - button "Saturday, November 15th, 2025" [ref=e386]: "15"
+                              - row "Sunday, November 16th, 2025 Monday, November 17th, 2025 Tuesday, November 18th, 2025 Wednesday, November 19th, 2025 Thursday, November 20th, 2025 Friday, November 21st, 2025 Saturday, November 22nd, 2025" [ref=e387]:
+                                - gridcell "Sunday, November 16th, 2025" [ref=e388]:
+                                  - button "Sunday, November 16th, 2025" [ref=e389]: "16"
+                                - gridcell "Monday, November 17th, 2025" [ref=e390]:
+                                  - button "Monday, November 17th, 2025" [ref=e391]: "17"
+                                - gridcell "Tuesday, November 18th, 2025" [ref=e392]:
+                                  - button "Tuesday, November 18th, 2025" [ref=e393]: "18"
+                                - gridcell "Wednesday, November 19th, 2025" [ref=e394]:
+                                  - button "Wednesday, November 19th, 2025" [ref=e395]: "19"
+                                - gridcell "Thursday, November 20th, 2025" [ref=e396]:
+                                  - button "Thursday, November 20th, 2025" [ref=e397]: "20"
+                                - gridcell "Friday, November 21st, 2025" [ref=e398]:
+                                  - button "Friday, November 21st, 2025" [ref=e399]: "21"
+                                - gridcell "Saturday, November 22nd, 2025" [ref=e400]:
+                                  - button "Saturday, November 22nd, 2025" [ref=e401]: "22"
+                              - row "Sunday, November 23rd, 2025 Monday, November 24th, 2025 Tuesday, November 25th, 2025 Today, Wednesday, November 26th, 2025, selected Thursday, November 27th, 2025 Friday, November 28th, 2025 Saturday, November 29th, 2025" [ref=e402]:
+                                - gridcell "Sunday, November 23rd, 2025" [ref=e403]:
+                                  - button "Sunday, November 23rd, 2025" [ref=e404]: "23"
+                                - gridcell "Monday, November 24th, 2025" [ref=e405]:
+                                  - button "Monday, November 24th, 2025" [ref=e406]: "24"
+                                - gridcell "Tuesday, November 25th, 2025" [ref=e407]:
+                                  - button "Tuesday, November 25th, 2025" [ref=e408]: "25"
+                                - gridcell "Today, Wednesday, November 26th, 2025, selected" [selected] [ref=e409]:
+                                  - button "Today, Wednesday, November 26th, 2025, selected" [ref=e410]: "26"
+                                - gridcell "Thursday, November 27th, 2025" [ref=e411]:
+                                  - button "Thursday, November 27th, 2025" [ref=e412]: "27"
+                                - gridcell "Friday, November 28th, 2025" [ref=e413]:
+                                  - button "Friday, November 28th, 2025" [ref=e414]: "28"
+                                - gridcell "Saturday, November 29th, 2025" [ref=e415]:
+                                  - button "Saturday, November 29th, 2025" [ref=e416]: "29"
+                              - row "Sunday, November 30th, 2025 Monday, December 1st, 2025 Tuesday, December 2nd, 2025 Wednesday, December 3rd, 2025 Thursday, December 4th, 2025 Friday, December 5th, 2025 Saturday, December 6th, 2025" [ref=e417]:
+                                - gridcell "Sunday, November 30th, 2025" [ref=e418]:
+                                  - button "Sunday, November 30th, 2025" [ref=e419]: "30"
+                                - gridcell "Monday, December 1st, 2025" [ref=e420]:
+                                  - button "Monday, December 1st, 2025" [ref=e421]: "1"
+                                - gridcell "Tuesday, December 2nd, 2025" [ref=e422]:
+                                  - button "Tuesday, December 2nd, 2025" [ref=e423]: "2"
+                                - gridcell "Wednesday, December 3rd, 2025" [ref=e424]:
+                                  - button "Wednesday, December 3rd, 2025" [ref=e425]: "3"
+                                - gridcell "Thursday, December 4th, 2025" [ref=e426]:
+                                  - button "Thursday, December 4th, 2025" [ref=e427]: "4"
+                                - gridcell "Friday, December 5th, 2025" [ref=e428]:
+                                  - button "Friday, December 5th, 2025" [ref=e429]: "5"
+                                - gridcell "Saturday, December 6th, 2025" [ref=e430]:
+                                  - button "Saturday, December 6th, 2025" [ref=e431]: "6"
+                    - generic [ref=e432]:
+                      - generic [ref=e433]:
+                        - generic [ref=e434]:
+                          - img [ref=e436]
+                          - generic [ref=e438]: Outstanding Invoices
+                        - link "View All" [ref=e440] [cursor=pointer]:
+                          - /url: /portal/billing
+                          - text: View All
+                          - img
+                      - img [ref=e443]
+          - generic [ref=e446]:
+            - generic [ref=e447]:
+              - generic [ref=e448]: © 2025 TaxHub Portal
+              - generic [ref=e449]: •
+              - generic [ref=e450]: v1.0.0
+            - generic [ref=e451]:
+              - link "Help" [ref=e452] [cursor=pointer]:
+                - /url: /portal/help
+                - img [ref=e453]
+                - generic [ref=e456]: Help
+              - link "Support" [ref=e457] [cursor=pointer]:
+                - /url: /portal/messages
+                - img [ref=e458]
+                - generic [ref=e461]: Support
+              - link "Docs" [ref=e462] [cursor=pointer]:
+                - /url: /docs
+                - img [ref=e463]
+                - generic [ref=e466]: Docs
+    - contentinfo [ref=e467]:
+      - generic [ref=e469]:
+        - generic [ref=e470]:
+          - link "AF Accounting Firm" [ref=e471] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e473]: AF
+            - generic [ref=e474]: Accounting Firm
+          - paragraph [ref=e475]: Professional accounting services for growing businesses since 2009. CPA certified • BBB A+ rated • 500+ happy clients.
+          - generic [ref=e476]:
+            - link "(555) 123-4567" [ref=e477] [cursor=pointer]:
+              - /url: tel:+15551234567
+              - img [ref=e478]
+              - text: (555) 123-4567
+            - link "info@accountingfirm.com" [ref=e480] [cursor=pointer]:
+              - /url: mailto:info@accountingfirm.com
+              - img [ref=e481]
+              - text: info@accountingfirm.com
+        - generic [ref=e484]:
+          - heading "Services" [level=4] [ref=e485]
+          - list [ref=e486]:
+            - listitem [ref=e487]:
+              - link "Bookkeeping" [ref=e488] [cursor=pointer]:
+                - /url: /services/bookkeeping
+            - listitem [ref=e489]:
+              - link "Tax Services" [ref=e490] [cursor=pointer]:
+                - /url: /services/tax
+            - listitem [ref=e491]:
+              - link "Payroll" [ref=e492] [cursor=pointer]:
+                - /url: /services/payroll
+            - listitem [ref=e493]:
+              - link "CFO Advisory" [ref=e494] [cursor=pointer]:
+                - /url: /services/cfo
+        - generic [ref=e495]:
+          - heading "Company" [level=4] [ref=e496]
+          - list [ref=e497]:
+            - listitem [ref=e498]:
+              - link "About" [ref=e499] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e500]:
+              - link "Blog" [ref=e501] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e502]:
+              - link "Careers" [ref=e503] [cursor=pointer]:
+                - /url: /careers
+            - listitem [ref=e504]:
+              - link "Contact" [ref=e505] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e506]:
+          - heading "Stay Updated" [level=4] [ref=e507]
+          - generic [ref=e508]:
+            - generic [ref=e509]:
+              - textbox "Your email" [ref=e510]
+              - button "Join" [ref=e511]
+            - paragraph [ref=e512]: Tax tips & business insights
+          - generic [ref=e513]:
+            - link "LinkedIn" [ref=e514] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e515]
+            - link "Facebook" [ref=e519] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e520]
+            - link "Twitter" [ref=e522] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e523]
+      - generic [ref=e527]:
+        - paragraph [ref=e528]: © 2025 Accounting Firm. All rights reserved.
+        - generic [ref=e529]:
+          - link "Privacy" [ref=e530] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms" [ref=e531] [cursor=pointer]:
+            - /url: /terms
+          - generic [ref=e532]: •
+          - generic [ref=e533]: CPA Licensed in NY, CA, TX
+  - button "Live chat" [ref=e535]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e541] [cursor=pointer]:
+    - img [ref=e542]
+  - alert [ref=e545]
+```

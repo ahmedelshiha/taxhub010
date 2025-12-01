@@ -35,7 +35,7 @@ export const GET = withTenantContext(async (req: NextRequest, context: { params:
     const permissions = ROLE_PERMISSIONS[roleKey] ?? []
 
     return NextResponse.json({ success: true, data: { user, permissions } })
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json({ error: 'Failed to load permissions' }, { status: 500 })
   }
 })

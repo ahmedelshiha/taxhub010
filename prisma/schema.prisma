@@ -776,6 +776,8 @@ model TaskComment {
   task        Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([taskId])
+  @@index([authorId])
+  @@index([parentId])
 }
 
 model TaskTemplate {
@@ -861,6 +863,7 @@ model ServiceRequest {
   @@index([tenantId, assignedTeamMemberId])
   @@index([tenantId, scheduledAt])
   @@index([tenantId, isBooking, status])
+  @@index([assignedBy])
 }
 
 model RequestTask {
@@ -903,6 +906,7 @@ model TeamMember {
 
   @@index([isAvailable])
   @@index([status])
+  @@index([userId])
   @@map("team_members")
 }
 
@@ -1020,6 +1024,8 @@ model Attachment {
 
   @@index([serviceRequestId])
   @@index([tenantId])
+  @@index([uploaderId])
+  @@index([entityId])
 }
 
 model DocumentVersion {
@@ -1045,6 +1051,7 @@ model DocumentVersion {
   @@index([attachmentId])
   @@index([tenantId])
   @@index([uploadedAt])
+  @@index([uploaderId])
 }
 
 model DocumentLink {
@@ -1121,6 +1128,9 @@ model WorkOrder {
   @@index([assigneeId])
   @@index([dueAt])
   @@index([createdAt])
+  @@index([serviceId])
+  @@index([serviceRequestId])
+  @@index([bookingId])
 }
 
 model BookingSettings {
@@ -2275,6 +2285,7 @@ model BulkOperation {
   @@index([createdBy, createdAt])
   @@index([status])
   @@map("bulk_operations")
+  @@index([approvedBy])
 }
 
 model BulkOperationResult {
@@ -2314,6 +2325,7 @@ model BulkOperationHistory {
 
   @@index([bulkOperationId, createdAt])
   @@map("bulk_operation_history")
+  @@index([changedBy])
 }
 
 // Phase 1 Entity Management Models
@@ -2356,6 +2368,9 @@ model Entity {
   @@index([createdAt])
   @@index([tenantId, createdAt])
   @@map("entities")
+  @@index([createdBy])
+  @@index([updatedBy])
+  @@index([parentEntityId])
 }
 
 model UserOnEntity {
@@ -2397,6 +2412,7 @@ model EntityLicense {
   @@index([status])
   @@index([createdAt])
   @@map("entity_licenses")
+  @@index([economicZoneId])
 }
 
 model EntityRegistration {
@@ -3144,6 +3160,8 @@ model Approval {
   @@index([tenantId, itemType, itemId])
   @@index([expiresAt])
   @@map("approvals")
+  @@index([requesterId])
+  @@index([decisionBy])
 }
 
 model ApprovalHistory {

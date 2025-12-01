@@ -1,6 +1,10 @@
 import path from 'node:path'
 import { defineConfig } from 'prisma/config'
 
+import * as dotenv from 'dotenv'
+
+dotenv.config()
+
 // Ensure Prisma has consistent DB URL regardless of environment (Netlify vs local)
 // Canonical: DATABASE_URL. Mirror to the other variable for compatibility.
 {

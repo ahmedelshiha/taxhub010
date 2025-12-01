@@ -47,7 +47,7 @@ export const GET = withTenantContext(
         },
         { status: 200 }
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Document links API error:', error)
       return NextResponse.json(
         { error: 'Internal server error' },
@@ -128,7 +128,7 @@ export const POST = withTenantContext(
         },
         { status: 201 }
       )
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           {
@@ -197,7 +197,7 @@ export const DELETE = withTenantContext(
         { success: true, message: 'Link deleted' },
         { status: 200 }
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Document link deletion API error:', error)
       return NextResponse.json(
         { error: 'Internal server error' },

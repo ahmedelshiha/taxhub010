@@ -156,7 +156,7 @@ export const GET = withAdminAuth(async (request, context) => {
         hasMore: filters.offset + filters.limit < total,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return respond.badRequest('Invalid query parameters', error.errors)
     }

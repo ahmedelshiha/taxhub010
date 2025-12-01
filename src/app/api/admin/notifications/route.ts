@@ -78,7 +78,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
         hasMore: offset + limit < total,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching notifications:', error)
     return respond.serverError()
   }
@@ -141,7 +141,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return respond.badRequest(error.errors.map(e => e.message).join(', '))
     }

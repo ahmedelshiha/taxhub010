@@ -88,7 +88,7 @@ export const GET = withTenantContext(
         },
         { status: 200 }
       )
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           {
@@ -156,7 +156,7 @@ export const POST = withTenantContext(
         },
         { status: 201 }
       )
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Document audit log creation API error:', error)
       return NextResponse.json(
         { error: 'Internal server error' },

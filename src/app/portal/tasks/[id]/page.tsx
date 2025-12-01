@@ -100,7 +100,7 @@ export default function PortalTaskDetailPage() {
         </Link>
         <Card className="border-red-200 bg-red-50">
           <CardContent className="pt-6">
-            <p className="text-red-700">{error || 'Task not found'}</p>
+            <p className="text-red-700">{error?.message || 'Task not found'}</p>
           </CardContent>
         </Card>
       </div>

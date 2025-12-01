@@ -74,7 +74,7 @@ const _api_GET = async (
         retryCount: jobState.retryCount,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching verification status", { error });
     return NextResponse.json(
       { error: "Internal server error" },

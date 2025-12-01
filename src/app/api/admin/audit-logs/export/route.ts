@@ -70,7 +70,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
         'X-RateLimit-Reset': String(Math.ceil(resetTime / 1000))
       }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error exporting audit logs:', error)
     return NextResponse.json(
       { error: 'Failed to export audit logs' },

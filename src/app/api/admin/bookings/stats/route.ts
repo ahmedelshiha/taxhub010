@@ -75,7 +75,7 @@ export const GET = withTenantContext(async () => {
     }
 
     return NextResponse.json({ success: true, data: stats })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching booking statistics:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

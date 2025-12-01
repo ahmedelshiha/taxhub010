@@ -38,7 +38,7 @@ export const GET = withAdminAuth(async (req: NextRequest) => {
         }
       }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch analytics:', error)
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },

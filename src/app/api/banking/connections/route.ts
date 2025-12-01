@@ -103,7 +103,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -143,7 +143,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       if (validated.credentials) {
         sessionToken = await provider.authenticate(validated.credentials)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return NextResponse.json(
         {
           error: 'Failed to authenticate with bank provider',
@@ -193,7 +193,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     }).catch(() => {})
 
     return NextResponse.json(connection, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

@@ -13,7 +13,7 @@ import prisma from '@/lib/prisma'
  * - Admins can view any user's profile
  */
 export const GET = withTenantContext(
-  async (request: NextRequest, { params }: any) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId, role } = requireTenantContext()
       const targetUserId = (await params).id
@@ -80,7 +80,7 @@ export const GET = withTenantContext(
       )
 
       return respond.ok(response)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching user profile:', error)
       return respond.serverError()
     }
@@ -96,7 +96,7 @@ export const GET = withTenantContext(
  * - Admins can update any user's profile
  */
 export const PUT = withTenantContext(
-  async (request: NextRequest, { params }: any) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId, role } = requireTenantContext()
       const targetUserId = (await params).id
@@ -173,7 +173,7 @@ export const PUT = withTenantContext(
       })
 
       return respond.ok(updatedUser)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating user profile:', error)
       return respond.serverError()
     }

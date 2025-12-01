@@ -74,7 +74,7 @@ export const GET = withTenantContext(async (request: NextRequest, { params }: an
     }).catch(() => { })
 
     return NextResponse.redirect(document.url, 302)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Download document error:', error)
     return respond.serverError()
   }

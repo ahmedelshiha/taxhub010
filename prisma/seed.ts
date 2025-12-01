@@ -1897,7 +1897,7 @@ Effective cash flow management requires ongoing attention and planning. Regular 
   try {
     const __rows = await prisma.$queryRaw`SELECT column_name FROM information_schema.columns WHERE table_name='Task' AND column_name='tenantId'`
     __canSeedTasks = Array.isArray(__rows) && (__rows as any).length > 0
-  } catch {}
+  } catch { }
 
   if (__canSeedTasks) {
     const now = new Date()
@@ -2585,6 +2585,149 @@ Effective cash flow management requires ongoing attention and planning. Regular 
   })
 
   console.log('✅ Cron telemetry settings created')
+
+  // Seed User Profiles and Sidebar Preferences
+  const allUsers = [admin, staff, client1, client2, lead, superadmin]
+
+  for (const user of allUsers) {
+    // User Profile
+    await prisma.userProfile.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: {
+        userId: user.id,
+        organization: user.role === 'CLIENT' ? 'Client Company' : 'Accounting Firm',
+        phoneNumber: '+1-555-0000',
+        preferredLanguage: 'en',
+        timezone: 'UTC',
+      },
+    })
+
+    // Sidebar Preferences
+    await prisma.sidebarPreferences.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: {
+        userId: user.id,
+        collapsed: false,
+        width: 256,
+        expandedGroups: ['dashboard', 'business', 'documents'],
+      },
+    })
+  }
+  console.log('✅ User profiles and preferences created')
+
+  // Seed Knowledge Base
+  const kbCategories = [
+    { name: 'Tax Guides', slug: 'tax-guides', description: 'Guides for tax preparation and filing' },
+    { name: 'Portal Help', slug: 'portal-help', description: 'How to use the client portal' },
+  ]
+
+  for (const cat of kbCategories) {
+    const category = await prisma.knowledgeBaseCategory.upsert({
+      where: {
+        tenantId_slug: {
+          tenantId: defaultTenant.id,
+          slug: cat.slug,
+        },
+      },
+      update: {
+        name: cat.name,
+        description: cat.description,
+      },
+      create: {
+        tenantId: defaultTenant.id,
+        name: cat.name,
+        slug: cat.slug,
+        description: cat.description,
+      },
+    })
+
+    await prisma.knowledgeBaseArticle.upsert({
+      where: {
+        tenantId_slug: {
+          tenantId: defaultTenant.id,
+          slug: `getting-started-${cat.slug}`,
+        },
+      },
+      update: {
+        title: `Getting Started with ${cat.name}`,
+        content: `This is a comprehensive guide about ${cat.name}.`,
+        authorId: admin.id,
+        published: true,
+        categoryId: category.id,
+      },
+      create: {
+        tenantId: defaultTenant.id,
+        categoryId: category.id,
+        title: `Getting Started with ${cat.name}`,
+        slug: `getting-started-${cat.slug}`,
+        content: `This is a comprehensive guide about ${cat.name}.`,
+        excerpt: `Learn the basics of ${cat.name}`,
+        authorId: admin.id,
+        published: true,
+      },
+    })
+  }
+  console.log('✅ Knowledge base created')
+
+  // Seed Support Tickets
+  const ticket = await prisma.supportTicket.create({
+    data: {
+      tenantId: defaultTenant.id,
+      title: 'Question about Invoice',
+      description: 'I have a question about the line item.',
+      status: 'OPEN',
+      priority: 'MEDIUM',
+      category: 'Billing',
+      userId: client1.id,
+      assignedToId: staff.id,
+    },
+  })
+
+  await prisma.supportTicketComment.create({
+    data: {
+      ticketId: ticket.id,
+      content: 'We are looking into this for you.',
+      authorId: staff.id,
+      isInternal: false,
+    },
+  })
+  console.log('✅ Support tickets created')
+
+  // Seed Entity
+  const entity = await prisma.entity.upsert({
+    where: {
+      tenantId_name: {
+        tenantId: defaultTenant.id,
+        name: 'Client One Business LLC',
+      },
+    },
+    update: {},
+    create: {
+      tenantId: defaultTenant.id,
+      name: 'Client One Business LLC',
+      country: 'US',
+      status: 'ACTIVE',
+      createdBy: admin.id,
+    },
+  })
+
+  await prisma.userOnEntity.upsert({
+    where: {
+      userId_entityId: {
+        userId: client1.id,
+        entityId: entity.id,
+      },
+    },
+    update: {},
+    create: {
+      userId: client1.id,
+      entityId: entity.id,
+      role: 'OWNER',
+    },
+  })
+  console.log('✅ Entities created')
 
   console.log('🎉 Enhanced seed completed successfully!')
   console.log('\n📋 Test Accounts:')

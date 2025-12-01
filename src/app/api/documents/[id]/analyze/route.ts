@@ -51,7 +51,7 @@ export const POST = withTenantContext(
         analysisType: type,
         status: 'processing',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Analyze document error:', error)
       return respond.serverError()
     }
@@ -78,7 +78,7 @@ export const GET = withTenantContext(
       return respond.ok({
         jobs: jobs || [],
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Get analysis error:', error)
       return respond.serverError()
     }

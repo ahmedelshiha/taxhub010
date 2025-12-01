@@ -122,7 +122,7 @@ export const POST = withTenantContext(async (request: NextRequest, context: { pa
           content: `Service request converted to booking #${booking.id.slice(-8).toUpperCase()}. Scheduled for ${bookingScheduledAt.toLocaleDateString()} at ${bookingScheduledAt.toLocaleTimeString()}.`
         }
       })
-    } catch {}
+    } catch { }
 
     return NextResponse.json({
       success: true,
@@ -138,7 +138,7 @@ export const POST = withTenantContext(async (request: NextRequest, context: { pa
         assignedTo: booking.assignedTeamMember?.name,
       }
     }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error converting service request to booking:', error)
     return NextResponse.json({ error: 'Internal server error during conversion' }, { status: 500 })
   }

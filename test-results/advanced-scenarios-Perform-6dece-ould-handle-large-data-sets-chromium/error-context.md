@@ -1,0 +1,252 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#site-main-content"
+  - status [ref=e3]: Navigated to Professional Accounting Services | Accounting Firm
+  - generic [ref=e4]: Sidebar expanded
+  - generic [ref=e5]:
+    - banner [ref=e6]:
+      - navigation "Top" [ref=e7]:
+        - generic [ref=e8]:
+          - link "Accounting Firm home" [ref=e10] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e12]: AF
+            - generic [ref=e13]: Accounting Firm
+          - generic [ref=e14]:
+            - link "Home" [ref=e15] [cursor=pointer]:
+              - /url: /
+            - link "About" [ref=e16] [cursor=pointer]:
+              - /url: /about
+            - link "Services" [ref=e17] [cursor=pointer]:
+              - /url: /services
+            - link "Blog" [ref=e18] [cursor=pointer]:
+              - /url: /blog
+            - link "Contact" [ref=e19] [cursor=pointer]:
+              - /url: /contact
+          - generic [ref=e20]:
+            - 'button "Change language: currently English" [ref=e21]':
+              - img
+              - generic [ref=e22]: 🇺🇸
+            - link "Sign In" [ref=e24] [cursor=pointer]:
+              - /url: /login
+    - main [ref=e25]:
+      - generic [ref=e26]:
+        - link "Skip to main content" [ref=e27] [cursor=pointer]:
+          - /url: "#portal-main-content"
+        - navigation "Portal sidebar" [ref=e28]:
+          - generic [ref=e30]:
+            - img [ref=e31]
+            - generic [ref=e35]: TaxHub
+          - navigation [ref=e36]:
+            - generic [ref=e37]:
+              - heading "Overview" [level=3] [ref=e38]
+              - list [ref=e39]:
+                - listitem [ref=e40]:
+                  - link "Dashboard" [ref=e41] [cursor=pointer]:
+                    - /url: /portal
+                    - img [ref=e42]
+                    - generic [ref=e45]: Dashboard
+                - listitem [ref=e46]:
+                  - link "Analytics" [ref=e47] [cursor=pointer]:
+                    - /url: /portal/analytics
+                    - img [ref=e48]
+                    - generic [ref=e50]: Analytics
+            - generic [ref=e51]:
+              - heading "Compliance" [level=3] [ref=e52]
+              - list [ref=e53]:
+                - listitem [ref=e54]:
+                  - link "KYC Center" [ref=e55] [cursor=pointer]:
+                    - /url: /portal/kyc
+                    - img [ref=e56]
+                    - generic [ref=e61]: KYC Center
+                - listitem [ref=e62]:
+                  - link "Documents" [ref=e63] [cursor=pointer]:
+                    - /url: /portal/documents
+                    - img [ref=e64]
+                    - generic [ref=e67]: Documents
+                - listitem [ref=e68]:
+                  - link "Compliance" [ref=e69] [cursor=pointer]:
+                    - /url: /portal/compliance
+                    - img [ref=e70]
+                    - generic [ref=e73]: Compliance
+            - generic [ref=e74]:
+              - heading "Financials" [level=3] [ref=e75]
+              - list [ref=e76]:
+                - listitem [ref=e77]:
+                  - link "Invoicing" [ref=e78] [cursor=pointer]:
+                    - /url: /portal/invoicing
+                    - img [ref=e79]
+                    - generic [ref=e81]: Invoicing
+                - listitem [ref=e82]:
+                  - link "Bills" [ref=e83] [cursor=pointer]:
+                    - /url: /portal/bills
+                    - img [ref=e84]
+                    - generic [ref=e87]: Bills
+                - listitem [ref=e88]:
+                  - link "Expenses" [ref=e89] [cursor=pointer]:
+                    - /url: /portal/expenses
+                    - img [ref=e90]
+                    - generic [ref=e92]: Expenses
+            - generic [ref=e93]:
+              - heading "Operations" [level=3] [ref=e94]
+              - list [ref=e95]:
+                - listitem [ref=e96]:
+                  - link "Tasks" [ref=e97] [cursor=pointer]:
+                    - /url: /portal/tasks
+                    - img [ref=e98]
+                    - generic [ref=e101]: Tasks
+                - listitem [ref=e102]:
+                  - link "Bookings" [ref=e103] [cursor=pointer]:
+                    - /url: /portal/bookings
+                    - img [ref=e104]
+                    - generic [ref=e106]: Bookings
+                - listitem [ref=e107]:
+                  - link "Service Requests" [ref=e108] [cursor=pointer]:
+                    - /url: /portal/service-requests
+                    - img [ref=e109]
+                    - generic [ref=e112]: Service Requests
+            - generic [ref=e113]:
+              - heading "Support" [level=3] [ref=e114]
+              - list [ref=e115]:
+                - listitem [ref=e116]:
+                  - link "Messages" [ref=e117] [cursor=pointer]:
+                    - /url: /portal/messages
+                    - img [ref=e118]
+                    - generic [ref=e121]: Messages
+                - listitem [ref=e122]:
+                  - link "Help Center" [ref=e123] [cursor=pointer]:
+                    - /url: /portal/help
+                    - img [ref=e124]
+                    - generic [ref=e127]: Help Center
+                - listitem [ref=e128]:
+                  - link "Settings" [ref=e129] [cursor=pointer]:
+                    - /url: /portal/settings
+                    - img [ref=e130]
+                    - generic [ref=e133]: Settings
+          - generic [ref=e135]:
+            - generic [ref=e137]: U
+            - generic [ref=e138]:
+              - paragraph [ref=e139]: User
+              - paragraph [ref=e140]: user@example.com
+        - generic [ref=e141]:
+          - generic [ref=e143]:
+            - generic [ref=e145]:
+              - img [ref=e146]
+              - textbox "Search entities, filings, documents..." [ref=e149]
+              - generic:
+                - generic: ⌘
+                - text: K
+            - generic [ref=e150]:
+              - button "Loading..." [disabled]:
+                - img
+                - generic: Loading...
+              - generic [ref=e152]:
+                - button "Upload" [ref=e153]:
+                  - img
+                  - text: Upload
+                - button "Book" [ref=e154]:
+                  - img
+                  - text: Book
+              - button "Notifications" [ref=e156]:
+                - img
+          - main "Portal content" [ref=e157]:
+            - paragraph [ref=e159]: Loading tasks...
+          - generic [ref=e161]:
+            - generic [ref=e162]:
+              - generic [ref=e163]: © 2025 TaxHub Portal
+              - generic [ref=e164]: •
+              - generic [ref=e165]: v1.0.0
+            - generic [ref=e166]:
+              - link "Help" [ref=e167] [cursor=pointer]:
+                - /url: /portal/help
+                - img [ref=e168]
+                - generic [ref=e171]: Help
+              - link "Support" [ref=e172] [cursor=pointer]:
+                - /url: /portal/messages
+                - img [ref=e173]
+                - generic [ref=e176]: Support
+              - link "Docs" [ref=e177] [cursor=pointer]:
+                - /url: /docs
+                - img [ref=e178]
+                - generic [ref=e181]: Docs
+    - contentinfo [ref=e182]:
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - link "AF Accounting Firm" [ref=e186] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e188]: AF
+            - generic [ref=e189]: Accounting Firm
+          - paragraph [ref=e190]: Professional accounting services for growing businesses since 2009. CPA certified • BBB A+ rated • 500+ happy clients.
+          - generic [ref=e191]:
+            - link "(555) 123-4567" [ref=e192] [cursor=pointer]:
+              - /url: tel:+15551234567
+              - img [ref=e193]
+              - text: (555) 123-4567
+            - link "info@accountingfirm.com" [ref=e195] [cursor=pointer]:
+              - /url: mailto:info@accountingfirm.com
+              - img [ref=e196]
+              - text: info@accountingfirm.com
+        - generic [ref=e199]:
+          - heading "Services" [level=4] [ref=e200]
+          - list [ref=e201]:
+            - listitem [ref=e202]:
+              - link "Bookkeeping" [ref=e203] [cursor=pointer]:
+                - /url: /services/bookkeeping
+            - listitem [ref=e204]:
+              - link "Tax Services" [ref=e205] [cursor=pointer]:
+                - /url: /services/tax
+            - listitem [ref=e206]:
+              - link "Payroll" [ref=e207] [cursor=pointer]:
+                - /url: /services/payroll
+            - listitem [ref=e208]:
+              - link "CFO Advisory" [ref=e209] [cursor=pointer]:
+                - /url: /services/cfo
+        - generic [ref=e210]:
+          - heading "Company" [level=4] [ref=e211]
+          - list [ref=e212]:
+            - listitem [ref=e213]:
+              - link "About" [ref=e214] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e215]:
+              - link "Blog" [ref=e216] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e217]:
+              - link "Careers" [ref=e218] [cursor=pointer]:
+                - /url: /careers
+            - listitem [ref=e219]:
+              - link "Contact" [ref=e220] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e221]:
+          - heading "Stay Updated" [level=4] [ref=e222]
+          - generic [ref=e223]:
+            - generic [ref=e224]:
+              - textbox "Your email" [ref=e225]
+              - button "Join" [ref=e226]
+            - paragraph [ref=e227]: Tax tips & business insights
+          - generic [ref=e228]:
+            - link "LinkedIn" [ref=e229] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e230]
+            - link "Facebook" [ref=e234] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e235]
+            - link "Twitter" [ref=e237] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e238]
+      - generic [ref=e242]:
+        - paragraph [ref=e243]: © 2025 Accounting Firm. All rights reserved.
+        - generic [ref=e244]:
+          - link "Privacy" [ref=e245] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms" [ref=e246] [cursor=pointer]:
+            - /url: /terms
+          - generic [ref=e247]: •
+          - generic [ref=e248]: CPA Licensed in NY, CA, TX
+  - button "Live chat" [ref=e250]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e256] [cursor=pointer]:
+    - img [ref=e257]
+  - alert [ref=e260]
+```

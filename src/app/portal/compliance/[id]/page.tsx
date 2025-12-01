@@ -212,7 +212,7 @@ export default function ComplianceDetailPage() {
       <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3 mb-4">
-            <Link href="/portal/dashboard">
+            <Link href="/portal">
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
@@ -264,13 +264,12 @@ export default function ComplianceDetailPage() {
               <div className="space-y-2">
                 <p className="text-sm text-gray-600 dark:text-gray-400">Priority</p>
                 <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${
-                    item.priority === "high"
+                  <span className={`w-3 h-3 rounded-full ${item.priority === "high"
                       ? "bg-red-500"
                       : item.priority === "medium"
-                      ? "bg-yellow-500"
-                      : "bg-green-500"
-                  }`} />
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
+                    }`} />
                   <p className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
                     {item.priority}
                   </p>
@@ -390,11 +389,10 @@ export default function ComplianceDetailPage() {
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className={`font-medium ${
-                            item.completed
+                          <p className={`font-medium ${item.completed
                               ? "line-through text-gray-500"
                               : "text-gray-900 dark:text-white"
-                          }`}>
+                            }`}>
                             {item.title}
                           </p>
                           {item.required && (

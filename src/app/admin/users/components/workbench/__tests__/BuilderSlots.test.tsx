@@ -18,11 +18,11 @@ vi.mock('../OverviewCards', () => ({
 }))
 
 vi.mock('../AdminSidebar', () => ({
-  default: (props: any) => <div data-testid="admin-sidebar-fallback">Default AdminSidebar</div>
+  default: (props: { [key: string]: unknown }) => <div data-testid="admin-sidebar-fallback">Default AdminSidebar</div>
 }))
 
 vi.mock('../BulkActionsPanel', () => ({
-  default: (props: any) => <div data-testid="bulk-actions-panel-fallback">Default BulkActionsPanel</div>
+  default: (props: { [key: string]: unknown }) => <div data-testid="bulk-actions-panel-fallback">Default BulkActionsPanel</div>
 }))
 
 // Mock the useBuilderContent hook
@@ -115,7 +115,7 @@ describe('BuilderSlots Components', () => {
     })
 
     it('should log warning on error', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { })
 
       mockUseBuilderContent.mockReturnValue({
         content: null,
@@ -287,7 +287,7 @@ describe('BuilderSlots Components', () => {
 
   describe('Error Handling', () => {
     it('should log warning when header fails to load', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { })
 
       mockUseBuilderContent.mockReturnValue({
         content: null,

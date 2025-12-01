@@ -34,7 +34,7 @@ export default function AdminServiceRequestsClient() {
   const [limit] = useState(10)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [refreshing, setRefreshing] = useState(false)
-  const [typeTab, setTypeTab] = useState<'ALL' | 'REQUESTS' | 'APPOINTMENTS'>('ALL')
+  const [typeTab, setTypeTab] = useState<'all' | 'requests' | 'appointments'>('all')
   const [viewMode, setViewMode] = useState<'LIST' | 'CALENDAR' | 'ANALYTICS'>('LIST')
 
   // Initialize filters/type/view from URL for deep linking
@@ -52,14 +52,14 @@ export default function AdminServiceRequestsClient() {
     } as RequestFilters
     setFilters(nextFilters)
     const t = get('type')
-    if (t === 'appointments') setTypeTab('APPOINTMENTS')
-    else if (t === 'requests') setTypeTab('REQUESTS')
+    if (t === 'appointments') setTypeTab('appointments')
+    else if (t === 'requests') setTypeTab('requests')
     const v = get('view')
     if (v === 'calendar') setViewMode('CALENDAR')
     else if (v === 'analytics') setViewMode('ANALYTICS')
     const p = parseInt(get('page') || '1', 10)
     if (!Number.isNaN(p) && p > 0) setPage(p)
-   
+
   }, [])
 
   // Build URL query string (optional, useful for deep linking)
@@ -74,23 +74,20 @@ export default function AdminServiceRequestsClient() {
     if (filters.dateFrom) params.set('dateFrom', filters.dateFrom)
     if (filters.dateTo) params.set('dateTo', filters.dateTo)
     if (filters.bookingType && filters.bookingType !== 'ALL') params.set('bookingType', filters.bookingType)
-    if (typeTab !== 'ALL') params.set('type', typeTab === 'APPOINTMENTS' ? 'appointments' : 'requests')
+    if (typeTab !== 'all') params.set('type', typeTab)
     if (viewMode !== 'LIST') params.set('view', viewMode.toLowerCase())
     return params.toString()
   }, [filters, page, limit, typeTab, viewMode])
 
-  const { items, pagination, isLoading, refresh } = useServiceRequests({
-    scope: 'admin',
+  const { serviceRequests, total, totalPages, isLoading, refresh } = useServiceRequests({
     page,
     limit,
     q: filters.q,
     status: filters.status,
-    priority: filters.priority,
+    bookingType: filters.bookingType,
     dateFrom: filters.dateFrom,
     dateTo: filters.dateTo,
-    sortBy: undefined,
-    sortOrder: undefined,
-    type: typeTab === 'ALL' ? 'all' : typeTab === 'APPOINTMENTS' ? 'appointments' : 'requests',
+    type: typeTab,
   })
 
   // Reload function with refreshing state and selection reset
@@ -107,7 +104,7 @@ export default function AdminServiceRequestsClient() {
   // Reset selection when items change
   useEffect(() => {
     setSelected(new Set())
-  }, [items])
+  }, [serviceRequests])
 
   // Realtime: refresh when updates occur
   useEffect(() => {
@@ -118,7 +115,7 @@ export default function AdminServiceRequestsClient() {
   }, [rt.events, rt.getLatestEvent, reload])
 
   const toggleAll = (checked: boolean) => {
-    setSelected(checked ? new Set(items.map(i => i.id)) : new Set())
+    setSelected(checked ? new Set(serviceRequests.map((i: any) => i.id)) : new Set())
   }
 
   const toggle = (id: string) => {
@@ -137,7 +134,7 @@ export default function AdminServiceRequestsClient() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `service-requests-${new Date().toISOString().slice(0,10)}.csv`
+    a.download = `service-requests-${new Date().toISOString().slice(0, 10)}.csv`
     document.body.appendChild(a)
     a.click()
     URL.revokeObjectURL(url)
@@ -189,9 +186,9 @@ export default function AdminServiceRequestsClient() {
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <Tabs value={typeTab} onValueChange={(v) => { setTypeTab(v as any); setPage(1) }}>
                   <TabsList>
-                    <TabsTrigger value="ALL">All</TabsTrigger>
-                    <TabsTrigger value="REQUESTS">Requests</TabsTrigger>
-                    <TabsTrigger value="APPOINTMENTS">Appointments</TabsTrigger>
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="requests">Requests</TabsTrigger>
+                    <TabsTrigger value="appointments">Appointments</TabsTrigger>
                   </TabsList>
                 </Tabs>
                 <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
@@ -213,7 +210,7 @@ export default function AdminServiceRequestsClient() {
                 <div className="text-center text-gray-400 py-12">Loading…</div>
               ) : viewMode === 'LIST' ? (
                 <ServiceRequestsTable
-                  items={items}
+                  items={serviceRequests}
                   selectedIds={selected}
                   onToggle={toggle}
                   onToggleAll={toggleAll}
@@ -221,7 +218,7 @@ export default function AdminServiceRequestsClient() {
                 />
               ) : viewMode === 'CALENDAR' ? (
                 <ServiceRequestsCalendarView
-                  items={items}
+                  items={serviceRequests}
                   onOpen={(id) => router.push(`/admin/service-requests/${id}`)}
                 />
               ) : (
@@ -234,8 +231,7 @@ export default function AdminServiceRequestsClient() {
             <div className="flex items-center justify-between">
               <ServiceRequestsBulkActions selectedIds={[...selected]} onDone={reload} />
               <div className="text-sm text-gray-500">
-                Page {pagination?.page ?? 1} of {pagination?.totalPages ?? 1} • Total{' '}
-                {pagination?.total ?? items.length}
+                Page {page} of {totalPages} • Total {total}
               </div>
             </div>
           </CardContent>

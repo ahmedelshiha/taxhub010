@@ -167,10 +167,16 @@ export const GET = withTenantContext(async (req: NextRequest) => {
             }))
         };
 
-        return NextResponse.json(dashboardData);
+        return NextResponse.json({
+            success: true,
+            ...dashboardData
+        });
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Dashboard API Error:', error);
-        return NextResponse.json({ error: 'Failed to fetch dashboard data' }, { status: 500 });
+        return NextResponse.json(
+            { success: false, error: 'Failed to fetch dashboard data' },
+            { status: 500 }
+        );
     }
 });

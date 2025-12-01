@@ -20,7 +20,7 @@ export const GET = withTenantContext(async (request: NextRequest, context: { par
 
     const tasks: any[] = []
     return NextResponse.json({ tasks })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching booking tasks:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -43,7 +43,7 @@ export const POST = withTenantContext(async (request: NextRequest, context: { pa
     if (!title?.trim()) return NextResponse.json({ error: 'Task title is required' }, { status: 400 })
 
     return NextResponse.json({ error: 'Task creation for bookings is not yet implemented' }, { status: 501 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating booking task:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

@@ -91,7 +91,7 @@ export function ServicesDirectory() {
   // Handle search input with typeahead
   const handleSearchChange = useCallback((value: string) => {
     setFilters((prev) => ({ ...prev, search: value }));
-    
+
     if (value.length > 0) {
       // Generate suggestions from current services
       const suggestions = services
@@ -220,7 +220,7 @@ export function ServicesDirectory() {
                 role="combobox"
                 aria-expanded={showSuggestions}
               />
-              
+
               {/* Search Suggestions Dropdown */}
               {showSuggestions && searchSuggestions.length > 0 && (
                 <div
@@ -336,7 +336,7 @@ export function ServicesDirectory() {
                 {/* Pricing */}
                 <div className="bg-blue-50 p-3 rounded">
                   <p className="text-sm font-semibold">
-                    {service.pricing.amount.toLocaleString()}{" "}
+                    {(service.pricing?.amount || 0).toLocaleString()}{" "}
                     {service.pricing.currency}
                   </p>
                   <p className="text-xs text-gray-600">{service.pricing.unit}</p>

@@ -55,7 +55,17 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
-        const tenantId = await getResolvedTenantId(requestLike)
+        let tenantId: string | null = null
+        try {
+          tenantId = await getResolvedTenantId(requestLike)
+        } catch (e) {
+          console.error('[Auth] Tenant resolution failed in authorize:', e)
+          return null // Fail authorization gracefully
+        }
+        if (!tenantId) {
+          console.warn('[Auth] Tenant ID could not be resolved in authorize')
+          return null
+        }
         try {
           if (!(await rateLimitAsync(`auth:login:ip:${clientIp}`, 20, 60_000))) {
             try { await logAudit({ action: 'security.ratelimit.block', details: { ip: clientIp, key: `auth:login:ip:${clientIp}` } }) } catch {}

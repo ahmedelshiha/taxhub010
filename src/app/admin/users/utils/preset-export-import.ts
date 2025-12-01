@@ -1,3 +1,4 @@
+import { FilterState } from '../hooks/useFilterState'
 import { ServerFilterPreset } from '../hooks/useServerPresets'
 
 export interface ExportedPresets {
@@ -16,7 +17,7 @@ export interface ExportedPreset {
   id: string
   name: string
   description?: string
-  filters: any
+  filters: FilterState
   isPinned: boolean
   usageCount: number
   createdAt: string

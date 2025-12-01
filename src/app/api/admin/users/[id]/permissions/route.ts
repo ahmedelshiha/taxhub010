@@ -50,13 +50,13 @@ export const PUT = withTenantContext(async (request: NextRequest, context: { par
             actorId: ctx.userId ?? null,
             details: { tenantId: ctx.tenantId ?? null, ip, key, route: new URL(request.url).pathname }
           })
-        } catch {}
+        } catch { }
         return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
       }
     }
 
     const json = await request.json().catch(() => ({}))
-    
+
     // Validate payload
     const { roleChange, permissionChanges } = json
     if (!roleChange && !permissionChanges) {
@@ -135,7 +135,7 @@ export const PUT = withTenantContext(async (request: NextRequest, context: { par
       success: true,
       data: updated
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating permissions:', error)
     return NextResponse.json({ error: 'Failed to update permissions' }, { status: 500 })
   }

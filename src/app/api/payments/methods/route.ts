@@ -58,7 +58,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Payment methods list API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -87,7 +87,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       stripePaymentMethod = await stripe.paymentMethods.retrieve(
         validated.paymentMethodId
       )
-    } catch (error) {
+    } catch (error: unknown) {
       return NextResponse.json(
         { error: 'Invalid payment method ID' },
         { status: 400 }
@@ -173,7 +173,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     }).catch(() => {})
 
     return NextResponse.json(paymentMethod, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

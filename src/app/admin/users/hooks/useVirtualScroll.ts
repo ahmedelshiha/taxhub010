@@ -62,19 +62,19 @@ export function useVirtualScroll({
  * Component wrapper for virtual list rendering
  * Handles item rendering with optimal performance
  */
-export interface VirtualListProps {
-  items: Array<any>
+export interface VirtualListProps<T> {
+  items: T[]
   itemSize: number | ((index: number) => number)
   height: number
   width?: string | number
   overscanCount?: number
-  renderItem: (item: any, index: number, style: React.CSSProperties) => React.ReactNode
+  renderItem: (item: T, index: number, style: React.CSSProperties) => React.ReactNode
   className?: string
   onScroll?: (scrollOffset: number, clientHeight: number) => void
 }
 
 export const VirtualList = React.memo(
-  React.forwardRef<any, VirtualListProps>(function VirtualListComponent(
+  React.forwardRef(function VirtualListComponent<T>(
     {
       items,
       itemSize,
@@ -84,12 +84,14 @@ export const VirtualList = React.memo(
       renderItem,
       className,
       onScroll
-    }: VirtualListProps,
+    }: VirtualListProps<T>,
     ref: React.Ref<any>
   ) {
     const handleScroll = useCallback(
-      (args: { scrollOffset: number; clientHeight: number }) => {
-        onScroll?.(args.scrollOffset, args.clientHeight)
+      (props: any) => {
+        if (onScroll && props.scrollOffset !== undefined) {
+          onScroll(props.scrollOffset, 0)
+        }
       },
       [onScroll]
     )
@@ -104,14 +106,11 @@ export const VirtualList = React.memo(
       [itemSize]
     )
 
-    const Row = ({ index, style }: { index: number; style: React.CSSProperties }) =>
-      React.createElement(
-        'div',
-        { key: index, style },
-        renderItem(items[index], index, style)
-      )
+    const Row = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) =>
+      React.createElement('div', { key: index, style }, renderItem(items[index], index, style))
+      , [items, renderItem])
 
-    return React.createElement(List, {
+    return React.createElement(List as any, {
       ref,
       height,
       itemCount: items.length,
@@ -119,8 +118,7 @@ export const VirtualList = React.memo(
       width,
       overscanCount,
       onScroll: handleScroll,
-      className,
-      children: Row
-    } as any)
+      className
+    }, Row as any)
   })
-)
+) as <T>(props: VirtualListProps<T> & { ref?: React.Ref<any> }) => React.ReactElement

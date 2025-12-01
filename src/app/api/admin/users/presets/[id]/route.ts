@@ -60,7 +60,7 @@ export const GET = withTenantContext(async (request: NextRequest, props: { param
     }
 
     return respond.ok(preset)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Presets GET] Error:', error)
     return respond.serverError('Failed to fetch preset')
   }
@@ -182,7 +182,7 @@ export const PATCH = withTenantContext(async (request: NextRequest, props: { par
     })
 
     return respond.ok(preset)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Presets PATCH] Error:', error)
     if ((error as any).code === 'P2002') {
       return respond.badRequest('A preset with this name already exists')
@@ -234,7 +234,7 @@ export const DELETE = withTenantContext(async (request: NextRequest, props: { pa
     })
 
     return respond.ok({ message: 'Preset deleted successfully', id })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Presets DELETE] Error:', error)
     return respond.serverError('Failed to delete preset')
   }

@@ -387,7 +387,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<BatchPerm
             userId: targetUser.id,
             success: true,
           })
-        } catch (error) {
+        } catch (error: unknown) {
           updateResults.push({
             userId: targetUser.id,
             success: false,
@@ -407,7 +407,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<BatchPerm
       results,
       message: `Updated ${successCount} user(s) successfully${failedCount > 0 ? `, ${failedCount} failed` : ''}`,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[permissions/batch] Error:', error)
     return NextResponse.json(
       {

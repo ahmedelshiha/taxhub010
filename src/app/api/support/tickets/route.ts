@@ -133,7 +133,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -218,7 +218,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

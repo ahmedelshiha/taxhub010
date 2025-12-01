@@ -20,7 +20,7 @@ export const POST = withTenantContext(
         sessionId: `sess_${Date.now()}`,
         total,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Checkout error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

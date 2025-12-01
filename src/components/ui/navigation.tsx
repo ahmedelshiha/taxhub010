@@ -82,7 +82,7 @@ export function Navigation({
   const pathname = usePathname()
   const { data: session, status } = useSession()
   const user = session?.user as any
-  const isAdminUser = hasRole((user?.role as string) || '', ['ADMIN','TEAM_LEAD','TEAM_MEMBER'])
+  const isAdminUser = hasRole((user?.role as string) || '', ['ADMIN', 'TEAM_LEAD', 'TEAM_MEMBER'])
 
   // prefer centralized settings when provider present
   const ctx = useOrgSettings()
@@ -105,10 +105,10 @@ export function Navigation({
             <Link href="/" aria-label={`${orgName} home`} className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center overflow-hidden">
                 {orgLogoUrl ? (
-                   
+
                   <img src={orgLogoUrl} alt={`${orgName} logo`} className="h-8 w-8 object-cover" />
                 ) : (
-                  <span className="text-white font-bold text-sm">{(orgName || 'A').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()}</span>
+                  <span className="text-white font-bold text-sm">{(orgName || 'A').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}</span>
                 )}
               </div>
               <span className="text-xl font-bold text-gray-900">
@@ -124,11 +124,10 @@ export function Navigation({
                 key={item.name}
                 href={item.href}
                 aria-current={isActive(item.href) ? 'page' : undefined}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                  isActive(item.href)
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                }`}
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${isActive(item.href)
+                  ? 'text-blue-600 bg-blue-50'
+                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
               >
                 {item.name}
               </Link>
@@ -194,7 +193,7 @@ export function Navigation({
                     ) : (
                       <>
                         <DropdownMenuItem asChild>
-                          <Link href="/portal/dashboard" className="flex items-center">
+                          <Link href="/portal" className="flex items-center">
                             <Calendar className="mr-2 h-4 w-4" />
                             My Dashboard
                           </Link>
@@ -213,7 +212,7 @@ export function Navigation({
                                 Admin Panel
                               </Link>
                             </DropdownMenuItem>
-    
+
                           </>
                         )}
                         <DropdownMenuSeparator />
@@ -266,17 +265,16 @@ export function Navigation({
                   key={item.name}
                   href={item.href}
                   aria-current={isActive(item.href) ? 'page' : undefined}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
-                    isActive(item.href)
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
+                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${isActive(item.href)
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                    }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
-              
+
               {/* Mobile Auth */}
               <div className="pt-4 border-t border-gray-200">
                 {session ? (
@@ -305,7 +303,7 @@ export function Navigation({
                     ) : (
                       <>
                         <Link
-                          href="/portal/dashboard"
+                          href="/portal"
                           className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -327,7 +325,7 @@ export function Navigation({
                             >
                               Admin Panel
                             </Link>
-    
+
                           </>
                         )}
                       </>

@@ -39,7 +39,7 @@ export const GET = withTenantContext(
         discount,
         total: subtotal + tax - discount,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Cart API error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

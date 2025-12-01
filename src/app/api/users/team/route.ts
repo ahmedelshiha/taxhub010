@@ -20,7 +20,7 @@ import { z } from 'zod'
  * - offset: Pagination offset (default: 0)
  */
 export const GET = withTenantContext(
-  async (request: NextRequest, { params }: any) => {
+  async (request: NextRequest, { params }: { params: unknown }) => {
     try {
       const { userId, tenantId, role } = requireTenantContext()
       const { searchParams } = new URL(request.url)
@@ -157,7 +157,7 @@ export const GET = withTenantContext(
           hasMore: offset + limit < total,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid filter parameters', error.errors)
       }

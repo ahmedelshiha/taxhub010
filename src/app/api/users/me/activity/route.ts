@@ -27,7 +27,7 @@ const FilterSchema = z.object({
  * - dateTo: End date for activity
  */
 export const GET = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: unknown }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId, userId } = ctx
@@ -87,7 +87,7 @@ export const GET = withTenantContext(
           hasMore: filters.offset + filters.limit < total,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid filters', error.errors)
       }

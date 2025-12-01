@@ -36,8 +36,8 @@ export interface UseGestureDetectionOptions {
  * ```tsx
  * const ref = useRef(null)
  * useGestureDetection(ref, {
- *   onSwipe: (direction) => console.log('Swiped', direction),
- *   onLongPress: () => console.log('Long pressed'),
+ *   onSwipe: (direction) => {}, // Handle swipe
+ *   onLongPress: () => {}, // Handle long press
  * })
  * return <div ref={ref}>Content</div>
  * ```

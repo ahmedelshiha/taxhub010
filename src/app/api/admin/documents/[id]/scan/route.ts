@@ -69,7 +69,7 @@ export const POST = withAdminAuth(async (request, context) => {
           force,
         },
       },
-    }).catch(() => {})
+    }).catch(() => { })
 
     // In production, this would queue the document for scanning with the AV service
     // Example: await scanDocumentWithClamAV(document.url)
@@ -83,7 +83,7 @@ export const POST = withAdminAuth(async (request, context) => {
         estimatedCompletionTime: '5-30 seconds',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return respond.badRequest('Invalid scan request', error.errors)
     }
@@ -142,7 +142,7 @@ export const GET = withAdminAuth(async (request, context) => {
         lastScan: document.avScanAt,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get scan status error:', error)
     return respond.serverError()
   }

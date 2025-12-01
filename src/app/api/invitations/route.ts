@@ -47,7 +47,7 @@ export const POST = withTenantContext(
           expiresAt: invitation.expiresAt,
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           { error: 'Invalid input', details: error.issues },
@@ -96,7 +96,7 @@ export const GET = withTenantContext(
           acceptedAt: inv.acceptedAt,
         })),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to list invitations', { error });
       return NextResponse.json(
         { error: 'Failed to list invitations' },

@@ -23,7 +23,7 @@ type SettingsInput = z.infer<typeof SettingsUpdateSchema>
  * Get user preferences and settings
  */
 export const GET = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: unknown }) => {
     try {
       const ctx = requireTenantContext()
       // Fetch user settings from database
@@ -53,7 +53,7 @@ export const GET = withTenantContext(
       return respond.ok({
         data: settings,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Get settings error:', error)
       return respond.serverError()
     }
@@ -66,7 +66,7 @@ export const GET = withTenantContext(
  * Update user preferences and settings
  */
 export const PUT = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: unknown }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId } = ctx
@@ -123,7 +123,7 @@ export const PUT = withTenantContext(
       return respond.ok({
         data: updated.preferences,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid settings', error.errors)
       }

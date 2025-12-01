@@ -271,10 +271,11 @@ export default function FeaturesHub({ entityId }: FeaturesHubProps) {
             </Card>
           ))
           : // Feature tiles
-          enabledTiles.map((tile) => (
+          enabledTiles.map((tile, index) => (
             <Card
               key={tile.id}
-              className={`border ${colorClasses[tile.color]} overflow-hidden hover:shadow-md transition-shadow cursor-pointer`}
+              className={`border ${colorClasses[tile.color]} overflow-hidden card-hover cursor-pointer animate-fade-in`}
+              style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
               onClick={() => router.push(tile.href)}
             >
               <CardContent className="pt-6">

@@ -27,7 +27,7 @@ const _api_POST = async (
       success: true,
       data: result,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       if (error.message === "Bill not found") {
         return NextResponse.json(

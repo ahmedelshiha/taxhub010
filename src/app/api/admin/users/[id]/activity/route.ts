@@ -15,7 +15,7 @@ const FilterSchema = z.object({
  * Get user's activity log (admin view)
  */
 export const GET = withAdminAuth(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId } = ctx
@@ -68,7 +68,7 @@ export const GET = withAdminAuth(
           hasMore: filters.offset + filters.limit < total,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid filters', error.errors)
       }

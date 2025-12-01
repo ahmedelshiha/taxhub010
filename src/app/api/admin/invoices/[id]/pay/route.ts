@@ -28,7 +28,7 @@ export const POST = withTenantContext(async (_request: NextRequest, context: { p
     await logAudit({ action: 'invoice.pay', actorId: ctx.userId ?? null, targetId: id })
 
     return NextResponse.json({ message: 'Invoice marked as paid', invoice: updated })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error marking invoice paid:', error)
     return NextResponse.json({ error: 'Failed to mark invoice as paid' }, { status: 500 })
   }

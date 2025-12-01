@@ -63,7 +63,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     const total = await prisma.invoice.count({ where })
 
     return NextResponse.json({ invoices, total, page, limit })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching invoices:', error)
     return NextResponse.json({ error: 'Failed to fetch invoices' }, { status: 500 })
   }
@@ -125,7 +125,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     await logAudit({ action: 'invoice.create', actorId: ctx.userId ?? null, targetId: invoice.id, details: { bookingId, totalCents } })
 
     return NextResponse.json({ message: 'Invoice created', invoice }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating invoice:', error)
     return NextResponse.json({ error: 'Failed to create invoice' }, { status: 500 })
   }
@@ -151,7 +151,7 @@ export const DELETE = withTenantContext(async (request: NextRequest) => {
     const result = await prisma.invoice.deleteMany({ where: { id: { in: invoiceIds }, ...tenantFilter(ctx.tenantId) } })
     await logAudit({ action: 'invoice.bulk.delete', actorId: ctx.userId ?? null, details: { count: result.count } })
     return NextResponse.json({ message: `Deleted ${result.count} invoices`, deleted: result.count })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error deleting invoices:', error)
     return NextResponse.json({ error: 'Failed to delete invoices' }, { status: 500 })
   }

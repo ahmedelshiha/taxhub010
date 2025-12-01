@@ -324,15 +324,15 @@ function generateSummarySectionHTML(section: ReportSection, data: ReportData): s
   return `
     <div class="section-summary">
       ${section.calculations
-        .map(
-          calc => `
+      .map(
+        calc => `
         <div class="summary-item no-break">
           <div class="summary-label">${escapeHTMLChars(calc.label || calc.name)}</div>
           <div class="summary-value">${formatSummaryValue(summary[calc.name])}</div>
         </div>
       `
-        )
-        .join('')}
+      )
+      .join('')}
     </div>
   `
 }
@@ -387,7 +387,7 @@ function generateGroupedTableRows(
 
   const groupedData = rows.reduce(
     (acc, row) => {
-      const key = row[groupKey]
+      const key = String(row[groupKey] ?? '')
       if (!acc[key]) acc[key] = []
       acc[key].push(row)
       return acc

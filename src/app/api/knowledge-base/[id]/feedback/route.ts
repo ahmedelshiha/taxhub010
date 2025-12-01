@@ -9,10 +9,10 @@ const FeedbackSchema = z.object({
 })
 
 export const POST = withTenantContext(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId } = requireTenantContext()
-      const { id } = params
+      const { id } = await params
 
       if (!id || !tenantId) {
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
@@ -42,7 +42,7 @@ export const POST = withTenantContext(
       }
 
       return NextResponse.json({ success: true }, { status: 200 })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json({ error: 'Invalid request body', details: error.issues }, { status: 400 })
       }

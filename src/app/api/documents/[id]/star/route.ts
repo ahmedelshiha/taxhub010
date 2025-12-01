@@ -43,7 +43,7 @@ export const POST = withTenantContext(async (request: NextRequest, { params }: {
       success: true,
       data: updated,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error starring document', { error })
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -90,7 +90,7 @@ export const DELETE = withTenantContext(async (request: NextRequest, { params }:
       success: true,
       data: updated,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error unstarring document', { error })
     return NextResponse.json(
       { error: 'Internal server error' },

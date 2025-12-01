@@ -78,7 +78,7 @@ async function handleGET(request: NextRequest) {
         count: rules.length,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error listing survivorship rules', { error });
     return NextResponse.json(
       { error: 'Failed to list survivorship rules' },
@@ -145,7 +145,7 @@ async function handlePOST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.flatten() },

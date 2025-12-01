@@ -35,7 +35,7 @@ export const GET = withTenantContext(async (request: NextRequest, context: { par
     })
 
     return NextResponse.json(post)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching post:', error)
     return NextResponse.json({ error: 'Failed to fetch post' }, { status: 500 })
   }
@@ -125,7 +125,7 @@ export const PUT = withTenantContext(async (request: NextRequest, context: { par
     })
 
     return NextResponse.json(post)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating post:', error)
     return NextResponse.json({ error: 'Failed to update post' }, { status: 500 })
   }
@@ -146,7 +146,7 @@ export const DELETE = withTenantContext(async (request: NextRequest, context: { 
 
     await prisma.post.delete({ where: { id: existing.id } })
     return NextResponse.json({ message: 'Post deleted successfully' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error deleting post:', error)
     return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 })
   }

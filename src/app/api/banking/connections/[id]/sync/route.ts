@@ -59,7 +59,7 @@ export const POST = withTenantContext(async (
         startDate,
         endDate
       )
-    } catch (error) {
+    } catch (error: unknown) {
       syncError = String(error)
       console.error('Failed to fetch transactions from provider:', error)
     }
@@ -103,7 +103,7 @@ export const POST = withTenantContext(async (
         })
 
         successCount++
-      } catch (error) {
+      } catch (error: unknown) {
         errorCount++
         console.error('Failed to create transaction:', error)
       }
@@ -144,7 +144,7 @@ export const POST = withTenantContext(async (
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Banking sync error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

@@ -156,7 +156,7 @@ export async function GET(
         legalForm: licenseData.legalForm,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("License lookup error", { error });
     return NextResponse.json(
       { error: "Failed to lookup license. Please try again later." },

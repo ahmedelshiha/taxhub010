@@ -72,7 +72,7 @@ async function handlePOST(request: NextRequest) {
       success: true,
       data: result,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.flatten() },
@@ -136,7 +136,7 @@ async function handlePUT(request: NextRequest) {
       success: true,
       data: result,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.flatten() },

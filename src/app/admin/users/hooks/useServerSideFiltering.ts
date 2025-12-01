@@ -154,14 +154,15 @@ export function useServerSideFiltering(
       setData(result.data || [])
       setPagination(result.pagination)
       setError(null)
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Ignore abort errors (from component unmount or filter change)
-      if (err.name === 'AbortError') {
+      if (err instanceof Error && err.name === 'AbortError') {
         return
       }
 
       console.error('Server-side filtering error:', err)
-      setError(err.message || 'Failed to fetch filtered users')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch filtered users'
+      setError(errorMessage)
       setData([])
     } finally {
       setLoading(false)

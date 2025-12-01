@@ -134,7 +134,7 @@ export const POST = withTenantContext(async (request: NextRequest, { params }: {
           'Content-Disposition': `attachment; filename="${filename}"`
         }
       })
-    } catch (error) {
+    } catch (error: unknown) {
       await prisma.reportExecution.update({
         where: { id: execution.id },
         data: {
@@ -145,7 +145,7 @@ export const POST = withTenantContext(async (request: NextRequest, { params }: {
       })
       throw error
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to generate report:', error)
     return NextResponse.json({ error: 'Failed to generate report' }, { status: 500 })
   }

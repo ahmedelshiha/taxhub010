@@ -89,7 +89,7 @@ export class IntegrationsService {
     filters: Record<string, any>,
     sharedBy: string,
     shareUrl?: string
-  ): Promise<{slack?: boolean; zapier?: boolean; teams?: boolean; webhook?: boolean; error?: string}> {
+  ): Promise<{ slack?: boolean; zapier?: boolean; teams?: boolean; webhook?: boolean; error?: string }> {
     const results: Record<string, boolean | undefined> = {}
     const sharedAt = new Date().toISOString()
 
@@ -171,7 +171,7 @@ export class IntegrationsService {
     resultCount: number,
     executionTime: number,
     userId: string
-  ): Promise<{success: boolean; error?: string}> {
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const timestamp = new Date().toISOString()
 
@@ -228,7 +228,7 @@ export class IntegrationsService {
     totalRecords: number,
     filteredRecords: number,
     userId: string
-  ): Promise<{slack?: boolean; teams?: boolean; zapier?: boolean; webhook?: boolean}> {
+  ): Promise<{ slack?: boolean; teams?: boolean; zapier?: boolean; webhook?: boolean }> {
     const results: Record<string, boolean> = {}
 
     try {
@@ -262,7 +262,18 @@ export class IntegrationsService {
       }
 
       if (this.webhook) {
-        const payload: any = {
+        const payload: {
+          event: string
+          timestamp: string
+          userId: string
+          tenantId: string
+          data: {
+            exportId: string
+            format: string
+            recordCount: number
+            fileSize: number
+          }
+        } = {
           event: 'export.scheduled',
           timestamp: new Date().toISOString(),
           userId,

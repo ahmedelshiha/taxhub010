@@ -132,7 +132,7 @@ const _api_POST = async (request: NextRequest) => {
     try {
       await initializeVerificationJob(entity.id);
       await enqueueVerificationJob(entity.id);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to enqueue verification job", { entityId: entity.id, error });
       // Don't fail the setup - verification can be retried
     }
@@ -170,7 +170,7 @@ const _api_POST = async (request: NextRequest) => {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.issues },

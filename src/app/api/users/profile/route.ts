@@ -40,7 +40,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       success: true,
       data: user,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error fetching user profile', { error })
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -79,7 +79,7 @@ export const PUT = withTenantContext(async (request: NextRequest) => {
       success: true,
       data: user,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation error', details: error.issues },

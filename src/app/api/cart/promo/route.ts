@@ -34,7 +34,7 @@ export const POST = withTenantContext(
         discount: discount * 100,
         percentage: discount,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Promo code error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

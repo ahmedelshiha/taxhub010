@@ -84,7 +84,7 @@ export const GET = withAdminAuth(async (request, context) => {
         })),
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get admin document error:', error)
     return respond.serverError()
   }
@@ -123,7 +123,7 @@ export const DELETE = withAdminAuth(async (request, context) => {
           deletedBy: userId,
         },
       },
-    }).catch(() => {})
+    }).catch(() => { })
 
     // Hard delete with cascading
     await prisma.attachment.delete({
@@ -137,7 +137,7 @@ export const DELETE = withAdminAuth(async (request, context) => {
         message: 'Document permanently deleted',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Delete document error:', error)
     return respond.serverError()
   }

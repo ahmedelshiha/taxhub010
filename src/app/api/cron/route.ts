@@ -26,7 +26,7 @@ const _api_POST = async (request: NextRequest) => {
       default:
         return NextResponse.json(await runCronTask('all', () => runScheduledTasks()))
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Cron job error:', error)
     return NextResponse.json(
       { 
@@ -89,7 +89,7 @@ const _api_GET = async (request: NextRequest) => {
         sendgrid_configured: !!process.env.SENDGRID_API_KEY
       }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Cron info error:', error)
     return NextResponse.json(
       { error: 'Failed to get cron job information' },

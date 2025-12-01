@@ -57,7 +57,7 @@ export const POST = withTenantContext(async (
     })
 
     return NextResponse.json({ success: true, signatureRequest })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('E-signature request API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

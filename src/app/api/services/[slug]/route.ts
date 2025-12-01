@@ -91,7 +91,7 @@ export const GET = withTenantContext(
       return respond.ok(filteredService, {
         cacheControl: 'public, max-age=60, stale-while-revalidate=300',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch service detail', { error })
       return respond.serverError('Failed to fetch service')
     }
@@ -152,7 +152,7 @@ export const PUT = withTenantContext(
       })
 
       return respond.ok(updated)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to update service', { error })
 
       if (error instanceof Error) {
@@ -212,7 +212,7 @@ export const DELETE = withTenantContext(
       })
 
       return respond.ok({ success: true, message: 'Service deleted successfully' })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to delete service', { error })
       return respond.serverError('Failed to delete service')
     }

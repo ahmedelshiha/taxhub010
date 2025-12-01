@@ -136,17 +136,17 @@ export class FilterAnalyticsService {
     limit = 10
   ): Promise<FilterCombinationMetrics[]> {
     const events = this.getClientEvents(tenantId)
-    
+
     // Group events by session (crude session detection: same user within 30 min)
     const sessions = this.groupIntoSessions(events, 30 * 60 * 1000)
-    
+
     const combinations = new Map<string, FilterCombinationMetrics>()
 
     sessions.forEach(sessionEvents => {
       const filterTypes = new Set(sessionEvents.map(e => e.filterType))
       if (filterTypes.size > 1) {
         const key = Array.from(filterTypes).sort().join('+')
-        
+
         if (!combinations.has(key)) {
           combinations.set(key, {
             combination: key,
@@ -235,7 +235,7 @@ export class FilterAnalyticsService {
     tenantId: string
   ): Promise<UserEngagementMetrics[]> {
     const events = this.getClientEvents(tenantId)
-    
+
     // Get user roles from context
     const users = await prisma.user.findMany({
       where: { tenantId },
@@ -327,14 +327,14 @@ export class FilterAnalyticsService {
     try {
       const key = `analytics:events:${event.tenantId}`
       const events = JSON.parse(localStorage.getItem(key) || '[]')
-      
+
       events.push({ ...event, timestamp: new Date().toISOString() })
-      
+
       // Keep only last 500 events
       if (events.length > 500) {
         events.shift()
       }
-      
+
       localStorage.setItem(key, JSON.stringify(events))
     } catch (e) {
       console.warn('Failed to record client event:', e)
@@ -350,7 +350,7 @@ export class FilterAnalyticsService {
     try {
       const key = `analytics:events:${tenantId}`
       const data = JSON.parse(localStorage.getItem(key) || '[]')
-      return data.map((e: any) => ({
+      return data.map((e: Omit<FilterUsageEvent, 'timestamp'> & { timestamp: string }) => ({
         ...e,
         timestamp: new Date(e.timestamp)
       }))
@@ -365,19 +365,19 @@ export class FilterAnalyticsService {
   private static calculateTrend(events: FilterUsageEvent[], days: number): number[] {
     const trend: number[] = []
     const now = Date.now()
-    
+
     for (let i = 0; i < days; i++) {
       const dayStart = now - (days - i) * 24 * 60 * 60 * 1000
       const dayEnd = dayStart + 24 * 60 * 60 * 1000
-      
+
       const count = events.filter(e => {
         const ts = e.timestamp.getTime()
         return ts >= dayStart && ts < dayEnd
       }).length
-      
+
       trend.push(count)
     }
-    
+
     return trend
   }
 
@@ -394,8 +394,8 @@ export class FilterAnalyticsService {
     let lastTimestamp = 0
 
     sorted.forEach(event => {
-      if (currentSession.length === 0 || 
-          event.timestamp.getTime() - lastTimestamp > sessionTimeout) {
+      if (currentSession.length === 0 ||
+        event.timestamp.getTime() - lastTimestamp > sessionTimeout) {
         if (currentSession.length > 0) {
           sessions.push(currentSession)
         }

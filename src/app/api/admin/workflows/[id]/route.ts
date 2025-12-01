@@ -20,7 +20,7 @@ export const GET = withAdminAuth(async (req: AuthenticatedRequest, context: any)
     }
 
     return NextResponse.json(workflow)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch workflow:', error)
     return NextResponse.json(
       { error: 'Failed to fetch workflow' },
@@ -48,7 +48,7 @@ export const PUT = withAdminAuth(async (req: AuthenticatedRequest, context: any)
     })
 
     return NextResponse.json(workflow)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to update workflow:', error)
     return NextResponse.json(
       { error: 'Failed to update workflow' },
@@ -66,7 +66,7 @@ export const DELETE = withAdminAuth(async (req: AuthenticatedRequest, context: a
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to delete workflow:', error)
     return NextResponse.json(
       { error: 'Failed to delete workflow' },

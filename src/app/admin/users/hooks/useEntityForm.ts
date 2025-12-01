@@ -80,7 +80,7 @@ export function useEntityForm<T extends Record<string, any>>(config: {
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof T, string>>>({})
 
-  const handleChange = useCallback((field: keyof T, value: any) => {
+  const handleChange = useCallback((field: keyof T, value: T[keyof T]) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     setError(null)
     setFieldErrors((prev) => ({ ...prev, [field]: undefined }))

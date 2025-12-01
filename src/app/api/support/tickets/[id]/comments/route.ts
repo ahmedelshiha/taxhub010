@@ -9,10 +9,10 @@ const CreateCommentSchema = z.object({
 })
 
 export const GET = withTenantContext(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId } = requireTenantContext()
-      const { id } = params
+      const { id } = await params
 
       const ticket = await prisma.supportTicket.findFirst({
         where: { id, tenantId: tenantId! },
@@ -29,7 +29,7 @@ export const GET = withTenantContext(
       })
 
       return NextResponse.json({ comments }, { status: 200 })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Support comments list API error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
@@ -38,10 +38,10 @@ export const GET = withTenantContext(
 );
 
 export const POST = withTenantContext(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId } = requireTenantContext()
-      const { id } = params
+      const { id } = await params
       const body = await request.json()
       const validated = CreateCommentSchema.parse(body)
 
@@ -56,7 +56,7 @@ export const POST = withTenantContext(
       const comment = await prisma.supportTicketComment.create({
         data: {
           ticketId: id,
-          
+
           authorId: userId!,
           content: validated.content,
         },
@@ -64,7 +64,7 @@ export const POST = withTenantContext(
       })
 
       return NextResponse.json({ success: true, comment }, { status: 201 })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json({ error: 'Invalid request body', details: error.issues }, { status: 400 })
       }

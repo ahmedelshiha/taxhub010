@@ -40,7 +40,7 @@ export function EconomicZoneSelector({
       <Label htmlFor="economicZone">
         Economic Zone {required && "*"}
       </Label>
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <Select value={value || ''} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger id="economicZone">
           <SelectValue placeholder="Select economic zone" />
         </SelectTrigger>

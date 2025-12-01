@@ -48,7 +48,7 @@ A full-stack, multi-tenant Next.js platform tailored for accounting firms. It un
 - Advanced task workspace featuring board, calendar, table, list, and Gantt views plus bulk operations.
 - Multi-channel communications: chat console, notifications, newsletters, and automated email flows.
 - Service request triage with workload, distribution charts, and SLA tracking.
-- Client self-service portal for bookings, expenses, secure uploads, and live chat.
+- Client self-service portal with unified dashboard, business setup wizard, compliance tracking, financial overview, and secure document management.
 - Internationalization (English, Arabic RTL, Hindi) with extensible locale registry.
 - Scheduled processes for reminders, telemetry, and data hygiene via cron routes and Netlify functions.
 
@@ -56,7 +56,7 @@ A full-stack, multi-tenant Next.js platform tailored for accounting firms. It un
 - **Admin Operations:** `src/app/admin` offers analytics, reports, bookings, services, service-request dashboards, invoicing, payments, expenses, posts, newsletter, permissions, roles, integrations, cron telemetry, and performance metrics.
 - **Task Workspace:** Boards, calendars, tables, list, and Gantt views powered by providers, filters, analytics, and extensive components in `src/app/admin/tasks`.
 - **Booking Lifecycle:** Public booking wizard, admin availability management, automation rules, exports, and reminders across `src/app/booking`, `src/app/admin/booking*`, and API routes.
-- **Client Portal:** Bookings, service requests, expenses scanning, secure uploads, realtime chat, and settings within `src/app/portal` plus supporting components.
+- **Client Portal:** Tab-based dashboard (Overview, Tasks, Compliance, Financial, Activity) with lazy loading, business setup wizard, global search, and secure document management within `src/app/portal` plus supporting components.
 - **Communications & Notifications:** Admin chat console, message center, newsletters, reminders, and notification providers located in `src/components/communication`, `src/app/admin/chat`, and cron endpoints.
 - **Financial & Analytics Tools:** Revenue time series, ROI/tax calculators, reports, invoices, payments, expenses ingestion, and dashboards under `src/components/admin`, `src/app/admin/reports`, `src/app/api/payments`, and `src/app/api/invoices`.
 - **Content & Marketing:** Blog, posts, landing variants, SEO schema, and localization resources through `src/app/blog`, `src/components/home`, and `src/locales`.

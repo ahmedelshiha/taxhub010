@@ -13,7 +13,7 @@ export const DELETE = withTenantContext(
         success: true,
         message: 'Item removed from cart',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Cart item delete error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

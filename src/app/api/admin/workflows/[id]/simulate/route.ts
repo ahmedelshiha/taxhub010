@@ -77,7 +77,7 @@ export const POST = withAdminAuth(async (req: AuthenticatedRequest, context: any
     })
 
     return NextResponse.json(simulation)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to simulate workflow:', error)
     return NextResponse.json(
       { error: 'Failed to simulate workflow' },

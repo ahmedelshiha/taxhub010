@@ -73,7 +73,7 @@ const getCachedCalendar = withCache<any>(
         include: { assignee: { select: { name: true } } },
         orderBy: { dueAt: 'asc' },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Task model not available, using empty array')
       tasks = []
     }
@@ -102,7 +102,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     }
 
     return getCachedCalendar(request)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Calendar API error:', error)
     return NextResponse.json({ error: 'Failed to fetch calendar data' }, { status: 500 })
   }

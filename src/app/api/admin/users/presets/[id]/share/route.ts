@@ -66,7 +66,7 @@ export const GET = withTenantContext(async (request: NextRequest, props: { param
     })
 
     return respond.ok({ shares, count: shares.length })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[PresetShare GET] Error:', error)
     return respond.serverError('Failed to fetch shares')
   }
@@ -183,7 +183,7 @@ export const POST = withTenantContext(async (request: NextRequest, props: { para
     })
 
     return respond.created(share)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[PresetShare POST] Error:', error)
     if ((error as any).code === 'P2002') {
       return respond.badRequest('Preset is already shared with this user')

@@ -37,7 +37,7 @@ export const POST = withTenantContext(async (request: NextRequest, context: { pa
     }
 
     return NextResponse.json({ message: 'Booking confirmed successfully', booking: updatedBooking })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error confirming booking:', error)
     return NextResponse.json({ error: 'Failed to confirm booking' }, { status: 500 })
   }

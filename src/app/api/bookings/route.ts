@@ -117,7 +117,7 @@ export const GET = withTenantContext(
           hasMore: offset + bookings.length < total,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to fetch bookings', { error })
       return respond.serverError('Failed to fetch bookings')
     }
@@ -231,7 +231,7 @@ export const POST = withTenantContext(
       })
 
       return respond.created(booking)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to create booking', { error })
 
       if (error instanceof Error) {

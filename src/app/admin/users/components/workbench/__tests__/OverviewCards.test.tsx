@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 
 vi.mock('../../OperationsOverviewCards', () => ({
-  OperationsOverviewCards: ({ metrics, isLoading }: any) => (
+  OperationsOverviewCards: ({ metrics, isLoading }: { metrics: { totalUsers: number } | null, isLoading: boolean }) => (
     <div data-testid="operations-cards">
       <div>Total: {metrics?.totalUsers ?? 0}</div>
       <div>Loading: {String(isLoading)}</div>

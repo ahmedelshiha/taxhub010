@@ -59,7 +59,7 @@ const _api_POST = async (
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.issues },

@@ -40,7 +40,7 @@ export default function OfflineQueueInspector() {
         const req = store.getAll()
         await new Promise<void>((resolve) => { req.onsuccess = () => resolve(); req.onerror = () => resolve() })
         if (!ignore) setItems((req.result as any[]) || [])
-        try { db.close() } catch {}
+        try { db.close() } catch { }
       } finally { if (!ignore) setLoading(false) }
     }
 
@@ -54,9 +54,9 @@ export default function OfflineQueueInspector() {
     try {
       const reg = await navigator.serviceWorker?.ready
       // Prefer Background Sync if available
-      if (reg && 'sync' in (reg as any)) { try { await (reg as any).sync.register('service-requests-sync') } catch {} }
+      if (reg && 'sync' in (reg as any)) { try { await (reg as any).sync.register('service-requests-sync') } catch { } }
       // Also send a message to SW to process now
-      try { navigator.serviceWorker.controller?.postMessage({ type: 'process-queue' }) } catch {}
+      try { navigator.serviceWorker.controller?.postMessage({ type: 'process-queue' }) } catch { }
     } finally { setTimeout(() => setFlushing(false), 800) }
   }
 
@@ -89,7 +89,7 @@ export default function OfflineQueueInspector() {
                 <tbody>
                   {items.map(it => (
                     <tr key={it.id} className="border-t">
-                      <td className="p-2">{new Date(it.createdAt).toLocaleString()}</td>
+                      <td className="p-2">{it.createdAt ? new Date(it.createdAt).toLocaleString() : 'N/A'}</td>
                       <td className="p-2 font-mono">{it.url}</td>
                       <td className="p-2 font-mono">{it.idempotencyKey || '-'}</td>
                       <td className="p-2">{it.retries ?? 0}</td>

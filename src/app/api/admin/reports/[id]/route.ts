@@ -32,7 +32,7 @@ export const GET = withTenantContext(async (request: NextRequest, { params }: { 
     }
 
     return NextResponse.json({ success: true, report })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch report:', error)
     return NextResponse.json({ error: 'Failed to fetch report' }, { status: 500 })
   }
@@ -78,7 +78,7 @@ export const PATCH = withTenantContext(async (request: NextRequest, { params }: 
     })
 
     return NextResponse.json({ success: true, report: updatedReport, message: 'Report updated successfully' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to update report:', error)
     return NextResponse.json({ error: 'Failed to update report' }, { status: 500 })
   }
@@ -106,7 +106,7 @@ export const DELETE = withTenantContext(async (request: NextRequest, { params }:
     }
 
     return NextResponse.json({ success: true, message: 'Report deleted successfully' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to delete report:', error)
     return NextResponse.json({ error: 'Failed to delete report' }, { status: 500 })
   }

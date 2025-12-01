@@ -17,10 +17,10 @@ const UpdateTicketSchema = z.object({
 })
 
 export const GET = withTenantContext(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId } = requireTenantContext()
-      const { id } = params
+      const { id } = await params
 
       const ticket = await prisma.supportTicket.findFirst({
         where: { id, tenantId: tenantId! },
@@ -43,7 +43,7 @@ export const GET = withTenantContext(
       }
 
       return NextResponse.json(ticket, { status: 200 })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Support ticket detail API error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
@@ -52,10 +52,10 @@ export const GET = withTenantContext(
 );
 
 export const PATCH = withTenantContext(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId } = requireTenantContext()
-      const { id } = params
+      const { id } = await params
       const body = await request.json()
       const validated = UpdateTicketSchema.parse(body)
 
@@ -79,10 +79,10 @@ export const PATCH = withTenantContext(
       await logAuditSafe({
         action: 'support:update_ticket',
         details: { ticketId: id, updates: Object.keys(validated) },
-      }).catch(() => {})
+      }).catch(() => { })
 
       return NextResponse.json(updatedTicket, { status: 200 })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json({ error: 'Invalid request body', details: error.issues }, { status: 400 })
       }
@@ -94,10 +94,10 @@ export const PATCH = withTenantContext(
 );
 
 export const DELETE = withTenantContext(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const { userId, tenantId } = requireTenantContext()
-      const { id } = params
+      const { id } = await params
 
       const ticket = await prisma.supportTicket.findFirst({
         where: { id, tenantId: tenantId! },
@@ -112,10 +112,10 @@ export const DELETE = withTenantContext(
       await logAuditSafe({
         action: 'support:delete_ticket',
         details: { ticketId: id },
-      }).catch(() => {})
+      }).catch(() => { })
 
       return NextResponse.json({ success: true }, { status: 200 })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Support ticket delete API error:', error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }

@@ -131,7 +131,7 @@ export const POST = withAdminAuth(async (request, context) => {
         message: approved ? 'Document approved successfully' : 'Document rejected',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return respond.badRequest('Invalid approval data', error.errors)
     }
@@ -188,7 +188,7 @@ export const GET = withAdminAuth(async (request, context) => {
           : false,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get approval status error:', error)
     return respond.serverError()
   }

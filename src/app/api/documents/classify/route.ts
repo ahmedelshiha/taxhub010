@@ -63,7 +63,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
         success: true,
         data: classification,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           { error: 'Invalid request', details: error.issues },

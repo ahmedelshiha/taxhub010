@@ -64,7 +64,7 @@ const _api_GET = async (request: NextRequest) => {
         'Content-Disposition': `attachment; filename="settings-${timestamp}.json"`,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Settings export error:', error)
     return NextResponse.json(
       { error: 'Failed to export settings' },

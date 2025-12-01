@@ -1,5 +1,6 @@
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
+import boundaries from "eslint-plugin-boundaries";
 
 const compat = new FlatCompat({ baseDirectory: process.cwd() });
 
@@ -20,6 +21,21 @@ const config = [
 
   // Base rules for the app
   {
+    plugins: {
+      boundaries,
+    },
+    settings: {
+      "boundaries/include": ["src/**/*"],
+      "boundaries/elements": [
+        { type: "app", pattern: "src/app/*" },
+        { type: "portal-components", pattern: "src/components/portal/*" },
+        { type: "admin-components", pattern: "src/components/admin/*" },
+        { type: "components", pattern: "src/components/*" },
+        { type: "hooks", pattern: "src/hooks/*" },
+        { type: "lib", pattern: "src/lib/*" },
+        { type: "stores", pattern: "src/stores/*" },
+      ],
+    },
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": ["off", { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrors: "all", caughtErrorsIgnorePattern: "^_", ignoreRestSiblings: true }],
@@ -27,6 +43,26 @@ const config = [
       "react-hooks/exhaustive-deps": "off",
       "@next/next/no-img-element": "off",
       "@typescript-eslint/triple-slash-reference": "off",
+
+      // Boundaries rules
+      "boundaries/element-types": [
+        "error",
+        {
+          default: "allow",
+          rules: [
+            {
+              from: ["portal-components"],
+              disallow: ["admin-components"],
+              message: "Portal components should not import Admin components",
+            },
+            {
+              from: ["admin-components"],
+              disallow: ["portal-components"],
+              message: "Admin components should not import Portal components",
+            },
+          ],
+        },
+      ],
     },
   },
 
@@ -75,10 +111,12 @@ const config = [
   {
     files: ["src/app/api/**/route.ts", "src/app/api/**/*.ts"],
     rules: {
-      "no-restricted-imports": ["error", { paths: [
-        { name: "next-auth", importNames: ["getServerSession"], message: "Use withTenantContext() and requireTenantContext() instead of getServerSession in API routes" },
-        { name: "next-auth/next", importNames: ["getServerSession"], message: "Use withTenantContext() and requireTenantContext() instead of getServerSession in API routes" }
-      ] }],
+      "no-restricted-imports": ["error", {
+        paths: [
+          { name: "next-auth", importNames: ["getServerSession"], message: "Use withTenantContext() and requireTenantContext() instead of getServerSession in API routes" },
+          { name: "next-auth/next", importNames: ["getServerSession"], message: "Use withTenantContext() and requireTenantContext() instead of getServerSession in API routes" }
+        ]
+      }],
       "no-restricted-syntax": ["error",
         {
           selector: "CallExpression[callee.name='getServerSession']",
@@ -97,8 +135,10 @@ const config = [
     ],
     rules: {
       "no-restricted-syntax": ["error",
-        { selector: "CallExpression[callee.property.name=/^\\$?(queryRaw|executeRaw|queryRawUnsafe|executeRawUnsafe)$/]",
-          message: "Use typed Prisma queries or a vetted db.raw helper with explicit tenant scoping. Raw SQL in API routes is restricted." }
+        {
+          selector: "CallExpression[callee.property.name=/^\\$?(queryRaw|executeRaw|queryRawUnsafe|executeRawUnsafe)$/]",
+          message: "Use typed Prisma queries or a vetted db.raw helper with explicit tenant scoping. Raw SQL in API routes is restricted."
+        }
       ]
     }
   },

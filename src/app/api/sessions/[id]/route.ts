@@ -18,7 +18,7 @@ export const DELETE = withTenantContext(async (request: NextRequest, { params }:
       success: true,
       message: 'Session has been revoked',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error revoking session', { error })
     return NextResponse.json(
       { error: 'Internal server error' },

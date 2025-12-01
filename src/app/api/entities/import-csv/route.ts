@@ -88,7 +88,7 @@ export const POST = withTenantContext(
           message: `Import started. ${result.validRows} entities will be processed.`,
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to process CSV import', { error });
       return NextResponse.json(
         {
@@ -123,7 +123,7 @@ export const GET = withTenantContext(
       return NextResponse.json({
         message: 'Use GET ?format=template to download a CSV template',
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to generate CSV template', { error });
       return NextResponse.json(
         { error: 'Failed to generate template' },

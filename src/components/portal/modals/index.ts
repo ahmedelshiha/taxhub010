@@ -46,3 +46,8 @@ export { default as CalendarEventModal } from "./CalendarEventModal";
 export { default as AvailabilityCheckerModal } from "./AvailabilityCheckerModal";
 export { default as RecurringBookingModal } from "./RecurringBookingModal";
 
+// Communication & Notifications Modals (Phase 5)
+export { default as NotificationCenterModal } from "./NotificationCenterModal";
+export { MessageComposeModal } from "./MessageComposeModal";
+export { MessageThreadModal } from "./MessageThreadModal";
+export { ApprovalActionModal } from "./ApprovalActionModal";

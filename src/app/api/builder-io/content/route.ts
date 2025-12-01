@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         'Cache-Control': 'public, max-age=300, s-maxage=300'
       }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Builder.io content endpoint error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

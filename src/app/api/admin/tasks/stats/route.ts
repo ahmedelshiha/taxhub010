@@ -10,7 +10,7 @@ import { TaskStatus, TaskPriority } from '@/types/shared/entities/task'
  * Get task statistics for dashboard (admin only)
  */
 export const GET = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: unknown }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId } = ctx
@@ -118,7 +118,7 @@ export const GET = withTenantContext(
           mostOverdue,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Task stats error:', error)
       return respond.serverError()
     }

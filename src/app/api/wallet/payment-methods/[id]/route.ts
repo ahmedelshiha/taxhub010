@@ -25,7 +25,7 @@ export const POST = withTenantContext(async (
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Payment method API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -48,7 +48,7 @@ export const DELETE = withTenantContext(async (
       success: true,
       message: 'Payment method deleted',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Payment method delete error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

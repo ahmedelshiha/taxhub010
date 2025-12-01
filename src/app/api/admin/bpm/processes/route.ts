@@ -46,7 +46,7 @@ export const GET = withTenantContext(
           total: processes.length,
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to list process definitions', { error });
       return NextResponse.json(
         { error: 'Failed to list process definitions' },
@@ -81,7 +81,7 @@ export const POST = withTenantContext(
         success: true,
         data: process,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           { error: 'Invalid process definition', details: error.flatten() },

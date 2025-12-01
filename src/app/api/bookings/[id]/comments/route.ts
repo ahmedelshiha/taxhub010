@@ -20,7 +20,7 @@ export const GET = withTenantContext(async (request: NextRequest, context: { par
 
     const comments: any[] = []
     return NextResponse.json({ comments })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching booking comments:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -54,7 +54,7 @@ export const POST = withTenantContext(async (request: NextRequest, context: { pa
     }
 
     return NextResponse.json({ error: 'Booking comments feature is not yet implemented' }, { status: 501 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating booking comment:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

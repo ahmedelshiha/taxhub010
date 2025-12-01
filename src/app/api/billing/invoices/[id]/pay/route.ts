@@ -39,7 +39,7 @@ export const POST = withTenantContext(
       const paymentData = payInvoiceSchema.parse(body)
 
       const amountToPay = paymentData.amount ? Math.round(paymentData.amount * 100) : invoice.totalCents
-      
+
       if (amountToPay > invoice.totalCents) {
         return NextResponse.json(
           { error: 'Payment amount exceeds invoice total' },
@@ -73,7 +73,7 @@ export const POST = withTenantContext(
           paidAt: updatedInvoice.paidAt?.toISOString(),
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           { error: 'Validation error', details: error.issues },

@@ -91,7 +91,7 @@ const _api_GET = async (request: NextRequest) => {
       success: true,
       data: kycData,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching KYC data", { error });
     return NextResponse.json(
       { error: "Internal server error" },

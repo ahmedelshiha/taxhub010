@@ -138,7 +138,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
         'Content-Disposition': `attachment; filename="${entity}.csv"`
       }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     try { const { captureError } = await import('@/lib/observability'); await captureError(error, { tags: { route: 'admin/export' } }) } catch {}
     console.error('Export error:', error)
     return new NextResponse('Failed to export', { status: 500 })

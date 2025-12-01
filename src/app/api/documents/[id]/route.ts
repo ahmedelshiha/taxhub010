@@ -123,7 +123,7 @@ export const GET = withTenantContext(async (request: NextRequest, { params }: an
     }).catch(() => { })
 
     return respond.ok({ data: baseData })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get document error:', error)
     return respond.serverError()
   }
@@ -214,7 +214,7 @@ export const PUT = withTenantContext(async (request: NextRequest, { params }: an
         isStarred: updated.isStarred,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return respond.badRequest('Invalid update data', error.errors)
     }
@@ -301,7 +301,7 @@ export const DELETE = withTenantContext(async (request: NextRequest, { params }:
         },
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Delete document error:', error)
     return respond.serverError()
   }

@@ -111,7 +111,7 @@ const _api_GET = async (request: NextRequest) => {
         limit,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching upcoming compliance", { error });
     return NextResponse.json(
       { error: "Internal server error" },

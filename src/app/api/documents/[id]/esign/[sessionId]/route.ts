@@ -60,7 +60,7 @@ export const GET = withTenantContext(async (
             sessionId,
             size: signedDocumentData.length,
           },
-        }).catch(() => {})
+        }).catch(() => { })
 
         return new NextResponse(signedDocumentData as any, {
           headers: {
@@ -68,7 +68,7 @@ export const GET = withTenantContext(async (
             'Content-Disposition': `attachment; filename="${document.name || 'signed-document.pdf'}"`,
           },
         })
-      } catch (error) {
+      } catch (error: unknown) {
         return NextResponse.json(
           {
             error: 'Failed to download signed document',
@@ -91,7 +91,7 @@ export const GET = withTenantContext(async (
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('E-signature status API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -139,13 +139,13 @@ export const DELETE = withTenantContext(async (
         sessionId,
         cancelledBy: ctx.userId,
       },
-    }).catch(() => {})
+    }).catch(() => { })
 
     return NextResponse.json(
       { success: true, message: 'Signing flow cancelled' },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('E-signature cancellation API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

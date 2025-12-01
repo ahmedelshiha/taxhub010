@@ -152,7 +152,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     const response = NextResponse.json({ success: true, token: encoded, cookie })
     response.headers.set('Set-Cookie', cookie)
     return response
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('dev login error', error)
     return NextResponse.json(
       { success: false, error: 'internal' },

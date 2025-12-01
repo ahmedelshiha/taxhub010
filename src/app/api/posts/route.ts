@@ -54,7 +54,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     })
 
     return NextResponse.json(posts)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching posts:', error)
     return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 })
   }
@@ -157,7 +157,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     })
 
     return NextResponse.json(post, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating post:', error)
     return NextResponse.json({ error: 'Failed to create post' }, { status: 500 })
   }

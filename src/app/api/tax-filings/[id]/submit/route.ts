@@ -80,7 +80,7 @@ export const POST = withTenantContext(async (
         taxAmount: filing.taxAmount,
         documentsCount: validated.documents?.length || 0,
       },
-    }).catch(() => {})
+    }).catch(() => { })
 
     return NextResponse.json(
       {
@@ -90,7 +90,7 @@ export const POST = withTenantContext(async (
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

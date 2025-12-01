@@ -116,7 +116,7 @@ const _api_POST = async (request: NextRequest) => {
     }
 
     return NextResponse.json({ message: 'Successfully subscribed to newsletter' }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
     }
@@ -162,7 +162,7 @@ const _api_GET = async (request: NextRequest) => {
       total,
       subscribed: await prisma.newsletter.count({ where: { subscribed: true } })
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching newsletter subscriptions:', error)
     return NextResponse.json({ error: 'Failed to fetch newsletter subscriptions' }, { status: 500 })
   }

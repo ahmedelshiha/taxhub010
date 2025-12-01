@@ -56,7 +56,7 @@ const _api_POST = async (request: NextRequest) => {
     }
 
     return NextResponse.json({ message: 'Successfully unsubscribed from newsletter' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Newsletter unsubscribe error:', error)
     return NextResponse.json({ error: 'Failed to unsubscribe from newsletter' }, { status: 500 })
   }
@@ -87,7 +87,7 @@ const _api_GET = async (request: NextRequest) => {
     await prisma.newsletter.update({ where: { email }, data: { subscribed: false, updatedAt: new Date() } })
 
     return NextResponse.json({ message: 'Successfully unsubscribed from newsletter', email, status: 'unsubscribed' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Newsletter unsubscribe error:', error)
     return NextResponse.json({ error: 'Failed to unsubscribe from newsletter' }, { status: 500 })
   }

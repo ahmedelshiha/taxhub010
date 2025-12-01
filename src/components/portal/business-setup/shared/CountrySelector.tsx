@@ -32,7 +32,7 @@ export function CountrySelector({
   return (
     <div className="space-y-2">
       <Label htmlFor="country">Country *</Label>
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <Select value={value || ''} onValueChange={(val) => onChange(val as Country)} disabled={disabled}>
         <SelectTrigger id="country">
           <SelectValue placeholder="Select country" />
         </SelectTrigger>

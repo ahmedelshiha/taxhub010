@@ -138,7 +138,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
                 limit,
             },
         })
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Search error:', error)
         return respond.serverError()
     }

@@ -8,7 +8,7 @@ try {
   // Best-effort: if no NETLIFY_DATABASE_URL is configured (local dev), don't throw at import time.
   // The route will return an error response when executed without a DB.
   // This avoids build-time failures when the environment variable isn't present.
-   
+
   console.warn('Neon client not initialized (NETLIFY_DATABASE_URL missing?):', e)
 }
 
@@ -43,7 +43,7 @@ export const GET = withTenantContext(async (_req: Request, ctx: any) => {
     const rows = (await sql`SELECT * FROM "Post" WHERE id = ${id} LIMIT 1`) as unknown as PostRow[]
     const post: PostRow | null = rows[0] ?? null
     return new Response(JSON.stringify(post), { status: 200, headers: { 'Content-Type': 'application/json' } })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Neon GET /api/neon/posts/[id] error:', error)
     return new Response(JSON.stringify({ error: 'Failed to fetch post' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }

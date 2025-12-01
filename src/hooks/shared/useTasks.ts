@@ -1,8 +1,7 @@
 'use client'
 
-import useSWR, { SWRConfiguration } from 'swr'
-import { apiFetch } from '@/lib/api'
 import { useMemo } from 'react'
+import { usePortalQuery } from '@/hooks/usePortalQuery'
 
 export interface TaskFilters {
   status?: string
@@ -21,16 +20,10 @@ export interface UseTasksResponse {
   error?: any
   isLoading: boolean
   isValidating: boolean
-  mutate: any
+  mutate: () => Promise<any>
   refresh: () => void
   hasMore: boolean
   total: number
-}
-
-const fetcher = async (url: string) => {
-  const res = await apiFetch(url)
-  if (!res.ok) throw new Error('Failed to fetch tasks')
-  return res.json()
 }
 
 /**
@@ -45,7 +38,7 @@ const fetcher = async (url: string) => {
  */
 export function useTasks(
   filters: TaskFilters = {},
-  swrConfig?: SWRConfiguration
+  options?: any
 ): UseTasksResponse {
   const params = useMemo(() => {
     const p = new URLSearchParams()
@@ -61,23 +54,27 @@ export function useTasks(
     return p.toString()
   }, [filters])
 
-  const key = `/api/tasks${params ? `?${params}` : ''}`
+  const endpoint = `/api/tasks${params ? `?${params}` : ''}`
 
-  const { data, error, isValidating, mutate } = useSWR(key, fetcher, {
-    revalidateOnFocus: false,
-    dedupingInterval: 30000,
-    ...swrConfig,
-  })
+  const { data: responseData, error, isFetching, refetch } = usePortalQuery<any>(
+    endpoint,
+    ['tasks', params],
+    {
+      staleTime: 30000,
+      refetchOnWindowFocus: false,
+      ...options
+    }
+  )
 
   return {
-    data: data?.data || [],
+    data: responseData?.data || [],
     error,
-    isLoading: !data && !error,
-    isValidating,
-    mutate,
-    refresh: () => mutate(),
-    hasMore: data?.meta?.hasMore || false,
-    total: data?.meta?.total || 0,
+    isLoading: !responseData && !error,
+    isValidating: isFetching,
+    mutate: refetch,
+    refresh: () => refetch(),
+    hasMore: responseData?.meta?.hasMore || false,
+    total: responseData?.meta?.total || 0,
   }
 }
 
@@ -93,21 +90,21 @@ export function useTasksData(filters: TaskFilters = {}) {
  * Fetch a single task with full details including comments
  */
 export function useTaskDetail(taskId: string) {
-  const { data, error, isLoading, mutate } = useSWR(
+  const { data: responseData, error, isLoading, refetch } = usePortalQuery<any>(
     `/api/tasks/${taskId}`,
-    fetcher,
+    ['tasks', taskId],
     {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000,
+      staleTime: 30000,
+      refetchOnWindowFocus: false,
     }
   )
 
   return {
-    task: data?.data || null,
-    comments: data?.data?.comments || [],
+    task: responseData?.data || null,
+    comments: responseData?.data?.comments || [],
     error,
-    isLoading: !data && !error,
-    mutate,
+    isLoading: !responseData && !error,
+    mutate: refetch,
   }
 }
 

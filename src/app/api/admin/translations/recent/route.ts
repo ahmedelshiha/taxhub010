@@ -62,7 +62,7 @@ export const GET = withTenantContext(async (request) => {
       stats,
       keys,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[translations/recent] Error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch recent translations' },

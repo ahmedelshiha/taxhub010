@@ -39,7 +39,7 @@ const _api_GET = async (
       success: true,
       data: entity,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error && error.message.includes("Unauthorized")) {
       return NextResponse.json(
         { error: "Not found or unauthorized" },
@@ -96,7 +96,7 @@ const _api_PATCH = async (
       success: true,
       data: entity,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.issues },
@@ -159,7 +159,7 @@ const _api_DELETE = async (
       success: true,
       message: permanent ? "Entity deleted" : "Entity archived",
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error && error.message.includes("Unauthorized")) {
       return NextResponse.json(
         { error: "Not found or unauthorized" },

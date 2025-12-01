@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma'
-import type { Locale } from '@/lib/i18n'
-import { locales } from '@/lib/i18n'
+import type { Locale } from '@/lib/i18n-config'
+import { locales } from '@/lib/i18n-config'
 
 /**
  * Fetch the authenticated user's preferred language from the database

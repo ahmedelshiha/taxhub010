@@ -49,14 +49,14 @@ export const GET = withTenantContext(async (request: NextRequest, { params }: { 
           'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Error generating PDF', { invoiceId, error })
       return NextResponse.json(
         { error: 'Failed to generate invoice PDF' },
         { status: 500 }
       )
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error downloading invoice', { error })
     return NextResponse.json(
       { error: 'Internal server error' },

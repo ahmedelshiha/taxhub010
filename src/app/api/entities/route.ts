@@ -72,7 +72,7 @@ const _api_GET = async (request: NextRequest) => {
       success: true,
       data: entities,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
 
@@ -159,7 +159,7 @@ const _api_POST = async (request: NextRequest) => {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.issues },

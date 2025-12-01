@@ -75,7 +75,7 @@ async function handlePOST(request: NextRequest) {
         matchCount: duplicates.length,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.flatten() },

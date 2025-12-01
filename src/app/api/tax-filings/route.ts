@@ -91,7 +91,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -184,7 +184,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
           calculations = { taxAmount: 0 }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return NextResponse.json(
         {
           error: 'Failed to calculate tax filing',
@@ -240,7 +240,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     }).catch(() => {})
 
     return NextResponse.json(filing, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

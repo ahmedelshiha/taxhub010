@@ -56,7 +56,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
         success: true,
         data: space,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           { error: 'Invalid request', details: error.issues },
@@ -121,7 +121,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
           offset,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Space list error:', error)
       return NextResponse.json(
         { error: 'Failed to list team spaces' },

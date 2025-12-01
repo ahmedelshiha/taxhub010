@@ -46,7 +46,7 @@ const _api_GET = async (
       success: true,
       data: bill,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching bill", { error, billId: params.id });
     return NextResponse.json(
       { error: "Internal server error" },
@@ -88,7 +88,7 @@ const _api_PATCH = async (
       success: true,
       data: bill,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.issues },
@@ -130,7 +130,7 @@ const _api_DELETE = async (
       success: true,
       message: "Bill deleted successfully",
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error && error.message === "Bill not found") {
       return NextResponse.json({ error: "Bill not found" }, { status: 404 });
     }

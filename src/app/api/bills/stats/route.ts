@@ -34,7 +34,7 @@ const _api_GET = async (request: NextRequest) => {
       success: true,
       data: stats,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching bill stats", { error });
     return NextResponse.json(
       { error: "Internal server error" },

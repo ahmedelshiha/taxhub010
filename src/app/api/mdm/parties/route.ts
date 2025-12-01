@@ -114,7 +114,7 @@ async function handleGET(request: NextRequest) {
         hasMore: params.offset + params.limit < total,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error listing parties', { error });
     return NextResponse.json(
       { error: 'Failed to list parties' },
@@ -181,7 +181,7 @@ async function handlePOST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.flatten() },

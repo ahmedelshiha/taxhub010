@@ -21,7 +21,7 @@ const ProfileUpdateSchema = z.object({
  * Get current user profile
  */
 export const GET = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: unknown }) => {
     try {
       const ctx = requireTenantContext()
       const profile = await prisma.user.findUnique({
@@ -48,7 +48,7 @@ export const GET = withTenantContext(
       return respond.ok({
         data: profile,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       return respond.serverError()
     }
   },
@@ -60,7 +60,7 @@ export const GET = withTenantContext(
  * Update current user profile
  */
 export const PUT = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: unknown }) => {
     try {
       const ctx = requireTenantContext()
       const body = await request.json()
@@ -108,7 +108,7 @@ export const PUT = withTenantContext(
       return respond.ok({
         data: updated,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid input', error.errors)
       }

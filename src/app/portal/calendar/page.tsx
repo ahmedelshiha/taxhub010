@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 import CalendarEventModal from "@/components/portal/modals/CalendarEventModal";
+import ModalErrorBoundary from "@/components/error-boundary/ModalErrorBoundary";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 // Setup localizer for React Big Calendar

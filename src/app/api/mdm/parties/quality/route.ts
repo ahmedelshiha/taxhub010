@@ -64,7 +64,7 @@ async function handlePOST(request: NextRequest) {
       success: true,
       data: qualityScore,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.flatten() },
@@ -135,7 +135,7 @@ async function handleGET(request: NextRequest) {
         count: history.length,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Error retrieving merge history', { error });
     return NextResponse.json(
       { error: 'Failed to retrieve merge history' },

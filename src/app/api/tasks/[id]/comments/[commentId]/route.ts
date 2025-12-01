@@ -12,7 +12,7 @@ import { z } from 'zod'
  * Update a task comment (author or admin only)
  */
 export const PUT = withTenantContext(
-  async (request: NextRequest, { params }: any) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string; commentId: string }> }) => {
     try {
       const { userId, tenantId, role } = requireTenantContext()
       const { id: taskId, commentId } = await params
@@ -83,7 +83,7 @@ export const PUT = withTenantContext(
       return respond.ok({
         data: updated,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid comment data', error.errors)
       }
@@ -99,7 +99,7 @@ export const PUT = withTenantContext(
  * Delete a task comment (author or admin only)
  */
 export const DELETE = withTenantContext(
-  async (request: NextRequest, { params }: any) => {
+  async (request: NextRequest, { params }: { params: Promise<{ id: string; commentId: string }> }) => {
     try {
       const { userId, tenantId, role } = requireTenantContext()
       const { id: taskId, commentId } = await params
@@ -155,7 +155,7 @@ export const DELETE = withTenantContext(
         success: true,
         message: 'Comment deleted successfully',
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Task comment deletion error:', error)
       return respond.serverError()
     }

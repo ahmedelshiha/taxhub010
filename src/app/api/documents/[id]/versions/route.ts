@@ -86,7 +86,7 @@ export const GET = withTenantContext(async (request: NextRequest, { params }: an
         documentId: params.id,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get versions error:', error)
     return respond.serverError()
   }
@@ -219,7 +219,7 @@ export const POST = withTenantContext(async (request: NextRequest, { params }: a
         changeDescription: version.changeDescription,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Create version error:', error)
     return respond.serverError()
   }

@@ -40,7 +40,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
 
     const body = rows.map(r => ({ id: r.id, name: r.name, shortDesc: r.shortDesc || null, price: r.price ?? null, duration: r.duration ?? null }))
     return NextResponse.json(body, { headers: { 'Cache-Control': 'private, max-age=60', ETag: etag } })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching services lite:', error)
     const fallback = [
       { id: '1', name: 'Bookkeeping', shortDesc: 'Monthly bookkeeping and reconciliations', price: 299, duration: 60 },

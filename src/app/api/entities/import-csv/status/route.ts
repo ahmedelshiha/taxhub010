@@ -31,7 +31,7 @@ export const GET = withTenantContext(
         success: true,
         data: status,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error("Failed to get CSV import status", { error });
       return NextResponse.json(
         {

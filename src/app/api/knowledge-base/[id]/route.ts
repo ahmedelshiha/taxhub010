@@ -64,7 +64,7 @@ export const GET = withTenantContext(async (
     })
 
     return NextResponse.json(article, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Knowledge Base detail API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -140,10 +140,10 @@ export const PATCH = withTenantContext(async (
         title: updatedArticle.title,
         changes: Object.keys(validated),
       },
-    }).catch(() => {})
+    }).catch(() => { })
 
     return NextResponse.json(updatedArticle, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -197,13 +197,13 @@ export const DELETE = withTenantContext(async (
         articleId: id,
         title: article.title,
       },
-    }).catch(() => {})
+    }).catch(() => { })
 
     return NextResponse.json(
       { success: true, message: 'Article deleted' },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Knowledge Base delete API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

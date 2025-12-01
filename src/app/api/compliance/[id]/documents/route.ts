@@ -48,7 +48,7 @@ const _api_GET = async (
       success: true,
       data: mockDocuments,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching linked documents", { error });
     return NextResponse.json(
       { error: "Internal server error" },

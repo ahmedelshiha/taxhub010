@@ -59,7 +59,7 @@ const _api_POST = async (request: NextRequest) => {
       message: 'Performance metric received'
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing performance metric:', error)
     return NextResponse.json({
       error: 'Internal server error'

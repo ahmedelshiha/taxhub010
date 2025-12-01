@@ -57,7 +57,7 @@ export default function AcceptInvitationPage() {
       setStatus("success");
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
-        router.push("/portal/dashboard");
+        router.push("/portal");
       }, 2000);
     } catch (error) {
       setStatus("error");
@@ -179,7 +179,7 @@ export default function AcceptInvitationPage() {
 
               <Button
                 className="w-full"
-                onClick={() => router.push("/portal/dashboard")}
+                onClick={() => router.push("/portal")}
               >
                 Go to Dashboard
               </Button>

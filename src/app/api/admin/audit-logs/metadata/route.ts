@@ -39,7 +39,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     response.headers.set('CDN-Cache-Control', 'max-age=1800, stale-while-revalidate=3600')
 
     return response
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching audit metadata:', error)
     return NextResponse.json(
       { error: 'Failed to fetch audit metadata' },

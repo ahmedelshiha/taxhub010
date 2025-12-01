@@ -1,0 +1,258 @@
+/**
+ * Portal Animations
+ * Micro-animations for enhanced user experience
+ * Inspired by Oracle Fusion and SAP Fiori design systems
+ */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-slide-in-top {
+  animation: slide-in-from-top 0.3s ease-out;
+}
+
+.animate-slide-in-bottom {
+  animation: slide-in-from-bottom 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-from-left 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Button effects */
+.button-press {
+  transition: transform 0.1s ease-in-out;
+}
+
+.button-press:active {
+  transform: scale(0.98);
+}
+
+/* Loading shimmer effect */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+/* Smooth transitions */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Badge pulse animation */
+@keyframes badge-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.badge-pulse {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Breadcrumb animations */
+.breadcrumb-item {
+  animation: fade-in 0.2s ease-out;
+  animation-fill-mode: both;
+}
+
+.breadcrumb-item:nth-child(1) { animation-delay: 0ms; }
+.breadcrumb-item:nth-child(2) { animation-delay: 50ms; }
+.breadcrumb-item:nth-child(3) { animation-delay: 100ms; }
+.breadcrumb-item:nth-child(4) { animation-delay: 150ms; }
+.breadcrumb-item:nth-child(5) { animation-delay: 200ms; }
+
+/* Tab transition */
+.tab-content-enter {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* Notification animations */
+.notification-enter {
+  animation: slide-in-from-top 0.3s ease-out;
+}
+
+/* Modal animations */
+.modal-overlay-enter {
+  animation: fade-in 0.2s ease-out;
+}
+
+.modal-content-enter {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* Sidebar animations */
+.sidebar-item {
+  transition: all 0.15s ease-in-out;
+}
+
+.sidebar-item:hover {
+  transform: translateX(2px);
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+.progress-bar-animate {
+  animation: progress 0.5s ease-out;
+}
+
+/* Focus ring with animation */
+.focus-ring {
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.dark .focus-ring:focus-visible {
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5);
+}
+
+/* Skeleton loading */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+ 100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0px,
+    #f8f8f8 40px,
+    #f0f0f0 80px
+  );
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    #2d2d2d 0px,
+    #3a3a3a 40px,
+    #2d2d2d 80px
+  );
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

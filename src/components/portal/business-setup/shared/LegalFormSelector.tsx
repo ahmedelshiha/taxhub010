@@ -40,7 +40,7 @@ export function LegalFormSelector({
       <Label htmlFor="legalForm">
         Legal Form {required && "*"}
       </Label>
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <Select value={value || ''} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger id="legalForm">
           <SelectValue placeholder="Select legal form" />
         </SelectTrigger>

@@ -12,7 +12,7 @@ import { z } from 'zod'
  * Get all comments for a task, with nested replies
  */
 export const GET = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId, userId } = ctx
@@ -93,7 +93,7 @@ export const GET = withTenantContext(
           hasMore: offset + limit < total,
         },
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Task comments fetch error:', error)
       return respond.serverError()
     }
@@ -106,7 +106,7 @@ export const GET = withTenantContext(
  * Create a new comment on a task
  */
 export const POST = withTenantContext(
-  async (request, { params }) => {
+  async (request, { params }: { params: Promise<{ id: string }> }) => {
     try {
       const ctx = requireTenantContext()
       const { tenantId, userId } = ctx
@@ -182,7 +182,7 @@ export const POST = withTenantContext(
       return respond.created({
         data: comment,
       })
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid comment data', error.errors)
       }

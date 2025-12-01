@@ -65,7 +65,7 @@ export const GET = withTenantContext(async (
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Banking connection detail error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -127,7 +127,7 @@ export const PATCH = withTenantContext(async (
     }).catch(() => {})
 
     return NextResponse.json(updatedConnection, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -199,7 +199,7 @@ export const DELETE = withTenantContext(async (
       { success: true, message: 'Connection deleted' },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Banking connection delete error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

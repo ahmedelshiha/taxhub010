@@ -70,7 +70,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       count: presets.length,
       maxPresets: MAX_PRESETS
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Presets GET] Error:', error)
     return respond.serverError('Failed to fetch presets')
   }
@@ -174,7 +174,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     })
 
     return respond.created(preset)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Presets POST] Error:', error)
     if ((error as any).code === 'P2002') {
       return respond.badRequest('A preset with this name already exists')

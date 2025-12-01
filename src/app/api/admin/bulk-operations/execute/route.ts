@@ -20,7 +20,7 @@ export const POST = withAdminAuth(async (req: NextRequest) => {
       isDryRun: dryRun,
       timestamp: new Date().toISOString()
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to execute bulk operation:', error)
     return NextResponse.json(
       { error: 'Failed to execute bulk operation' },

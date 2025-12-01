@@ -41,7 +41,7 @@ const _api_GET = async (
       success: true,
       data: mockData,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error fetching compliance details", { error });
     return NextResponse.json(
       { error: "Internal server error" },
@@ -104,7 +104,7 @@ const _api_PATCH = async (
       success: true,
       data: { id, status },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error("Error updating compliance status", { error });
     return NextResponse.json(
       { error: "Internal server error" },

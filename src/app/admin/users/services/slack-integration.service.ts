@@ -10,7 +10,7 @@ export interface SlackIntegrationConfig {
 export interface SlackMessage {
   channel?: string
   text?: string
-  blocks?: any[]
+  blocks?: unknown[]
   thread_ts?: string
 }
 
@@ -43,7 +43,7 @@ export class SlackIntegrationService {
   /**
    * Share a filter preset via Slack
    */
-  async sharePresetToSlack(payload: SlackPresetSharePayload): Promise<{success: boolean; messageTs?: string; error?: string}> {
+  async sharePresetToSlack(payload: SlackPresetSharePayload): Promise<{ success: boolean; messageTs?: string; error?: string }> {
     try {
       const message = this.buildPresetShareMessage(payload)
       const response = await fetch(this.webhookUrl, {
@@ -56,7 +56,7 @@ export class SlackIntegrationService {
         throw new Error(`Slack webhook returned ${response.status}`)
       }
 
-      const data = await response.json() as {ok?: boolean; ts?: string; error?: string}
+      const data = await response.json() as { ok?: boolean; ts?: string; error?: string }
       if (!data.ok) {
         throw new Error(data.error || 'Unknown Slack error')
       }
@@ -80,7 +80,7 @@ export class SlackIntegrationService {
       columns: string[]
       summary: Record<string, any>
     }
-  ): Promise<{success: boolean; messageTs?: string; error?: string}> {
+  ): Promise<{ success: boolean; messageTs?: string; error?: string }> {
     try {
       const message = this.buildScheduledReportMessage(payload, reportData)
       const response = await fetch(this.webhookUrl, {
@@ -93,7 +93,7 @@ export class SlackIntegrationService {
         throw new Error(`Slack webhook returned ${response.status}`)
       }
 
-      const data = await response.json() as {ok?: boolean; ts?: string; error?: string}
+      const data = await response.json() as { ok?: boolean; ts?: string; error?: string }
       if (!data.ok) {
         throw new Error(data.error || 'Unknown Slack error')
       }
@@ -114,7 +114,7 @@ export class SlackIntegrationService {
     title: string,
     message: string,
     details: Record<string, any>
-  ): Promise<{success: boolean; error?: string}> {
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const slackMessage: SlackMessage = {
         channel,
@@ -151,7 +151,7 @@ export class SlackIntegrationService {
         throw new Error(`Slack webhook returned ${response.status}`)
       }
 
-      const data = await response.json() as {ok?: boolean; error?: string}
+      const data = await response.json() as { ok?: boolean; error?: string }
       if (!data.ok) {
         throw new Error(data.error || 'Unknown Slack error')
       }
@@ -167,7 +167,7 @@ export class SlackIntegrationService {
   /**
    * Test Slack webhook connectivity
    */
-  async testWebhook(): Promise<{success: boolean; error?: string}> {
+  async testWebhook(): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await fetch(this.webhookUrl, {
         method: 'POST',
@@ -190,7 +190,7 @@ export class SlackIntegrationService {
         throw new Error(`Webhook returned ${response.status}`)
       }
 
-      const data = await response.json() as {ok?: boolean; error?: string}
+      const data = await response.json() as { ok?: boolean; error?: string }
       return { success: data.ok !== false, error: data.error }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error'
@@ -247,18 +247,18 @@ export class SlackIntegrationService {
         },
         ...(payload.shareUrl
           ? [
-              {
-                type: 'actions',
-                elements: [
-                  {
-                    type: 'button',
-                    text: { type: 'plain_text', text: 'View in Dashboard', emoji: true },
-                    url: payload.shareUrl,
-                    style: 'primary' as const,
-                  },
-                ],
-              },
-            ]
+            {
+              type: 'actions',
+              elements: [
+                {
+                  type: 'button',
+                  text: { type: 'plain_text', text: 'View in Dashboard', emoji: true },
+                  url: payload.shareUrl,
+                  style: 'primary' as const,
+                },
+              ],
+            },
+          ]
           : []),
       ],
     }

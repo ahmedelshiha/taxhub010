@@ -28,17 +28,19 @@ export const POST = withTenantContext(async (_request: NextRequest, context: { p
       requirements: { migratedFromBookingId: booking.id },
     }
 
-    const sr = await prisma.serviceRequest.create({ data: {
-      client: { connect: { id: (booking as any).clientId } },
-      service: { connect: { id: (booking as any).serviceId } },
-      ...payload,
-      tenant: (ctx.tenantId ? { connect: { id: ctx.tenantId } } : undefined),
-    } })
+    const sr = await prisma.serviceRequest.create({
+      data: {
+        client: { connect: { id: (booking as any).clientId } },
+        service: { connect: { id: (booking as any).serviceId } },
+        ...payload,
+        tenant: (ctx.tenantId ? { connect: { id: ctx.tenantId } } : undefined),
+      }
+    })
 
     const updated = await prisma.booking.update({ where: { id }, data: { serviceRequest: { connect: { id: sr.id } } } })
 
     return NextResponse.json({ success: true, data: { serviceRequest: sr, booking: updated } })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error migrating booking to service request:', error)
     return NextResponse.json({ error: 'Failed to migrate booking' }, { status: 500 })
   }

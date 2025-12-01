@@ -146,7 +146,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
                 expensesApproved: previousExpenses.approved,
             },
         })
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Error fetching financial summary:', error)
         return respond.serverError()
     }

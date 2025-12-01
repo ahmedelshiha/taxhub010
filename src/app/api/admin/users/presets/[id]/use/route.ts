@@ -62,7 +62,7 @@ export const POST = withTenantContext(async (request: NextRequest, props: { para
     })
 
     return respond.ok(updated)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Presets Use] Error:', error)
     return respond.serverError('Failed to update preset usage')
   }

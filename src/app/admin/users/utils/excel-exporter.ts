@@ -28,7 +28,7 @@ export interface CellFormat {
 
 export interface ExcelSheet {
   name: string
-  data: any[][]
+  data: (string | number | boolean | null)[][]
   formatting?: Record<string, CellFormat>
   columnWidths?: number[]
   frozenRows?: number
@@ -173,6 +173,7 @@ export function generateExcelXML(
       xmlContent += '<Row>\n'
       row.forEach((cell, cellIndex) => {
         let cellStyle = ''
+        const cellValue = cell ?? ''
 
         // Apply header style to first row
         if (rowIndex === 0) {
@@ -180,15 +181,15 @@ export function generateExcelXML(
         }
 
         // Apply status formatting
-        if (cell === 'ACTIVE') {
+        if (cellValue === 'ACTIVE') {
           cellStyle = ' ss:StyleID="statusActive"'
-        } else if (cell === 'INACTIVE') {
+        } else if (cellValue === 'INACTIVE') {
           cellStyle = ' ss:StyleID="statusInactive"'
-        } else if (cell === 'SUSPENDED') {
+        } else if (cellValue === 'SUSPENDED') {
           cellStyle = ' ss:StyleID="statusSuspended"'
         }
 
-        xmlContent += `<Cell${cellStyle}><Data ss:Type="String">${escapeXML(cell.toString())}</Data></Cell>\n`
+        xmlContent += `<Cell${cellStyle}><Data ss:Type="String">${escapeXML(String(cellValue))}</Data></Cell>\n`
       })
       xmlContent += '</Row>\n'
     })

@@ -1,8 +1,14 @@
+/**
+ * Admin Users API
+ * Thin controller using service layer
+ */
+
 import { NextRequest, NextResponse } from 'next/server'
 import { withAdminAuth } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
 import { respond } from '@/lib/api-response'
-import prisma from '@/lib/prisma'
+import { usersService } from '@/services/admin/users.service'
+import { ServiceError } from '@/services/shared/base.service'
 import { logAudit } from '@/lib/audit'
 import { z } from 'zod'
 
@@ -36,67 +42,19 @@ export const GET = withAdminAuth(
       const { searchParams } = new URL(request.url)
       const filters = UserListFilterSchema.parse(Object.fromEntries(searchParams))
 
-      // Build query
-      const where: any = { tenantId: tenantId as string }
+      // Delegate to service layer
+      const result = await usersService.listUsers(tenantId as string, filters)
 
-      if (filters.role) {
-        where.role = filters.role
-      }
-
-      if (filters.department) {
-        where.department = filters.department
-      }
-
-      if (filters.active !== undefined) {
-        where.isActive = filters.active
-      }
-
-      if (filters.search) {
-        where.OR = [
-          { email: { contains: filters.search, mode: 'insensitive' } },
-          { name: { contains: filters.search, mode: 'insensitive' } },
-          { department: { contains: filters.search, mode: 'insensitive' } },
-        ]
-      }
-
-      // Get total count
-      const total = await prisma.user.count({ where })
-
-      // Get paginated results
-      const data = await prisma.user.findMany({
-        where,
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          image: true,
-          role: true,
-          department: true,
-          position: true,
-          isActive: true,
-          createdAt: true,
-          updatedAt: true,
-          emailVerified: true,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        skip: filters.offset,
-        take: filters.limit,
-      })
-
-      return respond.ok({
-        data,
-        meta: {
-          total,
-          limit: filters.limit,
-          offset: filters.offset,
-          hasMore: filters.offset + filters.limit < total,
-        },
-      })
-    } catch (error) {
+      return respond.ok(result)
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid filters', error.errors)
+      }
+      if (error instanceof ServiceError) {
+        return NextResponse.json(
+          { success: false, error: error.message },
+          { status: error.statusCode }
+        )
       }
       console.error('User list error:', error)
       return respond.serverError()
@@ -117,40 +75,8 @@ export const POST = withAdminAuth(
       const body = await request.json()
       const input = UserCreateSchema.parse(body)
 
-      // Check if user with email already exists in tenant
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          email: input.email,
-          tenantId: tenantId as string,
-        },
-      })
-
-      if (existingUser) {
-        return respond.badRequest('User with this email already exists in this organization')
-      }
-
-      // Create new user
-      const newUser = await prisma.user.create({
-        data: {
-          email: input.email,
-          name: input.name,
-          role: input.role,
-          department: input.department,
-          position: input.position,
-          tenantId: tenantId as string,
-          isActive: true,
-        },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          role: true,
-          department: true,
-          position: true,
-          isActive: true,
-          createdAt: true,
-        },
-      })
+      // Delegate to service layer
+      const newUser = await usersService.createUser(tenantId as string, input)
 
       // Log audit event
       await logAudit({
@@ -162,12 +88,16 @@ export const POST = withAdminAuth(
         changes: input,
       })
 
-      return respond.created({
-        data: newUser,
-      })
-    } catch (error) {
+      return respond.created({ data: newUser })
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         return respond.badRequest('Invalid user data', error.errors)
+      }
+      if (error instanceof ServiceError) {
+        return NextResponse.json(
+          { success: false, error: error.message },
+          { status: error.statusCode }
+        )
       }
       console.error('User creation error:', error)
       return respond.serverError()

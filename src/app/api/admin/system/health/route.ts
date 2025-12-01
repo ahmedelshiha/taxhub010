@@ -296,7 +296,7 @@ export async function GET(): Promise<NextResponse<SystemHealthResponse>> {
         'Expires': '0',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     // Handle unexpected errors gracefully
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
 
