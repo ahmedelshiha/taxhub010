@@ -15,7 +15,8 @@ import { Breadcrumbs } from '../Breadcrumbs'
 import { useResponsive } from '@/hooks/admin/useResponsive'
 import {
     usePortalSidebarCollapsed,
-    usePortalLayoutActions
+    usePortalLayoutActions,
+    usePortalLayoutStore
 } from '@/stores/portal/layout.store'
 import { cn } from '@/lib/utils'
 import { PortalLayoutSkeleton } from './PortalLayoutSkeleton'
@@ -35,7 +36,8 @@ export default function PortalDashboardLayout({
 
     // State from Zustand store
     const collapsed = usePortalSidebarCollapsed()
-    const { setSidebarCollapsed } = usePortalLayoutActions()
+    // Use stable selector to prevent unnecessary re-renders
+    const setSidebarCollapsed = usePortalLayoutStore((state) => state.setSidebarCollapsed)
 
     // Mobile menu state
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
