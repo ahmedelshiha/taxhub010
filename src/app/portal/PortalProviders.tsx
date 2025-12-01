@@ -9,6 +9,7 @@ import { ModalRegistry } from "@/components/portal/modals/ModalRegistry";
 import { PortalErrorBoundary } from "@/components/portal/PortalErrorBoundary";
 import { BreadcrumbProvider } from "@/components/portal/providers/BreadcrumbProvider";
 import { KeyboardProvider } from "@/components/providers/KeyboardProvider";
+import { PortalAuthGuard } from "@/components/portal/PortalAuthGuard";
 
 interface PortalProvidersProps {
     children: ReactNode;
@@ -16,21 +17,23 @@ interface PortalProvidersProps {
 
 export function PortalProviders({ children }: PortalProvidersProps) {
     return (
-        <ThemeProvider defaultTheme="light" enableSystem>
-            <QueryProvider>
-                <PortalErrorBoundary>
-                    <KeyboardProvider>
-                        <ModalProvider>
-                            <BreadcrumbProvider>
-                                <PortalDashboardLayout>
-                                    {children}
-                                </PortalDashboardLayout>
-                                <ModalRegistry />
-                            </BreadcrumbProvider>
-                        </ModalProvider>
-                    </KeyboardProvider>
-                </PortalErrorBoundary>
-            </QueryProvider>
-        </ThemeProvider>
+        <PortalAuthGuard>
+            <ThemeProvider defaultTheme="light" enableSystem>
+                <QueryProvider>
+                    <PortalErrorBoundary>
+                        <KeyboardProvider>
+                            <ModalProvider>
+                                <BreadcrumbProvider>
+                                    <PortalDashboardLayout>
+                                        {children}
+                                    </PortalDashboardLayout>
+                                    <ModalRegistry />
+                                </BreadcrumbProvider>
+                            </ModalProvider>
+                        </KeyboardProvider>
+                    </PortalErrorBoundary>
+                </QueryProvider>
+            </ThemeProvider>
+        </PortalAuthGuard>
     );
 }
