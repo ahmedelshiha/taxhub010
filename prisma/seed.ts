@@ -374,6 +374,76 @@ async function main() {
 
   console.log('✅ Team members created')
 
+  // User Profile Enhancements
+  const userProfiles = [
+    { userId: admin.id, organization: 'Primary Accounting Firm', phoneNumber: '+1-555-0100', timezone: 'America/New_York', preferredLanguage: 'en' },
+    { userId: staff.id, organization: 'Primary Accounting Firm', phoneNumber: '+1-555-0101', timezone: 'America/Chicago', preferredLanguage: 'en' },
+    { userId: client1.id, organization: 'Tech Startup Inc', phoneNumber: '+1-555-0102', timezone: 'America/Los_Angeles', preferredLanguage: 'en' },
+    { userId: client2.id, organization: 'Wilson Consulting', phoneNumber: '+1-555-0103', timezone: 'America/Denver', preferredLanguage: 'en' },
+    { userId: lead.id, organization: 'Primary Accounting Firm', phoneNumber: '+1-555-0104', timezone: 'America/New_York', preferredLanguage: 'en' },
+    { userId: superadmin.id, organization: 'Primary Accounting Firm', phoneNumber: '+1-555-0105', timezone: 'UTC', preferredLanguage: 'en' },
+  ]
+
+  for (const profile of userProfiles) {
+    await prisma.userProfile.upsert({
+      where: { userId: profile.userId },
+      update: profile,
+      create: {
+        ...profile,
+        twoFactorEnabled: false,
+        bookingEmailCancellation: true,
+        bookingEmailConfirm: true,
+        bookingEmailReminder: true,
+        bookingEmailReschedule: true,
+        bookingSmsConfirmation: false,
+        bookingSmsReminder: false,
+        reminderHours: [24, 2],
+      },
+    })
+  }
+
+  console.log('✅ User profiles created')
+
+  // NotificationPreferences for users
+  const notificationPreferences = [
+    { userId: admin.id, tenantId: defaultTenant.id, inAppEnabled: true, emailEnabled: true, smsEnabled: false },
+    { userId: staff.id, tenantId: defaultTenant.id, inAppEnabled: true, emailEnabled: true, smsEnabled: false },
+    { userId: client1.id, tenantId: defaultTenant.id, inAppEnabled: true, emailEnabled: true, smsEnabled: true },
+    { userId: client2.id, tenantId: defaultTenant.id, inAppEnabled: true, emailEnabled: true, smsEnabled: false },
+    { userId: lead.id, tenantId: defaultTenant.id, inAppEnabled: true, emailEnabled: true, smsEnabled: true },
+    { userId: superadmin.id, tenantId: defaultTenant.id, inAppEnabled: true, emailEnabled: true, smsEnabled: true },
+  ]
+
+  for (const prefs of notificationPreferences) {
+    await prisma.notificationPreference.upsert({
+      where: { userId: prefs.userId },
+      update: { inAppEnabled: prefs.inAppEnabled, emailEnabled: prefs.emailEnabled, smsEnabled: prefs.smsEnabled },
+      create: prefs,
+    })
+  }
+
+  console.log('✅ Notification preferences created')
+
+  // SidebarPreferences for users
+  const sidebarPrefs = [
+    { userId: admin.id, collapsed: false, width: 280, mobileOpen: false, expandedGroups: ['dashboard', 'business', 'clients', 'services'] },
+    { userId: staff.id, collapsed: false, width: 280, mobileOpen: false, expandedGroups: ['dashboard', 'business', 'bookings', 'tasks'] },
+    { userId: client1.id, collapsed: false, width: 280, mobileOpen: false, expandedGroups: ['dashboard', 'business', 'services'] },
+    { userId: client2.id, collapsed: false, width: 280, mobileOpen: false, expandedGroups: ['dashboard', 'business', 'bookings'] },
+    { userId: lead.id, collapsed: false, width: 280, mobileOpen: false, expandedGroups: ['dashboard', 'business', 'team', 'reports'] },
+    { userId: superadmin.id, collapsed: false, width: 280, mobileOpen: false, expandedGroups: ['dashboard', 'business', 'users', 'settings'] },
+  ]
+
+  for (const prefs of sidebarPrefs) {
+    await prisma.sidebarPreferences.upsert({
+      where: { userId: prefs.userId },
+      update: { collapsed: prefs.collapsed, width: prefs.width, mobileOpen: prefs.mobileOpen, expandedGroups: prefs.expandedGroups },
+      create: prefs,
+    })
+  }
+
+  console.log('✅ Sidebar preferences created')
+
   // Create services
   const services = [
     {
@@ -749,6 +819,421 @@ Effective cash flow management requires ongoing attention and planning. Regular 
 
   console.log('✅ Blog posts created')
 
+  // Support & Knowledge Base
+  const kbCategories = [
+    { id: 'kb_cat_1', name: 'Tax Guides', slug: 'tax-guides', description: 'Comprehensive guides on tax topics', tenantId: defaultTenant.id, order: 1 },
+    { id: 'kb_cat_2', name: 'Portal Help', slug: 'portal-help', description: 'Help articles for using the client portal', tenantId: defaultTenant.id, order: 2 },
+    { id: 'kb_cat_3', name: 'Accounting Basics', slug: 'accounting-basics', description: 'Introduction to accounting concepts', tenantId: defaultTenant.id, order: 3 },
+    { id: 'kb_cat_4', name: 'Compliance', slug: 'compliance', description: 'Compliance and regulatory information', tenantId: defaultTenant.id, order: 4 },
+  ]
+
+  for (const cat of kbCategories) {
+    await prisma.knowledgeBaseCategory.upsert({
+      where: { id: cat.id },
+      update: { name: cat.name, slug: cat.slug, description: cat.description, order: cat.order },
+      create: cat,
+    })
+  }
+
+  console.log('✅ Knowledge base categories created')
+
+  const kbArticles = [
+    {
+      id: 'kb_art_1',
+      categoryId: 'kb_cat_1',
+      tenantId: defaultTenant.id,
+      title: 'Understanding Quarterly Tax Payments',
+      slug: 'quarterly-tax-payments',
+      content: 'Quarterly tax payments are required if you expect to owe $1,000 or more in taxes. Learn how to calculate and submit your estimated tax payments.',
+      excerpt: 'Learn how to calculate and submit quarterly tax payments correctly.',
+      authorId: admin.id,
+      published: true,
+      featured: false,
+      viewCount: 245,
+      helpfulCount: 18,
+      tags: ['tax', 'quarterly', 'payments'],
+    },
+    {
+      id: 'kb_art_2',
+      categoryId: 'kb_cat_1',
+      tenantId: defaultTenant.id,
+      title: 'Deductions vs Credits: What\'s the Difference?',
+      slug: 'deductions-vs-credits',
+      content: 'Understanding the difference between tax deductions and tax credits is essential for maximizing your tax savings. Deductions reduce your taxable income, while credits directly reduce your tax liability.',
+      excerpt: 'Understand the key differences between tax deductions and credits.',
+      authorId: admin.id,
+      published: true,
+      featured: false,
+      viewCount: 189,
+      helpfulCount: 14,
+      tags: ['tax', 'deductions', 'credits'],
+    },
+    {
+      id: 'kb_art_3',
+      categoryId: 'kb_cat_2',
+      tenantId: defaultTenant.id,
+      title: 'How to Upload Documents to Your Portal',
+      slug: 'upload-documents-portal',
+      content: 'Follow these simple steps to upload your financial documents to the client portal for easy sharing with your accountant.',
+      excerpt: 'Step-by-step guide to uploading documents to your portal.',
+      authorId: staff.id,
+      published: true,
+      featured: false,
+      viewCount: 567,
+      helpfulCount: 52,
+      tags: ['portal', 'documents', 'upload'],
+    },
+    {
+      id: 'kb_art_4',
+      categoryId: 'kb_cat_2',
+      tenantId: defaultTenant.id,
+      title: 'Viewing Your Financial Reports',
+      slug: 'viewing-reports',
+      content: 'Learn how to access and interpret your financial reports in the portal, including income statements, balance sheets, and cash flow summaries.',
+      excerpt: 'Learn to access and interpret your financial reports.',
+      authorId: staff.id,
+      published: true,
+      featured: false,
+      viewCount: 423,
+      helpfulCount: 35,
+      tags: ['portal', 'reports', 'financial'],
+    },
+    {
+      id: 'kb_art_5',
+      categoryId: 'kb_cat_3',
+      tenantId: defaultTenant.id,
+      title: 'What is Bookkeeping?',
+      slug: 'what-is-bookkeeping',
+      content: 'Bookkeeping is the process of recording, classifying, and organizing all financial transactions of a business. It\'s the foundation of good financial management.',
+      excerpt: 'Introduction to bookkeeping and its importance.',
+      authorId: admin.id,
+      published: true,
+      featured: false,
+      viewCount: 312,
+      helpfulCount: 28,
+      tags: ['bookkeeping', 'accounting', 'basics'],
+    },
+    {
+      id: 'kb_art_6',
+      categoryId: 'kb_cat_4',
+      tenantId: defaultTenant.id,
+      title: 'GDPR Compliance Requirements',
+      slug: 'gdpr-compliance',
+      content: 'General Data Protection Regulation (GDPR) imposes strict requirements on how you handle personal data. Learn about your compliance obligations.',
+      excerpt: 'Overview of GDPR compliance requirements.',
+      authorId: admin.id,
+      published: true,
+      featured: false,
+      viewCount: 178,
+      helpfulCount: 12,
+      tags: ['compliance', 'gdpr', 'data-protection'],
+    },
+  ]
+
+  for (const article of kbArticles) {
+    await prisma.knowledgeBaseArticle.upsert({
+      where: { id: article.id },
+      update: {
+        title: article.title,
+        content: article.content,
+        excerpt: article.excerpt,
+        published: article.published,
+        featured: article.featured,
+        viewCount: article.viewCount,
+        helpfulCount: article.helpfulCount,
+        tags: article.tags,
+      },
+      create: article,
+    })
+  }
+
+  console.log('✅ Knowledge base articles created')
+
+  // Support Tickets
+  const supportTickets = [
+    {
+      id: 'ticket_1',
+      tenantId: defaultTenant.id,
+      userId: client1.id,
+      assignedToId: staff.id,
+      title: 'Unable to upload quarterly documents',
+      description: 'I\'m having trouble uploading my quarterly financial documents. The upload keeps failing.',
+      priority: 'HIGH',
+      status: 'IN_PROGRESS',
+      category: 'PORTAL_HELP',
+    },
+    {
+      id: 'ticket_2',
+      tenantId: defaultTenant.id,
+      userId: client2.id,
+      assignedToId: staff.id,
+      title: 'Question about tax deductions',
+      description: 'Can you clarify which business expenses are deductible this year?',
+      priority: 'MEDIUM',
+      status: 'OPEN',
+      category: 'TAX_QUESTION',
+    },
+    {
+      id: 'ticket_3',
+      tenantId: defaultTenant.id,
+      userId: client1.id,
+      assignedToId: staff.id,
+      title: 'Invoice not reflecting in my account',
+      description: 'The recent invoice from your firm is not showing up in my portal.',
+      priority: 'MEDIUM',
+      status: 'RESOLVED',
+      category: 'BILLING',
+    },
+  ]
+
+  for (const ticket of supportTickets) {
+    await prisma.supportTicket.upsert({
+      where: { id: ticket.id },
+      update: { title: ticket.title, description: ticket.description, priority: ticket.priority, status: ticket.status, category: ticket.category, assignedToId: ticket.assignedToId },
+      create: ticket,
+    })
+  }
+
+  console.log('✅ Support tickets created')
+
+  // Support Ticket Comments
+  const ticketComments = [
+    {
+      id: 'comment_1',
+      ticketId: 'ticket_1',
+      authorId: staff.id,
+      content: 'I\'ve reviewed your account. It looks like the file size exceeded our limit. Try uploading files under 10MB.',
+    },
+    {
+      id: 'comment_2',
+      ticketId: 'ticket_1',
+      authorId: client1.id,
+      content: 'Thank you! I\'ll try splitting the documents and upload them separately.',
+    },
+    {
+      id: 'comment_3',
+      ticketId: 'ticket_2',
+      authorId: staff.id,
+      content: 'Generally, ordinary and necessary business expenses are deductible. This includes office supplies, equipment, professional fees, etc. Let me schedule a detailed consultation to review your specific situation.',
+    },
+    {
+      id: 'comment_4',
+      ticketId: 'ticket_3',
+      authorId: staff.id,
+      content: 'We\'ve corrected the billing issue. The invoice should now appear in your portal. Please refresh your browser.',
+    },
+  ]
+
+  for (const comment of ticketComments) {
+    await prisma.supportTicketComment.upsert({
+      where: { id: comment.id },
+      update: { content: comment.content },
+      create: comment,
+    })
+  }
+
+  console.log('✅ Support ticket comments created')
+
+  // Communication & Notifications
+  const notifications = [
+    {
+      id: 'notif_1',
+      tenantId: defaultTenant.id,
+      userId: client1.id,
+      relatedUserId: admin.id,
+      title: 'Your Quarterly Tax Report is Ready',
+      message: 'Your Q3 tax report has been completed and is available for review in your portal.',
+      type: 'REPORT_READY',
+      status: 'sent',
+      channels: ['in_app', 'email'],
+    },
+    {
+      id: 'notif_2',
+      tenantId: defaultTenant.id,
+      userId: client2.id,
+      relatedUserId: admin.id,
+      title: 'Invoice Paid Successfully',
+      message: 'Your recent invoice has been marked as paid. Thank you!',
+      type: 'PAYMENT_RECEIVED',
+      status: 'sent',
+      channels: ['in_app', 'email'],
+      readAt: new Date(new Date().getTime() - 1000 * 60 * 60),
+    },
+    {
+      id: 'notif_3',
+      tenantId: defaultTenant.id,
+      userId: staff.id,
+      relatedUserId: admin.id,
+      title: 'New Service Request Assigned',
+      message: 'A new bookkeeping service request has been assigned to you.',
+      type: 'ASSIGNMENT',
+      status: 'sent',
+      channels: ['in_app', 'email'],
+    },
+    {
+      id: 'notif_4',
+      tenantId: defaultTenant.id,
+      userId: lead.id,
+      relatedUserId: admin.id,
+      title: 'Team Performance Report',
+      message: 'Your weekly team performance report is ready.',
+      type: 'REPORT_READY',
+      status: 'sent',
+      channels: ['in_app', 'email'],
+    },
+    {
+      id: 'notif_5',
+      tenantId: defaultTenant.id,
+      userId: admin.id,
+      relatedUserId: staff.id,
+      title: 'Task Completed',
+      message: 'The quarterly compliance review has been completed.',
+      type: 'TASK_COMPLETED',
+      status: 'sent',
+      channels: ['in_app', 'email'],
+      readAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 2),
+    },
+  ]
+
+  for (const notif of notifications) {
+    await prisma.notification.upsert({
+      where: { id: notif.id },
+      update: { title: notif.title, message: notif.message, type: notif.type, status: notif.status, channels: notif.channels, readAt: notif.readAt },
+      create: notif,
+    })
+  }
+
+  console.log('✅ Notifications created')
+
+  // Direct Messages (optional - may not be present in all schemas)
+  try {
+    const messages = [
+      {
+        id: 'msg_1',
+        tenantId: defaultTenant.id,
+        senderId: admin.id,
+        recipientId: staff.id,
+        subject: 'Follow up on Client Request',
+        body: 'Can you please follow up with Client One regarding their bookkeeping setup? They should have received our initial questionnaire.',
+        status: 'read',
+        readAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24),
+      },
+      {
+        id: 'msg_2',
+        tenantId: defaultTenant.id,
+        senderId: staff.id,
+        recipientId: admin.id,
+        subject: 'Re: Follow up on Client Request',
+        body: 'I\'ll reach out to them today. I\'ll send you an update by end of day.',
+        status: 'read',
+        readAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 23),
+      },
+      {
+        id: 'msg_3',
+        tenantId: defaultTenant.id,
+        senderId: client1.id,
+        recipientId: admin.id,
+        subject: 'Question about Invoice',
+        body: 'Hi, I received your invoice but have a question about the service breakdown. Can we discuss?',
+        status: 'sent',
+      },
+      {
+        id: 'msg_4',
+        tenantId: defaultTenant.id,
+        senderId: lead.id,
+        recipientId: staff.id,
+        subject: 'Great Work on Tax Return',
+        body: 'Excellent job on the tax return preparation. Your attention to detail is appreciated.',
+        status: 'read',
+        readAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 12),
+      },
+    ]
+
+    for (const msg of messages) {
+      await prisma.message.upsert({
+        where: { id: msg.id },
+        update: { subject: msg.subject, body: msg.body, status: msg.status, readAt: msg.readAt },
+        create: msg,
+      })
+    }
+
+    console.log('✅ Direct messages created')
+  } catch (e) {
+    console.warn('Skipping direct messages seed:', (e as any)?.message || 'Table not found')
+  }
+
+  // Chat Messages (optional - may not be present in all schemas)
+  try {
+    const chatMessages = [
+      {
+        id: 'chat_1',
+        tenantId: defaultTenant.id,
+        userId: admin.id,
+        userName: admin.name || 'Admin',
+        role: 'ADMIN',
+        text: 'Welcome to the team channel! This is where we discuss general project updates.',
+        room: 'general',
+      },
+      {
+        id: 'chat_2',
+        tenantId: defaultTenant.id,
+        userId: staff.id,
+        userName: staff.name || 'Staff',
+        role: 'TEAM_MEMBER',
+        text: 'Thanks for the welcome! Looking forward to collaborating with everyone.',
+        room: 'general',
+      },
+      {
+        id: 'chat_3',
+        tenantId: defaultTenant.id,
+        userId: lead.id,
+        userName: lead.name || 'Lead',
+        role: 'TEAM_LEAD',
+        text: 'Don\'t forget that the quarterly review meeting is scheduled for next Friday at 2 PM.',
+        room: 'general',
+      },
+      {
+        id: 'chat_4',
+        tenantId: defaultTenant.id,
+        userId: admin.id,
+        userName: admin.name || 'Admin',
+        role: 'ADMIN',
+        text: 'Great reminder. I\'ll send out the meeting details to everyone.',
+        room: 'general',
+      },
+      {
+        id: 'chat_5',
+        tenantId: defaultTenant.id,
+        userId: staff.id,
+        userName: staff.name || 'Staff',
+        role: 'TEAM_MEMBER',
+        text: 'Quick question about the new client onboarding process.',
+        room: 'operations',
+      },
+      {
+        id: 'chat_6',
+        tenantId: defaultTenant.id,
+        userId: lead.id,
+        userName: lead.name || 'Lead',
+        role: 'TEAM_LEAD',
+        text: 'Sure, what would you like to know?',
+        room: 'operations',
+      },
+    ]
+
+    for (const chat of chatMessages) {
+      await prisma.chatMessage.upsert({
+        where: { id: chat.id },
+        update: { text: chat.text, room: chat.room },
+        create: chat,
+      })
+    }
+
+    console.log('✅ Chat messages created')
+  } catch (e) {
+    console.warn('Skipping chat messages seed:', (e as any)?.message || 'Table not found')
+  }
+
   // Create task templates
   const templates = [
     {
@@ -801,6 +1286,190 @@ Effective cash flow management requires ongoing attention and planning. Regular 
   }
 
   console.log('✅ Default task templates created')
+
+  // Documents & Approvals (optional - may not be present in all schemas)
+  try {
+    const attachmentData = [
+      {
+        id: 'attach_1',
+        name: 'Client_Onboarding_Agreement.pdf',
+        contentType: 'application/pdf',
+        size: 245680,
+        uploadedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
+        uploaderId: admin.id,
+        tenantId: defaultTenant.id,
+      },
+      {
+        id: 'attach_2',
+        name: 'Tax_Return_2024.pdf',
+        contentType: 'application/pdf',
+        size: 892310,
+        uploadedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 3),
+        uploaderId: staff.id,
+        tenantId: defaultTenant.id,
+      },
+      {
+        id: 'attach_3',
+        name: 'Financial_Statement_Q3_2024.xlsx',
+        contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        size: 567890,
+        uploadedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 5),
+        uploaderId: lead.id,
+        tenantId: defaultTenant.id,
+      },
+    ];
+
+    const attachments = await Promise.all(
+      attachmentData.map((attachment) =>
+        prisma.attachment.upsert({
+          where: { id: attachment.id },
+          update: attachment,
+          create: attachment,
+        })
+      )
+    );
+
+    const documentVersions = [
+      {
+        id: 'doc_v_1',
+        attachmentId: attachments[0].id,
+        versionNumber: 1,
+        uploadedAt: attachments[0].uploadedAt,
+        uploaderId: attachments[0].uploaderId,
+        tenantId: defaultTenant.id,
+      },
+      {
+        id: 'doc_v_2',
+        attachmentId: attachments[1].id,
+        versionNumber: 1,
+        uploadedAt: attachments[1].uploadedAt,
+        uploaderId: attachments[1].uploaderId,
+        tenantId: defaultTenant.id,
+      },
+      {
+        id: 'doc_v_3',
+        attachmentId: attachments[1].id,
+        versionNumber: 2,
+        uploadedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 1),
+        uploaderId: admin.id,
+        tenantId: defaultTenant.id,
+      },
+      {
+        id: 'doc_v_4',
+        attachmentId: attachments[2].id,
+        versionNumber: 1,
+        uploadedAt: attachments[2].uploadedAt,
+        uploaderId: attachments[2].uploaderId,
+        tenantId: defaultTenant.id,
+      },
+    ];
+
+    for (const doc of documentVersions) {
+      await prisma.documentVersion.upsert({
+        where: { id: doc.id },
+        update: { attachmentId: doc.attachmentId, versionNumber: doc.versionNumber, uploadedAt: doc.uploadedAt, uploaderId: doc.uploaderId },
+        create: doc,
+      });
+    }
+
+  console.log('✅ Document versions created')
+
+  // Approvals
+  const approvals = [
+    {
+      id: 'appr_1',
+      tenantId: defaultTenant.id,
+      requesterId: client1.id,
+      approverId: admin.id,
+      documentVersionId: 'doc_v_1',
+      type: 'DOCUMENT_REVIEW' as const,
+      status: 'APPROVED' as const,
+      reason: 'Verified and approved for use',
+      decidedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2),
+    },
+    {
+      id: 'appr_2',
+      tenantId: defaultTenant.id,
+      requesterId: staff.id,
+      approverId: lead.id,
+      documentVersionId: 'doc_v_2',
+      type: 'DOCUMENT_REVIEW' as const,
+      status: 'PENDING' as const,
+      reason: 'Awaiting manager approval for final tax return',
+    },
+    {
+      id: 'appr_3',
+      tenantId: defaultTenant.id,
+      requesterId: client2.id,
+      approverId: admin.id,
+      type: 'EXPENSE_REPORT' as const,
+      status: 'APPROVED' as const,
+      reason: 'All expenses verified',
+      decidedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 1),
+    },
+    {
+      id: 'appr_4',
+      tenantId: defaultTenant.id,
+      requesterId: staff.id,
+      approverId: lead.id,
+      type: 'TIME_OFF' as const,
+      status: 'PENDING' as const,
+      reason: 'Vacation request for next month',
+    },
+  ]
+
+  for (const appr of approvals) {
+    await prisma.approval.upsert({
+      where: { id: appr.id },
+      update: { ...appr, id: undefined },
+      create: appr,
+    })
+  }
+
+  console.log('✅ Approvals created')
+
+  // Approval History
+  const approvalHistories = [
+    {
+      id: 'appr_hist_1',
+      tenantId: defaultTenant.id,
+      approvalId: 'appr_1',
+      performedBy: admin.id,
+      action: 'APPROVED' as const,
+      comment: 'Document looks good and complies with all standards',
+      metadata: { reviewTime: 45, pages: 15 },
+    },
+    {
+      id: 'appr_hist_2',
+      tenantId: defaultTenant.id,
+      approvalId: 'appr_3',
+      performedBy: admin.id,
+      action: 'APPROVED' as const,
+      comment: 'All receipts verified and amounts match supporting documentation',
+      metadata: { expenseCount: 12, totalAmount: 2450 },
+    },
+    {
+      id: 'appr_hist_3',
+      tenantId: defaultTenant.id,
+      approvalId: 'appr_1',
+      performedBy: client1.id,
+      action: 'SUBMITTED' as const,
+      comment: 'Initial submission for review',
+    },
+  ]
+
+  for (const hist of approvalHistories) {
+    await prisma.approvalHistory.upsert({
+      where: { id: hist.id },
+      update: { ...hist, id: undefined },
+      create: hist,
+    })
+  }
+
+    console.log('✅ Approval history created')
+  } catch (e) {
+    console.warn('Skipping documents & approvals seed:', (e as any)?.message || 'Tables not found')
+  }
 
   // Create contact submissions
   const contactSubmissions = [
@@ -927,6 +1596,325 @@ Effective cash flow management requires ongoing attention and planning. Regular 
   }
 
   console.log('✅ Currencies & exchange rates created')
+
+  // Financial & Domain Data (optional - may not be present in all schemas)
+  try {
+    const bankingConnections = [
+    {
+      id: 'bc_1',
+      tenantId: defaultTenant.id,
+      bankName: 'Chase Bank',
+      accountNumber: '****1234',
+      routingNumber: '021000021',
+      accountType: 'CHECKING' as const,
+      status: 'ACTIVE' as const,
+      isDefault: true,
+      syncEnabled: true,
+      lastSyncedAt: new Date(),
+    },
+    {
+      id: 'bc_2',
+      tenantId: defaultTenant.id,
+      bankName: 'Wells Fargo',
+      accountNumber: '****5678',
+      routingNumber: '121000248',
+      accountType: 'SAVINGS' as const,
+      status: 'ACTIVE' as const,
+      isDefault: false,
+      syncEnabled: true,
+      lastSyncedAt: new Date(),
+    },
+  ]
+
+  for (const conn of bankingConnections) {
+    await prisma.bankingConnection.upsert({
+      where: { id: conn.id },
+      update: { ...conn, id: undefined },
+      create: conn,
+    })
+  }
+
+  console.log('✅ Banking connections created')
+
+  // Banking Transactions
+  const bankingTransactions = [
+    {
+      id: 'bt_1',
+      tenantId: defaultTenant.id,
+      bankingConnectionId: 'bc_1',
+      transactionDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 10),
+      amount: 5000.00,
+      type: 'DEPOSIT' as const,
+      description: 'Client payment for bookkeeping services',
+      referenceNumber: 'CK-001234',
+      status: 'CLEARED' as const,
+      category: 'INCOME' as const,
+    },
+    {
+      id: 'bt_2',
+      tenantId: defaultTenant.id,
+      bankingConnectionId: 'bc_1',
+      transactionDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 8),
+      amount: 850.00,
+      type: 'WITHDRAWAL' as const,
+      description: 'Office supplies purchase',
+      referenceNumber: 'CHK-005678',
+      status: 'CLEARED' as const,
+      category: 'EXPENSE' as const,
+    },
+    {
+      id: 'bt_3',
+      tenantId: defaultTenant.id,
+      bankingConnectionId: 'bc_1',
+      transactionDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 5),
+      amount: 3200.00,
+      type: 'DEPOSIT' as const,
+      description: 'Client payment for tax preparation',
+      referenceNumber: 'ACH-009012',
+      status: 'CLEARED' as const,
+      category: 'INCOME' as const,
+    },
+    {
+      id: 'bt_4',
+      tenantId: defaultTenant.id,
+      bankingConnectionId: 'bc_2',
+      transactionDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 3),
+      amount: 500.00,
+      type: 'DEPOSIT' as const,
+      description: 'Interest earned',
+      referenceNumber: 'INT-001',
+      status: 'CLEARED' as const,
+      category: 'INCOME' as const,
+    },
+  ]
+
+  for (const trans of bankingTransactions) {
+    await prisma.bankingTransaction.upsert({
+      where: { id: trans.id },
+      update: { ...trans, id: undefined },
+      create: trans,
+    })
+  }
+
+  console.log('✅ Banking transactions created')
+
+  // Tax Filings
+  const taxFilings = [
+    {
+      id: 'tf_1',
+      tenantId: defaultTenant.id,
+      entityId: null,
+      filingType: '1040' as const,
+      taxYear: 2024,
+      status: 'DRAFT' as const,
+      dueDate: new Date('2025-04-15'),
+      submittedDate: null,
+      estimatedRefund: 2500.00,
+    },
+    {
+      id: 'tf_2',
+      tenantId: defaultTenant.id,
+      entityId: null,
+      filingType: 'QUARTERLY_ES' as const,
+      taxYear: 2024,
+      status: 'FILED' as const,
+      dueDate: new Date('2024-09-16'),
+      submittedDate: new Date('2024-09-10'),
+      estimatedTax: 5000.00,
+    },
+    {
+      id: 'tf_3',
+      tenantId: defaultTenant.id,
+      entityId: null,
+      filingType: 'STATE_RETURN' as const,
+      taxYear: 2024,
+      status: 'FILED' as const,
+      dueDate: new Date('2025-04-15'),
+      submittedDate: new Date('2025-01-20'),
+    },
+  ]
+
+  for (const filing of taxFilings) {
+    await prisma.taxFiling.upsert({
+      where: { id: filing.id },
+      update: { ...filing, id: undefined },
+      create: filing,
+    })
+  }
+
+  console.log('✅ Tax filings created')
+
+  // Bills
+  const bills = [
+    {
+      id: 'bill_1',
+      tenantId: defaultTenant.id,
+      vendorName: 'Software Solutions Inc',
+      vendorId: null,
+      billNumber: 'BILL-001',
+      description: 'Annual software license subscription',
+      amountCents: 120000,
+      dueDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 15),
+      billDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 5),
+      status: 'PENDING' as const,
+      currency: 'USD',
+    },
+    {
+      id: 'bill_2',
+      tenantId: defaultTenant.id,
+      vendorName: 'Office Supplies Co',
+      vendorId: null,
+      billNumber: 'BILL-002',
+      description: 'Monthly office supply order',
+      amountCents: 45000,
+      dueDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10),
+      billDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2),
+      status: 'APPROVED' as const,
+      currency: 'USD',
+    },
+    {
+      id: 'bill_3',
+      tenantId: defaultTenant.id,
+      vendorName: 'Professional Services LLC',
+      vendorId: null,
+      billNumber: 'BILL-003',
+      description: 'Consulting services for system implementation',
+      amountCents: 350000,
+      dueDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 5),
+      billDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 25),
+      status: 'PAID' as const,
+      currency: 'USD',
+      paidDate: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 3),
+    },
+  ]
+
+  for (const bill of bills) {
+    await prisma.bill.upsert({
+      where: { id: bill.id },
+      update: { ...bill, id: undefined },
+      create: bill,
+    })
+  }
+
+  console.log('✅ Bills created')
+
+  // Party (Master Data for vendors, customers, employees)
+  const parties = [
+    {
+      id: 'party_1',
+      tenantId: defaultTenant.id,
+      name: 'Tech Solutions Ltd',
+      type: 'VENDOR' as const,
+      email: 'contact@techsolutions.com',
+      phone: '+1-555-0200',
+      category: 'Software Provider',
+      status: 'ACTIVE' as const,
+      taxId: '12-3456789',
+    },
+    {
+      id: 'party_2',
+      tenantId: defaultTenant.id,
+      name: 'Wilson Consulting Group',
+      type: 'CUSTOMER' as const,
+      email: 'info@wilsongroup.com',
+      phone: '+1-555-0300',
+      category: 'Corporate Client',
+      status: 'ACTIVE' as const,
+      taxId: '98-7654321',
+    },
+    {
+      id: 'party_3',
+      tenantId: defaultTenant.id,
+      name: 'Office Supplies Depot',
+      type: 'VENDOR' as const,
+      email: 'sales@osdepot.com',
+      phone: '+1-555-0400',
+      category: 'Supplies',
+      status: 'ACTIVE' as const,
+    },
+    {
+      id: 'party_4',
+      tenantId: defaultTenant.id,
+      name: 'Digital Marketing Pro',
+      type: 'CUSTOMER' as const,
+      email: 'hello@digitalmarketingpro.com',
+      phone: '+1-555-0500',
+      category: 'Service Client',
+      status: 'ACTIVE' as const,
+      taxId: '55-1234567',
+    },
+  ]
+
+  for (const party of parties) {
+    await prisma.party.upsert({
+      where: { id: party.id },
+      update: { ...party, id: undefined },
+      create: party,
+    })
+  }
+
+  console.log('✅ Parties (vendors/customers) created')
+
+  // Products
+  const products = [
+    {
+      id: 'prod_1',
+      tenantId: defaultTenant.id,
+      name: 'Bookkeeping Service - Monthly',
+      sku: 'BOOK-MONTHLY-001',
+      description: 'Monthly bookkeeping service package including transaction recording and reconciliation',
+      category: 'Services',
+      unitPrice: 29900,
+      taxable: true,
+      status: 'ACTIVE' as const,
+    },
+    {
+      id: 'prod_2',
+      tenantId: defaultTenant.id,
+      name: 'Tax Preparation Service',
+      sku: 'TAX-PREP-001',
+      description: 'Comprehensive tax preparation and filing service',
+      category: 'Services',
+      unitPrice: 45000,
+      taxable: true,
+      status: 'ACTIVE' as const,
+    },
+    {
+      id: 'prod_3',
+      tenantId: defaultTenant.id,
+      name: 'Payroll Processing - Per Employee',
+      sku: 'PAYROLL-EMP-001',
+      description: 'Monthly payroll processing per employee',
+      category: 'Services',
+      unitPrice: 5000,
+      taxable: true,
+      status: 'ACTIVE' as const,
+    },
+    {
+      id: 'prod_4',
+      tenantId: defaultTenant.id,
+      name: 'Financial Consultation Hour',
+      sku: 'CONSULT-HOUR-001',
+      description: 'One hour of professional financial consultation',
+      category: 'Services',
+      unitPrice: 15000,
+      taxable: true,
+      status: 'ACTIVE' as const,
+    },
+  ]
+
+  for (const product of products) {
+    await prisma.product.upsert({
+      where: { id: product.id },
+      update: { ...product, id: undefined },
+      create: product,
+    })
+  }
+
+    console.log('✅ Products created')
+  } catch (e) {
+    console.warn('Skipping financial & domain data seed:', (e as any)?.message || 'Tables not found')
+  }
 
   // Seed sample tasks with compliance requirements
   let __canSeedTasks = false
@@ -1355,6 +2343,229 @@ Effective cash flow management requires ongoing attention and planning. Regular 
 
   console.log('✅ Organization settings created')
 
+  // Advanced Features: Workflows
+  const workflowTemplates = [
+    {
+      id: 'wf_tmpl_1',
+      tenantId: defaultTenant.id,
+      name: 'Client Onboarding Workflow',
+      description: 'Standard workflow for new client onboarding',
+      createdBy: admin.id,
+      category: 'ONBOARDING' as const,
+      isActive: true,
+      steps: [
+        { stepNumber: 1, name: 'Collect KYC Documents', duration: 1 },
+        { stepNumber: 2, name: 'Set Up Client Profile', duration: 1 },
+        { stepNumber: 3, name: 'Configure Billing', duration: 1 },
+        { stepNumber: 4, name: 'Schedule Kickoff Call', duration: 0.5 },
+      ] as any,
+    },
+    {
+      id: 'wf_tmpl_2',
+      tenantId: defaultTenant.id,
+      name: 'Tax Return Preparation Workflow',
+      description: 'Workflow for preparing tax returns',
+      createdBy: admin.id,
+      category: 'TAX_COMPLIANCE' as const,
+      isActive: true,
+      steps: [
+        { stepNumber: 1, name: 'Request Documents from Client', duration: 2 },
+        { stepNumber: 2, name: 'Review and Organize Documents', duration: 2 },
+        { stepNumber: 3, name: 'Prepare Draft Return', duration: 4 },
+        { stepNumber: 4, name: 'Client Review and Approval', duration: 2 },
+        { stepNumber: 5, name: 'File Return', duration: 1 },
+      ] as any,
+    },
+  ]
+
+  for (const tmpl of workflowTemplates) {
+    await prisma.workflowTemplate.upsert({
+      where: { id: tmpl.id },
+      update: { ...tmpl, id: undefined },
+      create: tmpl,
+    })
+  }
+
+  console.log('✅ Workflow templates created')
+
+  // User Workflows
+  const userWorkflows = [
+    {
+      id: 'uw_1',
+      tenantId: defaultTenant.id,
+      workflowTemplateId: 'wf_tmpl_1',
+      userId: client1.id,
+      triggeredBy: admin.id,
+      status: 'IN_PROGRESS' as const,
+      startedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2),
+      completedAt: null,
+      metadata: { clientName: client1.name } as any,
+    },
+    {
+      id: 'uw_2',
+      tenantId: defaultTenant.id,
+      workflowTemplateId: 'wf_tmpl_2',
+      userId: client2.id,
+      triggeredBy: admin.id,
+      status: 'PENDING' as const,
+      startedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 1),
+      completedAt: null,
+      metadata: { clientName: client2.name, taxYear: 2024 } as any,
+    },
+  ]
+
+  for (const uw of userWorkflows) {
+    await prisma.userWorkflow.upsert({
+      where: { id: uw.id },
+      update: { ...uw, id: undefined },
+      create: uw,
+    })
+  }
+
+  console.log('✅ User workflows created')
+
+  // Reports
+  const reports = [
+    {
+      id: 'report_1',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Monthly Revenue Report',
+      description: 'Summary of monthly revenue by service',
+      type: 'REVENUE' as const,
+      frequency: 'MONTHLY' as const,
+      status: 'ACTIVE' as const,
+      config: { metrics: ['total_revenue', 'revenue_by_service', 'top_clients'] } as any,
+    },
+    {
+      id: 'report_2',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Team Performance Report',
+      description: 'Team member performance metrics and utilization',
+      type: 'PERFORMANCE' as const,
+      frequency: 'WEEKLY' as const,
+      status: 'ACTIVE' as const,
+      config: { metrics: ['utilization_rate', 'completion_rate', 'client_satisfaction'] } as any,
+    },
+    {
+      id: 'report_3',
+      tenantId: defaultTenant.id,
+      createdBy: lead.id,
+      name: 'Tax Compliance Status',
+      description: 'Status of all tax filings and compliance deadlines',
+      type: 'COMPLIANCE' as const,
+      frequency: 'MONTHLY' as const,
+      status: 'ACTIVE' as const,
+      config: { metrics: ['filing_status', 'upcoming_deadlines', 'overdue_items'] } as any,
+    },
+    {
+      id: 'report_4',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Client Engagement Report',
+      description: 'Client activity and engagement metrics',
+      type: 'CLIENT' as const,
+      frequency: 'MONTHLY' as const,
+      status: 'ACTIVE' as const,
+      config: { metrics: ['active_clients', 'service_usage', 'support_tickets'] } as any,
+    },
+  ]
+
+  for (const report of reports) {
+    await prisma.report.upsert({
+      where: { id: report.id },
+      update: { ...report, id: undefined },
+      create: report,
+    })
+  }
+
+  console.log('✅ Reports created')
+
+  // Entities (business entities like LLC, Corp, etc.)
+  const entities = [
+    {
+      id: 'entity_1',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Primary Accounting Firm LLC',
+      type: 'LLC' as const,
+      status: 'ACTIVE' as const,
+      registrationNumber: 'LLC-2020-001234',
+      industry: 'Accounting & Finance',
+      foundedDate: new Date('2020-03-15'),
+      registrationDate: new Date('2020-03-20'),
+      jurisdiction: 'Delaware',
+      businessAddress: '123 Business Ave, Suite 100, New York, NY 10001',
+      websiteUrl: 'https://www.accountingfirm.com',
+      metadata: { employees: 15, revenue: 2500000 } as any,
+    },
+    {
+      id: 'entity_2',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Client Service Division',
+      type: 'DIVISION' as const,
+      status: 'ACTIVE' as const,
+      registrationNumber: 'DIV-2021-005678',
+      industry: 'Professional Services',
+      parentEntityId: 'entity_1',
+      businessAddress: '123 Business Ave, Suite 200, New York, NY 10001',
+      metadata: { focus: 'client services', team_size: 8 } as any,
+    },
+    {
+      id: 'entity_3',
+      tenantId: defaultTenant.id,
+      createdBy: admin.id,
+      name: 'Tech Startup Client Inc',
+      type: 'C_CORP' as const,
+      status: 'ACTIVE' as const,
+      registrationNumber: 'CORP-2023-009012',
+      industry: 'Software Development',
+      foundedDate: new Date('2023-01-10'),
+      registrationDate: new Date('2023-01-15'),
+      jurisdiction: 'California',
+      businessAddress: '456 Tech Drive, San Francisco, CA 94103',
+      taxId: '12-3456789',
+      metadata: { stage: 'Series A', investors: ['VC Fund 1', 'VC Fund 2'] } as any,
+    },
+  ]
+
+  for (const entity of entities) {
+    await prisma.entity.upsert({
+      where: { id: entity.id },
+      update: { ...entity, id: undefined },
+      create: entity,
+    })
+  }
+
+  console.log('✅ Entities created')
+
+  // Create associations between users and entities
+  try {
+    await prisma.userOnEntity.upsert({
+      where: { unique_user_entity: { userId: admin.id, entityId: 'entity_1' } },
+      update: { role: 'OWNER' },
+      create: { userId: admin.id, entityId: 'entity_1', role: 'OWNER' },
+    })
+
+    await prisma.userOnEntity.upsert({
+      where: { unique_user_entity: { userId: client1.id, entityId: 'entity_3' } },
+      update: { role: 'OWNER' },
+      create: { userId: client1.id, entityId: 'entity_3', role: 'OWNER' },
+    })
+
+    await prisma.userOnEntity.upsert({
+      where: { unique_user_entity: { userId: staff.id, entityId: 'entity_1' } },
+      update: { role: 'MEMBER' },
+      create: { userId: staff.id, entityId: 'entity_1', role: 'MEMBER' },
+    })
+
+    console.log('✅ User-entity associations created')
+  } catch (e) {
+    console.warn('Skipping user-entity associations due to error:', (e as any)?.message)
+  }
+
   // Seed communication settings
   await prisma.communicationSettings.upsert({
     where: { tenantId: defaultTenant.id },
@@ -1429,60 +2640,6 @@ Effective cash flow management requires ongoing attention and planning. Regular 
     })
   }
   console.log('✅ User profiles and preferences created')
-
-  // Seed Knowledge Base
-  const kbCategories = [
-    { name: 'Tax Guides', slug: 'tax-guides', description: 'Guides for tax preparation and filing' },
-    { name: 'Portal Help', slug: 'portal-help', description: 'How to use the client portal' },
-  ]
-
-  for (const cat of kbCategories) {
-    const category = await prisma.knowledgeBaseCategory.upsert({
-      where: {
-        tenantId_slug: {
-          tenantId: defaultTenant.id,
-          slug: cat.slug,
-        },
-      },
-      update: {
-        name: cat.name,
-        description: cat.description,
-      },
-      create: {
-        tenantId: defaultTenant.id,
-        name: cat.name,
-        slug: cat.slug,
-        description: cat.description,
-      },
-    })
-
-    await prisma.knowledgeBaseArticle.upsert({
-      where: {
-        tenantId_slug: {
-          tenantId: defaultTenant.id,
-          slug: `getting-started-${cat.slug}`,
-        },
-      },
-      update: {
-        title: `Getting Started with ${cat.name}`,
-        content: `This is a comprehensive guide about ${cat.name}.`,
-        authorId: admin.id,
-        published: true,
-        categoryId: category.id,
-      },
-      create: {
-        tenantId: defaultTenant.id,
-        categoryId: category.id,
-        title: `Getting Started with ${cat.name}`,
-        slug: `getting-started-${cat.slug}`,
-        content: `This is a comprehensive guide about ${cat.name}.`,
-        excerpt: `Learn the basics of ${cat.name}`,
-        authorId: admin.id,
-        published: true,
-      },
-    })
-  }
-  console.log('✅ Knowledge base created')
 
   // Seed Support Tickets
   const ticket = await prisma.supportTicket.create({

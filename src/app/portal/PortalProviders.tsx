@@ -1,8 +1,6 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 import PortalDashboardLayout from "@/components/portal/layout/PortalDashboardLayout";
@@ -11,15 +9,15 @@ import { ModalRegistry } from "@/components/portal/modals/ModalRegistry";
 import { PortalErrorBoundary } from "@/components/portal/PortalErrorBoundary";
 import { BreadcrumbProvider } from "@/components/portal/providers/BreadcrumbProvider";
 import { KeyboardProvider } from "@/components/providers/KeyboardProvider";
+import { PortalAuthGuard } from "@/components/portal/PortalAuthGuard";
 
 interface PortalProvidersProps {
     children: ReactNode;
-    session: Session | null;
 }
 
-export function PortalProviders({ children, session }: PortalProvidersProps) {
+export function PortalProviders({ children }: PortalProvidersProps) {
     return (
-        <SessionProvider session={session}>
+        <PortalAuthGuard>
             <ThemeProvider defaultTheme="light" enableSystem>
                 <QueryProvider>
                     <PortalErrorBoundary>
@@ -36,6 +34,6 @@ export function PortalProviders({ children, session }: PortalProvidersProps) {
                     </PortalErrorBoundary>
                 </QueryProvider>
             </ThemeProvider>
-        </SessionProvider>
+        </PortalAuthGuard>
     );
 }

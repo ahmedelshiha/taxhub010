@@ -6,9 +6,9 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Bell } from 'lucide-react'
-import useSWR from 'swr'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import {
     DropdownMenu,
@@ -23,8 +23,6 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { NotificationWithRelations } from '@/types/notifications'
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
-
 interface NotificationBellProps {
     onOpenCenter?: () => void
     className?: string
@@ -35,9 +33,10 @@ export default function NotificationBell({
     className,
 }: NotificationBellProps) {
     const [isOpen, setIsOpen] = useState(false)
+    const queryClient = useQueryClient()
 
-    // Fetch recent notifications (last 5 unread)
-    const { data, mutate } = useSWR<{
+    // Fetch recent notifications (last 5 unread) using React Query
+    const { data } = useQuery<{
         success: boolean
         data: NotificationWithRelations[]
         meta: {
@@ -47,9 +46,16 @@ export default function NotificationBell({
             offset: number
             hasMore: boolean
         }
-    }>('/api/notifications?unreadOnly=true&limit=5', fetcher, {
-        refreshInterval: 60000, // Refresh every 60 seconds
-        revalidateOnFocus: true,
+    }>({
+        queryKey: ['/api/notifications', { unreadOnly: true, limit: 5 }],
+        queryFn: async () => {
+            const res = await fetch('/api/notifications?unreadOnly=true&limit=5')
+            if (!res.ok) throw new Error('Failed to fetch notifications')
+            return res.json()
+        },
+        staleTime: 30000, // 30 seconds
+        gcTime: 5 * 60 * 1000, // 5 minutes
+        refetchInterval: 60000, // Refetch every 60 seconds
     })
 
     const rawNotifications = data?.data
@@ -71,8 +77,10 @@ export default function NotificationBell({
                 }),
             })
 
-            // Refresh notifications
-            mutate()
+            // Invalidate and refetch notifications
+            queryClient.invalidateQueries({
+                queryKey: ['/api/notifications']
+            })
 
             // Navigate to link if provided
             if (link) {

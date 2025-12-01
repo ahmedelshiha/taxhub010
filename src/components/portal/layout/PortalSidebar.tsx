@@ -38,7 +38,7 @@ import {
     usePortalExpandedGroups,
     usePortalLayoutActions
 } from '@/stores/portal/layout.store'
-import useSWR from 'swr'
+import { useQuery } from '@tanstack/react-query'
 
 interface NavigationItem {
     name: string
@@ -59,8 +59,6 @@ interface PortalSidebarProps {
     onClose?: () => void
 }
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
-
 export default function PortalSidebar({
     isMobile = false,
     isOpen = false,
@@ -75,11 +73,19 @@ export default function PortalSidebar({
     const expandedGroups = usePortalExpandedGroups()
     const { toggleGroup } = usePortalLayoutActions()
 
-    // Fetch notification counts for badges
-    const { data: counts } = useSWR('/api/portal/counts', fetcher, {
-        refreshInterval: 30000,
-        revalidateOnFocus: false,
+    // Fetch notification counts for badges using React Query
+    const { data: countsResponse } = useQuery({
+        queryKey: ['/api/portal/counts'],
+        queryFn: async () => {
+            const res = await fetch('/api/portal/counts')
+            if (!res.ok) throw new Error('Failed to fetch counts')
+            return res.json()
+        },
+        staleTime: 30000, // 30 seconds
+        gcTime: 5 * 60 * 1000, // 5 minutes
+        refetchInterval: 60000, // Refetch every 60 seconds (background)
     })
+    const counts = countsResponse?.data || countsResponse
 
     // Navigation structure
     const navigation: NavigationSection[] = useMemo(() => [

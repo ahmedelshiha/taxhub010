@@ -29,16 +29,17 @@ export function SetupProvider({ children, onComplete }: { children: ReactNode; o
         }
     }, [])
 
-    // Auto-save draft
+    // Auto-save draft (30 second debounce)
     useEffect(() => {
+        // Skip if no form data
+        if (Object.keys(formData).length === 0) return
+
         const timer = setTimeout(() => {
-            if (Object.keys(formData).length > 0) {
-                saveDraft()
-            }
+            saveDraft()
         }, 30000) // 30 seconds
 
         return () => clearTimeout(timer)
-    }, [formData, currentStep, completedSteps])
+    }, [formData, currentStep, completedSteps, saveDraft])
 
     const updateFormData = useCallback((data: Partial<SetupFormData>) => {
         setFormData(prev => ({ ...prev, ...data }))

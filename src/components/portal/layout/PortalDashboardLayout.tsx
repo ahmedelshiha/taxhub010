@@ -47,17 +47,13 @@ export default function PortalDashboardLayout({
         setIsClient(true)
     }, [])
 
-    // Auto-collapse sidebar on mobile/tablet with guard to avoid infinite loops
-    const prevResponsiveRef = useRef({ isMobile: responsive.isMobile, isTablet: responsive.isTablet })
+    // Auto-collapse sidebar on mobile/tablet
     useEffect(() => {
-        const prev = prevResponsiveRef.current
-        const shouldCollapse = (responsive.isMobile || responsive.isTablet) && !prev.isMobile && !prev.isTablet
-        if (shouldCollapse && !collapsed) {
+        // If on mobile/tablet and sidebar is expanded, collapse it
+        if ((responsive.isMobile || responsive.isTablet) && !collapsed) {
             setSidebarCollapsed(true)
         }
-        // Update ref for next render
-        prevResponsiveRef.current = { isMobile: responsive.isMobile, isTablet: responsive.isTablet }
-    }, [responsive.isMobile, responsive.isTablet, setSidebarCollapsed, collapsed])
+    }, [responsive.isMobile, responsive.isTablet, collapsed, setSidebarCollapsed])
 
     // Close mobile menu on route change
     useEffect(() => {

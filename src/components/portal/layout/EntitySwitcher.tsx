@@ -1,6 +1,5 @@
-
 import { useState, useEffect, useMemo } from 'react'
-import useSWR, { mutate } from 'swr'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, Building2, ChevronDown, Search, History, Plus } from 'lucide-react'
 import {
     DropdownMenu,
@@ -26,20 +25,27 @@ interface Entity {
     country: string
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
 const RECENT_ENTITIES_KEY = 'portal_recent_entities'
 
 export default function EntitySwitcher() {
     const selectedEntityId = usePortalSelectedEntity()
     const { setSelectedEntity } = usePortalLayoutActions()
+    const queryClient = useQueryClient()
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [recentIds, setRecentIds] = useState<string[]>([])
 
-    const { data, error, isLoading } = useSWR<{
+    const { data, error, isLoading } = useQuery<{
         success: boolean
         data: { entities: Entity[]; total: number }
-    }>('/api/portal/entities', fetcher)
+    }>({
+        queryKey: ['/api/portal/entities'],
+        queryFn: async () => {
+            const res = await fetch('/api/portal/entities')
+            if (!res.ok) throw new Error('Failed to fetch entities')
+            return res.json()
+        },
+    })
 
     const rawEntities = data?.data?.entities
     const entities = Array.isArray(rawEntities) ? rawEntities : []
@@ -72,15 +78,8 @@ export default function EntitySwitcher() {
             localStorage.setItem(RECENT_ENTITIES_KEY, JSON.stringify(newRecents))
         }
 
-        // Refresh all portal data for new entity
-        await Promise.all([
-            mutate('/api/portal/overview'),
-            mutate('/api/portal/tasks'),
-            mutate('/api/portal/compliance'),
-            mutate('/api/portal/financial'),
-            mutate('/api/portal/activity'),
-            mutate('/api/portal/counts'),
-        ])
+        // Invalidate all portal data to refetch for new entity
+        queryClient.invalidateQueries({ queryKey: ['/api/portal'] }, { cancelRefetch: false })
     }
 
     const filteredEntities = useMemo(() => {
