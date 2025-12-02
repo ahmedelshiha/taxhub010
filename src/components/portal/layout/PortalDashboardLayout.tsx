@@ -48,13 +48,25 @@ export default function PortalDashboardLayout({
         setIsClient(true)
     }, [])
 
+    // Track previous breakpoint to only trigger collapse when entering mobile/tablet
+    const prevIsSmallScreenRef = useRef<boolean | null>(null);
+
     // Auto-collapse sidebar on mobile/tablet
     useEffect(() => {
-        // If on mobile/tablet and sidebar is expanded, collapse it
-        if ((responsive.isMobile || responsive.isTablet) && !collapsed) {
-            setSidebarCollapsed(true)
+        // Wait for client-side hydration and responsive data
+        if (!isClient) return;
+
+        const isSmallScreen = responsive.isMobile || responsive.isTablet;
+
+        // Check if we just transitioned to small screen or it's the first check
+        const shouldCheck = prevIsSmallScreenRef.current === null || (!prevIsSmallScreenRef.current && isSmallScreen);
+
+        if (shouldCheck && isSmallScreen && !collapsed) {
+            setSidebarCollapsed(true);
         }
-    }, [responsive.isMobile, responsive.isTablet, collapsed, setSidebarCollapsed])
+
+        prevIsSmallScreenRef.current = isSmallScreen;
+    }, [responsive.isMobile, responsive.isTablet, collapsed, setSidebarCollapsed, isClient])
 
     // Close mobile menu on route change
     useEffect(() => {

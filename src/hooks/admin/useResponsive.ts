@@ -88,9 +88,16 @@ export const useResponsive = (
   const updateSize = useCallback(() => {
     if (typeof window === 'undefined') return
     
-    setWindowSize({
-      width: window.innerWidth,
-      height: window.innerHeight,
+    setWindowSize(prev => {
+      const width = window.innerWidth
+      const height = window.innerHeight
+
+      // Only update if dimensions actually changed to prevent unnecessary re-renders
+      if (prev.width === width && prev.height === height) {
+        return prev
+      }
+
+      return { width, height }
     })
   }, [])
 

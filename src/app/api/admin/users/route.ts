@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAdminAuth } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
 import { respond } from '@/lib/api-response'
-import { usersService } from '@/services/admin/users.service'
+import { usersService, type UserCreateInput } from '@/services/admin/users.service'
 import { ServiceError } from '@/services/shared/base.service'
 import { logAudit } from '@/lib/audit'
 import { z } from 'zod'
@@ -73,7 +73,7 @@ export const POST = withAdminAuth(
       const { tenantId, userId } = ctx
 
       const body = await request.json()
-      const input = UserCreateSchema.parse(body)
+      const input = UserCreateSchema.parse(body) as UserCreateInput
 
       // Delegate to service layer
       const newUser = await usersService.createUser(tenantId as string, input)

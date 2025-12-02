@@ -8,7 +8,7 @@ import { withTenantContext } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
 import { respond } from '@/lib/api-response'
 import { TaskFilterSchema, TaskCreateSchema } from '@/schemas/shared/entities/task'
-import { tasksService } from '@/services/portal/tasks.service'
+import { tasksService, type TaskCreateInput } from '@/services/portal/tasks.service'
 import { ServiceError, ValidationError, ForbiddenError } from '@/services/shared/base.service'
 import { logAudit } from '@/lib/audit'
 import { z } from 'zod'
@@ -89,7 +89,7 @@ export const POST = withTenantContext(
       }
 
       const body = await request.json()
-      const input = TaskCreateSchema.parse(body)
+      const input = TaskCreateSchema.parse(body) as TaskCreateInput
 
       // Delegate to service layer
       const task = await tasksService.createTask(tenantId as string, userId as string, input)
