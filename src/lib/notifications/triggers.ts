@@ -209,6 +209,13 @@ export async function notifyDocumentUploaded(params: {
         relatedUserId: params.uploaderId,
         priority: 'normal',
     })
+}
+
+/**
+ * Notify admins when entity is submitted for approval
+ */
+export async function notifyAdminsOfEntitySubmission(params: {
+    tenantId: string
     entityId: string
     businessName: string
     userName: string
