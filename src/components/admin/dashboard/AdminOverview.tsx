@@ -184,7 +184,23 @@ export default function AdminOverview({ initial }: { initial?: AdminOverviewInit
     params: { range: usersRange },
     events: ['service-request-updated', 'task-updated', 'availability-updated', 'booking-updated', 'booking-created', 'booking-deleted'],
     revalidateOnEvents: true,
-    initialData: initial?.usersStats,
+  })
+
+  // Fetch entity statistics
+  const {
+    data: entityStats,
+    error: entityStatsError,
+    authError: entityStatsAuthError,
+    isLoading: entityStatsLoading,
+  } = useUnifiedData<{
+    totalBusinesses: number;
+    pendingApprovals: number;
+    newThisWeek: number;
+    activeBusinesses: number;
+  }>({
+    key: 'admin/stats/entities',
+    events: ['entity-updated', 'entity-created'],
+    revalidateOnEvents: true,
   })
 
   const { data: recentBookingsResp } = useUnifiedData<{ bookings: any[]; total: number }>({
@@ -238,10 +254,10 @@ export default function AdminOverview({ initial }: { initial?: AdminOverviewInit
   const conversionRate = clamp(safeNumber(bookingsPayload.completionRate), 0, 100)
 
   const statusCounts = new Map<string, number>()
-  ;(tasksPayload.byStatus || []).forEach((item) => {
-    const key = String(item?.status ?? '').toUpperCase()
-    statusCounts.set(key, (statusCounts.get(key) || 0) + safeNumber(item?._count?._all))
-  })
+    ; (tasksPayload.byStatus || []).forEach((item) => {
+      const key = String(item?.status ?? '').toUpperCase()
+      statusCounts.set(key, (statusCounts.get(key) || 0) + safeNumber(item?._count?._all))
+    })
   const overdueTasks = ['OVERDUE', 'PAST_DUE', 'LATE'].reduce((acc, key) => acc + (statusCounts.get(key) || 0), 0)
   const dueTodayCount = safeNumber((tasksPayload.dailyTotals || []).slice(-1)[0])
   const totalTasks = safeNumber(tasksPayload.total)
@@ -305,11 +321,12 @@ export default function AdminOverview({ initial }: { initial?: AdminOverviewInit
     tasksAuthError,
     servicesAuthError,
     usersAuthError,
+    entityStatsAuthError,
   ].filter(Boolean)
 
   const firstAuthError = authErrors.length > 0 ? authErrors[0] : null
 
-  const combinedError = analyticsError || bookingStatsError || serviceRequestsError || tasksError || servicesError || usersError
+  const combinedError = analyticsError || bookingStatsError || serviceRequestsError || tasksError || servicesError || usersError || entityStatsError
   const errorMessage = combinedError ? 'Failed to load dashboard metrics' : null
 
   const primaryAction: ActionItem = {
@@ -370,7 +387,7 @@ export default function AdminOverview({ initial }: { initial?: AdminOverviewInit
     }
   }
 
-  const isLoading = analyticsLoading || bookingStatsLoading || serviceRequestsLoading || tasksLoading || servicesStatsLoading || usersLoading
+  const isLoading = analyticsLoading || bookingStatsLoading || serviceRequestsLoading || tasksLoading || servicesStatsLoading || usersLoading || entityStatsLoading
 
   // Show auth error fallback if any endpoint returns 401/403
   if (firstAuthError) {
@@ -477,6 +494,75 @@ export default function AdminOverview({ initial }: { initial?: AdminOverviewInit
                   <p className="text-sm font-medium text-muted-foreground">This Week</p>
                   <p className="text-2xl font-semibold text-foreground">
                     {weekBookingsResp?.total || 0}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Entity KPI Cards */}
+          <h3 className="text-lg font-semibold text-foreground mt-6">Business Metrics</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <a
+              href="/admin/approvals/businesses"
+              className="bg-card rounded-lg border border-border p-4 hover:border-blue-500 cursor-pointer transition-colors"
+            >
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-muted-foreground">Total Businesses</p>
+                  <p className="text-2xl font-semibold text-foreground">
+                    {entityStats?.totalBusinesses || 0}
+                  </p>
+                </div>
+              </div>
+            </a>
+            <a
+              href="/admin/approvals/businesses?status=PENDING"
+              className={`bg-card rounded-lg border p-4 hover:border-yellow-500 cursor-pointer transition-colors ${(entityStats?.pendingApprovals || 0) > 5 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/10' : 'border-border'
+                }`}
+            >
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className={`h-8 w-8 ${(entityStats?.pendingApprovals || 0) > 5 ? 'text-yellow-600' : 'text-orange-600'
+                  }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-muted-foreground">Pending Approvals</p>
+                  <p className={`text-2xl font-semibold ${(entityStats?.pendingApprovals || 0) > 5 ? 'text-yellow-700 dark:text-yellow-400' : 'text-foreground'
+                    }`}>
+                    {entityStats?.pendingApprovals || 0}
+                  </p>
+                  {(entityStats?.pendingApprovals || 0) > 5 && (
+                    <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">Requires attention</p>
+                  )}
+                </div>
+              </div>
+            </a>
+            <div className="bg-card rounded-lg border border-border p-4">
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-muted-foreground">New This Week</p>
+                  <p className="text-2xl font-semibold text-foreground">
+                    {entityStats?.newThisWeek || 0}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-card rounded-lg border border-border p-4">
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-muted-foreground">Active</p>
+                  <p className="text-2xl font-semibold text-foreground">
+                    {entityStats?.activeBusinesses || 0}
                   </p>
                 </div>
               </div>
