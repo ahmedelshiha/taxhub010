@@ -2461,7 +2461,7 @@ Effective cash flow management requires ongoing attention and planning. Regular 
   console.log('✅ Reports created')
 
   // Entities (business entities like LLC, Corp, etc.)
-  const entities = [
+  const businessEntities = [
     {
       id: 'entity_1',
       tenantId: defaultTenant.id,
@@ -2512,7 +2512,7 @@ Effective cash flow management requires ongoing attention and planning. Regular 
     },
   ]
 
-  for (const entity of entities) {
+  for (const entity of businessEntities) {
     await prisma.entity.upsert({
       where: { id: entity.id },
       update: { ...entity, id: undefined },

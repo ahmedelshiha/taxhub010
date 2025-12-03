@@ -209,32 +209,6 @@ export async function notifyDocumentUploaded(params: {
         relatedUserId: params.uploaderId,
         priority: 'normal',
     })
-}
-
-/**
- * Notify requester when approval is processed (approved/rejected)
- */
-export async function notifyApprovalProcessed(params: {
-    tenantId: string
-    approvalId: string
-    requesterId: string
-    approverId: string
-    approverName: string
-    action: 'approved' | 'rejected'
-    approvalType: string
-    comment?: string
-}) {
-    const isApproved = params.action === 'approved'
-
-    return createNotification({
-    })
-}
-
-/**
- * Notify admins when entity is submitted for approval
- */
-export async function notifyAdminsOfEntitySubmission(params: {
-    tenantId: string
     entityId: string
     businessName: string
     userName: string

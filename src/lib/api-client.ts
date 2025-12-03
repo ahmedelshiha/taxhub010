@@ -155,3 +155,21 @@ export const apiClient = {
     delete: <T>(url: string, config?: RequestConfig) =>
         apiFetch<T>(url, { ...config, method: 'DELETE' }),
 }
+
+/**
+ * Simple fetcher for SWR
+ * @param url - API endpoint to fetch
+ */
+export const fetcher = async (url: string) => {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        const error: any = new Error('An error occurred while fetching the data.');
+        error.info = await response.json();
+        error.status = response.status;
+        throw error;
+    }
+
+    return response.json();
+};
+

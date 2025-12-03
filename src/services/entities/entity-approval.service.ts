@@ -109,8 +109,8 @@ export class EntityApprovalService {
                 reviewedBy: reviewerId,
                 reviewedAt: new Date(),
                 metadata: {
-                    ...approval.metadata,
-                    ...metadata,
+                    ...(approval.metadata as Record<string, any> || {}),
+                    ...(metadata || {}),
                     reviewerNote: metadata?.note || null,
                 },
             },
@@ -186,8 +186,8 @@ export class EntityApprovalService {
                 reviewedAt: new Date(),
                 rejectionReason: reason,
                 metadata: {
-                    ...approval.metadata,
-                    ...metadata,
+                    ...(approval.metadata as Record<string, any> || {}),
+                    ...(metadata || {}),
                 },
             },
             include: {
@@ -257,8 +257,8 @@ export class EntityApprovalService {
                 reviewedAt: new Date(),
                 rejectionReason: reason,
                 metadata: {
-                    ...approval.metadata,
-                    ...metadata,
+                    ...(approval.metadata as Record<string, any> || {}),
+                    ...(metadata || {}),
                 },
             },
             include: {
