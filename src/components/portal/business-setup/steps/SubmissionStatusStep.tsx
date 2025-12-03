@@ -15,7 +15,8 @@ export default function SubmissionStatusStep() {
         // In real app, this state would come from the mutation result
         const timer = setTimeout(() => {
             setStatus('success')
-            setEntityId('ent_123456789')
+            // Mock ID for successful submission simulation
+            setEntityId(`ent_${Date.now()}`)
         }, 2000)
         return () => clearTimeout(timer)
     }, [])
