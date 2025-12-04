@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,12 +45,17 @@ export default function PortalDashboardPage() {
   const { openModal } = useModal();
   const [activeTab, setActiveTab] = useState("overview");
 
+  // Memoize the modal opener to prevent re-creating on every render
+  const handleOpenGlobalSearch = useCallback(() => {
+    openModal('global-search');
+  }, [openModal]);
+
   // Global search keyboard shortcut (Cmd+K / Ctrl+K)
   useKeyboardShortcut({
     id: 'dashboard-global-search',
     combo: 'Meta+k',
     description: 'Open global search',
-    action: () => openModal('global-search')
+    action: handleOpenGlobalSearch
   })
 
   // Helper function for time-based greeting

@@ -149,8 +149,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
         combo: 'ArrowDown',
         description: 'Navigate down',
         action: () => setSelectedIndex(prev => Math.min(prev + 1, results.length - 1)),
-        disabled: !open || results.length === 0,
-        deps: [results.length]
+        disabled: !open || results.length === 0
     })
 
     useKeyboardShortcut({
@@ -158,8 +157,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
         combo: 'ArrowUp',
         description: 'Navigate up',
         action: () => setSelectedIndex(prev => Math.max(prev - 1, 0)),
-        disabled: !open || results.length === 0,
-        deps: [results.length]
+        disabled: !open || results.length === 0
     })
 
     useKeyboardShortcut({
@@ -171,8 +169,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                 handleSelect(results[selectedIndex])
             }
         },
-        disabled: !open || results.length === 0,
-        deps: [results, selectedIndex]
+        disabled: !open || results.length === 0
     })
 
     const handleSelect = (result: SearchResult) => {

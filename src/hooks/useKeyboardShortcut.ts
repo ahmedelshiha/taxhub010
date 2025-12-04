@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useCallback, useRef } from "react"
 import { useKeyboard } from "@/components/providers/KeyboardProvider"
 
 interface UseShortcutOptions {
@@ -9,7 +9,6 @@ interface UseShortcutOptions {
     description: string
     action: () => void
     disabled?: boolean
-    deps?: any[]
 }
 
 export function useKeyboardShortcut({
@@ -18,9 +17,21 @@ export function useKeyboardShortcut({
     description,
     action,
     disabled = false,
-    deps = []
 }: UseShortcutOptions) {
     const { registerShortcut, unregisterShortcut } = useKeyboard()
+
+    // Use ref to store the latest action without causing re-renders
+    const actionRef = useRef(action)
+
+    // Keep ref in sync with latest action
+    useEffect(() => {
+        actionRef.current = action
+    }, [action])
+
+    // Stable action wrapper that always calls the latest action
+    const stableAction = useCallback(() => {
+        actionRef.current()
+    }, [])
 
     useEffect(() => {
         if (disabled) return
@@ -29,12 +40,12 @@ export function useKeyboardShortcut({
             id,
             combo,
             description,
-            action,
+            action: stableAction,
             disabled
         })
 
         return () => {
             unregisterShortcut(id)
         }
-    }, [id, combo, description, disabled, registerShortcut, unregisterShortcut, ...deps])
+    }, [id, combo, description, disabled, stableAction, registerShortcut, unregisterShortcut])
 }

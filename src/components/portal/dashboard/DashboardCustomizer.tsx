@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Settings2, Eye, EyeOff, GripVertical } from 'lucide-react'
 import {
     Dialog,
@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { usePortalWidgetPreferences, usePortalLayoutActions } from '@/stores/portal/layout.store'
+import { usePortalWidgetPreferences, usePortalLayoutStore } from '@/stores/portal/layout.store'
 
 export interface WidgetConfig {
     id: string
@@ -29,11 +29,14 @@ interface DashboardCustomizerProps {
 export function DashboardCustomizer({ widgets }: DashboardCustomizerProps) {
     const [open, setOpen] = useState(false)
     const preferences = usePortalWidgetPreferences()
-    const { updateWidgetPreference, resetWidgetPreferences } = usePortalLayoutActions()
 
-    const handleToggle = (widgetId: string, checked: boolean) => {
+    // Use stable selectors for actions
+    const updateWidgetPreference = usePortalLayoutStore((state) => state.updateWidgetPreference)
+    const resetWidgetPreferences = usePortalLayoutStore((state) => state.resetWidgetPreferences)
+
+    const handleToggle = useCallback((widgetId: string, checked: boolean) => {
         updateWidgetPreference(widgetId, { visible: checked })
-    }
+    }, [updateWidgetPreference])
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
