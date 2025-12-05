@@ -10,6 +10,7 @@ import { SetupErrorBoundary } from '../components/SetupErrorBoundary'
 import { SetupModalSkeleton } from '../components/LoadingStates'
 import { analytics } from '../services/analytics'
 import { useAutoSave, loadDraft, clearDraft, hasDraft, getDraftAge } from '../hooks/useAutoSave'
+import { SuccessScreen } from '@/components/portal/entities'
 import type { SetupFormData } from '../types/setup'
 
 export interface SetupModalProps {
@@ -42,6 +43,8 @@ export function SetupModal({ open, onOpenChange, onComplete }: SetupModalProps) 
     })
     const [showDraftPrompt, setShowDraftPrompt] = useState(false)
     const [draftAge, setDraftAge] = useState<string | null>(null)
+    const [showSuccess, setShowSuccess] = useState(false)
+    const [submittedBusinessName, setSubmittedBusinessName] = useState('')
 
     // Track when modal was opened for duration calculation
     const openTimeRef = useRef<number | null>(null)
@@ -107,6 +110,9 @@ export function SetupModal({ open, onOpenChange, onComplete }: SetupModalProps) 
             ? Math.round((Date.now() - openTimeRef.current) / 1000)
             : 0
 
+        // Store business name for success screen
+        setSubmittedBusinessName(data.businessName || 'Your Business')
+
         if (onComplete) {
             await onComplete(data)
         }
@@ -115,7 +121,19 @@ export function SetupModal({ open, onOpenChange, onComplete }: SetupModalProps) 
         clearDraft()
 
         analytics.setupCompleted(data.businessType || 'new', data.country || 'AE', duration)
+
+        // Show success screen instead of closing immediately
+        setShowSuccess(true)
+    }
+
+    const handleGoToDashboard = () => {
+        setShowSuccess(false)
         onOpenChange(false)
+    }
+
+    const handleAddAnother = () => {
+        setShowSuccess(false)
+        setFormData({ country: selectedCountry, businessType: activeTab })
     }
 
     const handleClose = () => {
@@ -125,6 +143,21 @@ export function SetupModal({ open, onOpenChange, onComplete }: SetupModalProps) 
             analytics.flowAbandoned(activeTab, duration)
         }
         onOpenChange(false)
+    }
+
+    // Success screen after submission
+    if (showSuccess) {
+        return (
+            <Dialog open={open} onOpenChange={() => handleGoToDashboard()}>
+                <DialogContent className="max-w-md bg-gray-900 border-gray-800 text-white p-0 overflow-hidden">
+                    <SuccessScreen
+                        businessName={submittedBusinessName}
+                        onGoToDashboard={handleGoToDashboard}
+                        onAddAnother={handleAddAnother}
+                    />
+                </DialogContent>
+            </Dialog>
+        )
     }
 
     // Draft resume prompt

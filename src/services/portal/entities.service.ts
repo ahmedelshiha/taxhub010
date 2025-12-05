@@ -12,17 +12,56 @@ export interface EntityListItem {
     name: string
     status: string
     country: string
+    legalForm?: string
+    createdAt?: string
+    approvalStatus?: string
 }
 
 export class EntitiesService extends BaseService {
     /**
-     * List active entities for a tenant
+     * List all entities for a tenant (including pending)
+     */
+    async listAllEntities(tenantId: string): Promise<EntityListItem[]> {
+        const entities = await prisma.entity.findMany({
+            where: {
+                tenantId,
+            },
+            select: {
+                id: true,
+                name: true,
+                status: true,
+                country: true,
+                legalForm: true,
+                createdAt: true,
+                approval: {
+                    select: {
+                        status: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
+
+        return entities.map(e => ({
+            id: e.id,
+            name: e.name,
+            status: e.approval?.status || e.status,
+            country: e.country,
+            legalForm: e.legalForm || undefined,
+            createdAt: e.createdAt?.toISOString(),
+            approvalStatus: e.approval?.status || undefined,
+        }))
+    }
+
+    /**
+     * List active entities only (legacy method)
      */
     async listActiveEntities(tenantId: string): Promise<EntityListItem[]> {
         const entities = await prisma.entity.findMany({
             where: {
                 tenantId,
-                // Only show active entities
                 OR: [
                     { status: 'ACTIVE' },
                     { status: 'VERIFIED' },
@@ -45,3 +84,4 @@ export class EntitiesService extends BaseService {
 
 // Export singleton instance
 export const entitiesService = new EntitiesService()
+

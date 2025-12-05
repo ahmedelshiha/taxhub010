@@ -20,8 +20,8 @@ export async function GET(request: NextRequest) {
 
         const tenantId = (session.user as any).tenantId
 
-        // Delegate to service layer
-        const entities = await entitiesService.listActiveEntities(tenantId)
+        // Get all entities including pending (for dashboard display)
+        const entities = await entitiesService.listAllEntities(tenantId)
 
         return NextResponse.json({
             success: true,
@@ -51,3 +51,4 @@ export async function GET(request: NextRequest) {
         )
     }
 }
+
