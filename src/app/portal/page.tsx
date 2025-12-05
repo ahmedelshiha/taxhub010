@@ -4,6 +4,7 @@ import { useState, lazy, Suspense, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import useSWR from "swr";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { PageLayout, ActionHeader } from "@/components/ui-oracle";
 import { useModal } from "@/components/providers/ModalProvider";
 import { useKeyboardShortcut } from "@/hooks/useKeyboardShortcut";
 import { SetupModal } from "@/components/portal/business-setup/modal";
+import { EntityList } from "@/components/portal/entities";
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() => import("@/components/portal/dashboard/tabs/OverviewTab"));
@@ -41,12 +43,23 @@ function TabLoadingSkeleton() {
   );
 }
 
+// Fetcher for SWR
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 export default function PortalDashboardPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { openModal } = useModal();
   const [activeTab, setActiveTab] = useState("overview");
   const [showSetupModal, setShowSetupModal] = useState(false);
+
+  // Fetch user's entities
+  const { data: entitiesResponse, isLoading: entitiesLoading, mutate: refreshEntities } = useSWR(
+    '/api/portal/entities',
+    fetcher,
+    { revalidateOnFocus: false }
+  );
+  const entities = entitiesResponse?.data?.entities || [];
 
   // Memoize the modal opener to prevent re-creating on every render
   const handleOpenGlobalSearch = useCallback(() => {
@@ -56,14 +69,9 @@ export default function PortalDashboardPage() {
   // Handle setup completion
   const handleSetupComplete = useCallback((data: any) => {
     toast.success('Business added successfully!');
-    // If we have an entityId from the API response, redirect to the entity page
-    if (data?.entityId) {
-      router.push(`/portal/businesses/${data.entityId}`);
-    } else {
-      // Refresh the current page to show the new entity
-      router.refresh();
-    }
-  }, [router]);
+    // Refresh entities list to show new entity
+    refreshEntities();
+  }, [refreshEntities]);
 
   // Global search keyboard shortcut (Cmd+K / Ctrl+K)
   useKeyboardShortcut({
@@ -120,6 +128,16 @@ export default function PortalDashboardPage() {
               Add Business
             </Button>
           }
+        />
+      </div>
+
+      {/* Entity List Section - Similar to LEDGERS */}
+      <div className="mb-8 animate-slide-in-left" style={{ animationDelay: '100ms' }}>
+        <EntityList
+          entities={entities}
+          isLoading={entitiesLoading}
+          onAddBusiness={() => setShowSetupModal(true)}
+          title="Your Businesses"
         />
       </div>
 
