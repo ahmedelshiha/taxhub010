@@ -44,9 +44,11 @@ export function getFeatureFlagStates(): Record<string, boolean | string> {
     }
 }
 
-export default {
+const featureFlagsUtils = {
     isNewBusinessSetupEnabled,
     isNewBusinessSetupEnabledForUser,
     getFeatureFlagStates,
     FEATURE_FLAGS,
 }
+
+export default featureFlagsUtils

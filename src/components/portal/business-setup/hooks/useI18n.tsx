@@ -170,9 +170,11 @@ export function getRTLFlexDirection(isRTL: boolean, reverse: boolean = false) {
     return isRTL ? 'row-reverse' : 'row'
 }
 
-export default {
+const i18nUtils = {
     I18nProvider,
     useI18n,
     useDirection,
     useIsRTL,
 }
+
+export default i18nUtils

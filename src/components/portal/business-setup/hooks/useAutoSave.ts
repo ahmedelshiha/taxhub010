@@ -221,7 +221,7 @@ export function useAutoSave(
     }
 }
 
-export default {
+const autoSaveUtils = {
     saveDraft,
     loadDraft,
     clearDraft,
@@ -229,3 +229,5 @@ export default {
     getDraftAge,
     useAutoSave,
 }
+
+export default autoSaveUtils

@@ -179,7 +179,7 @@ export function createAuditEntry(
     }
 }
 
-export default {
+const securityService = {
     checkRateLimit,
     validateCSRF,
     sanitizeString,
@@ -190,3 +190,5 @@ export default {
     createAuditEntry,
     RATE_LIMITS,
 }
+
+export default securityService
